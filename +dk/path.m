@@ -1,3 +1,3 @@
-function d = package_dir()
+function d = path()
     d = fileparts(mfilename('fullpath'));
 end
