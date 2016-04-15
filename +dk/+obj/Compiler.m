@@ -17,8 +17,8 @@ classdef Compiler < handle
         out_dir, out_name, opt_file;
         
         % use_64b_size : use uint64_t types for matrix indexing (cf -largeArrayDims)
-        % use_cpp11    : define compiler option -std=c++0x
-        use_64b_size, use_cpp11;
+        % use_cpp0x    : define compiler option -std=c++0x
+        use_64b_size, use_cpp0x;
         
         % if true,  compilation produces a Mex-file
         % if false, option -c is used, producing an ordinary object file
@@ -58,7 +58,7 @@ classdef Compiler < handle
             self.dry_run       = false;
             self.verbose       = false;
             self.use_64b_size  = true;
-            self.use_cpp11     = false;
+            self.use_cpp0x     = false;
             self.silent        = false;
             self.debug         = false;
             
@@ -91,7 +91,7 @@ classdef Compiler < handle
             end
             
             % C++11
-            if self.use_cpp11
+            if self.use_cpp0x
                 self.flag('-std=c++0x');
             end
             
@@ -121,7 +121,7 @@ classdef Compiler < handle
             
             % Flags
             if self.flags.len
-                self.command.append([ 'CXXFLAGS=''$CXXFLAGS ' strjoin(self.flags.list) '''' ]);
+                self.command.append([ 'CXXFLAGS="$CXXFLAGS ' strjoin(self.flags.list) '"' ]);
             end
             
             % Defines
