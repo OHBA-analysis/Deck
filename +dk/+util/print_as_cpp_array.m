@@ -1,4 +1,7 @@
 function print_as_cpp_array( values, fmt, width )
+%
+% Print all input values as a comma-separated list of elements formatted using input 'fmt'.
+% The width specifies the number of formated values per line.
 
     if nargin < 3, width = 10; end
 
