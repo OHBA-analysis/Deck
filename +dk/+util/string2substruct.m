@@ -12,7 +12,7 @@ function sub = string2substruct( str )
     n    = numel(elem);
     
     % each token can be of the form <name>.{<bracket>}(<parenthesis>)
-    elem = cellfun( @(x) regexp(x,'([\w_]+)(\{[\d,]+\})?(\([\d,]+\))?','tokens'), elem ); 
+    elem = cellfun( @(x) regexp(x,'([\w_]+)(\{[\d,:]+\})?(\([\d,:]+\))?','tokens'), elem ); 
     
     % concatenate the three matches for each token (results in 1x3*n cell)
     elem = [elem{:}];
@@ -49,7 +49,7 @@ function il = convert_index_list(il)
     
     for i = 1:ni
     if ~strcmp( il{i}, ':' )
-        il{i} = str2double(il{i});
+        il{i} = str2num(il{i});
     end
     end
 
