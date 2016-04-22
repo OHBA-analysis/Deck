@@ -8,9 +8,11 @@ function c = compare( v1, v2 )
 %
 % JH
 
+    FP_THRESHOLD = 1e-10;
+
     if isstruct(v1)
         
-        n = numel(s1);
+        n = numel(v1);
         f = fieldnames(v1);
         c = isstruct(v2) && (numel(v2) == n);
         i = 1;
@@ -37,10 +39,11 @@ function c = compare( v1, v2 )
         c = ischar(v2) && strcmp(v1,v2);
         
     elseif isnumeric(v1)
-        c = isnumeric(v2) && (numel(v1) == numel(v2)) && all( v1(:) == v2(:) );
-        
+        %c = isnumeric(v2) && (numel(v1) == numel(v2)) && all( v1(:) == v2(:) );
+        c = isnumeric(v2) && (numel(v1) == numel(v2)) && ( max(abs(v1(:)-v2(:))) < FP_THRESHOLD );
+    
     elseif islogical(v1)
-        c = islogical(v2) && (numel(v1) == numel(v2)) && all( v1 & v2 );
+        c = islogical(v2) && (numel(v1) == numel(v2)) && ~xor(v1,v2);
         
     else
         try
