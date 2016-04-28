@@ -7,7 +7,7 @@ function [M,r,c] = shuffle( M )
 %
 % JH
 
-    assert( ismatrix(A), 'Input should be a matrix.' );
+    assert( ismatrix(M), 'Input should be a matrix.' );
     [nr,nc] = size(M);
 
     % shuffle rows and columns
