@@ -14,7 +14,7 @@ function s = strip( s, chars )
     
     if ~isempty(chars)
         s = regexp( s, sprintf('^[%s]*(.*?)[%s]*$',chars,chars), 'tokens' );
-        s = s{1};
+        s = s{1}{1};
     end
 
 end

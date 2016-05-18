@@ -12,13 +12,14 @@ function sub = string2substruct( str )
     n    = numel(elem);
     
     % each token can be of the form <name>.{<bracket>}(<parenthesis>)
-    elem = cellfun( @(x) regexp(x,'([\w_]+)(\{[\d,:]+\})?(\([\d,:]+\))?','tokens'), elem ); 
+    elem = cellfun( @(x) regexp(x,'([\w_]+)(\{[\d,:end]+\})?(\([\d,:end]+\))?','tokens'), elem ); 
     
     % concatenate the three matches for each token (results in 1x3*n cell)
     elem = [elem{:}];
     
     % find which matches are non-empty
     mask = ~cellfun( @isempty, elem );
+    mask(1) = false; % first variable name
     
     % cell-array with matching "operators", ie repeating dot, bracket and parenthesis
     ops  = repmat( {'.','{}','()'}, 1, n );
@@ -48,8 +49,9 @@ function il = convert_index_list(il)
     ni = numel(il);
     
     for i = 1:ni
-    if ~strcmp( il{i}, ':' )
+    if ~ismember( il{i}, {':','end'} )
         il{i} = str2num(il{i});
+        assert( ~isempty(il{i}) );
     end
     end
 

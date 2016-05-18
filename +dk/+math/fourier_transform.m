@@ -38,9 +38,9 @@ function [frq,dfc] = fourier_transform( vals, fs, npts )
     
     % sampling information
     df = fs/npts;
-    nf = floor( npts/2 + 1 ); % number of non-negative frequencies
+    nf = floor( npts/2 + 1 ); % number of frequencies >= 0
 
-    % complex Discrete Fourier Coefficients (complex)
+    % Discrete Fourier Coefficients (complex)
     dfc = fft(vals,npts) / npts;
 
     % real input: return one-sided spectra
@@ -67,7 +67,7 @@ function [frq,dfc] = fourier_transform( vals, fs, npts )
 
     end
 
-    % make sure frq is a column vector and compute phases
+    % make sure frq is a column vector
     frq = frq(:);
 
 end
