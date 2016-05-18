@@ -16,8 +16,8 @@ function [h,color_scale] = image( img, varargin )
     cmap_name      = opt.get('cmap',          'bgr' );
     subpos         = opt.get('subplot',       {} );
     
-    cmap_unsigned  = dk.ui.cmap.(cmap_name)(128,false);
-    cmap_signed    = dk.ui.cmap.(cmap_name)(256,true);
+    cmap_unsigned  = eval(sprintf('dk.ui.cmap.%s(128,false)', cmap_name));
+    cmap_signed    = eval(sprintf('dk.ui.cmap.%s(256,true)',  cmap_name));
     
     % subplot if asked
     if ~isempty(subpos)
