@@ -47,7 +47,7 @@ function c = compare( v1, v2 )
         
     else
         try
-            c = (v1 == v2);
+            c = all(v1 == v2);
         catch
             warning( 'Dont know how to compare values of type "%s".', class(v1) );
             c = false;

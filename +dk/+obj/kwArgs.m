@@ -75,9 +75,7 @@ classdef kwArgs < handle
         
         function parse(self,varargin)
             
-            function x = temp(x), if iscell(x), x={x}; end; end
-            
-            % reset the list of accessed fields
+            self.parsed = struct();
             self.reset_accessed();
             
             % get inputs
@@ -92,10 +90,15 @@ classdef kwArgs < handle
                 if ~self.CaseSensitive
                     args(1:2:end) = cellfun( @lower, args(1:2:end), 'UniformOutput', false );
                 end
-                args(2:2:end) = cellfun( @temp, args(2:2:end), 'UniformOutput', false );
-                self.parsed = struct(args{:});
+                
+                % don't do struct(args{:}) to avoid issues with cells and doublons
+                n = numel(args);
+                for i = 1:2:n
+                    self.parsed.(args{i}) = args{i+1};
+                end
                 
             elseif isstruct(args)
+                assert( numel(args) == 1, 'Struct arrays are not accepted.' );
                 self.parse( dk.util.struct2cell(args) );
                 
             elseif isa(args,'dk.obj.kwArgs')
@@ -104,6 +107,14 @@ classdef kwArgs < handle
             else
                 error('Inputs should be either a cell of key-values or a structure.');
             end
+        end
+        
+        function merge(self,varargin)
+            
+            p = self.parsed;
+            self.parse(varargin{:});
+            self.parsed = dk.util.mergestruct( p, self.parsed );
+            
         end
         
         % check field existence

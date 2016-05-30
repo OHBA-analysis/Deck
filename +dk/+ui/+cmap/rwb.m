@@ -19,21 +19,20 @@ function c = rwb(n,twosided)
 	end
 
 	red = rgb2hsv([1 0 0]);
-	blue = rgb2hsv([0 0 1]);
-
-	cmap = zeros(n,3);
 	red = repmat(red,length(saturation),1);
 	red(:,2) = saturation;
 
-	if ~twosided
-		c = hsv2rgb(red);
-		return
-	end
+    if ~twosided
+        c = hsv2rgb(red);
+        return
+    end
 
+    blue = rgb2hsv([0 0 1]);
 	blue = repmat(blue,length(saturation),1);
 	blue(end:-1:1,2) = saturation;
 
 	c = [hsv2rgb(red); 1 1 1; hsv2rgb(blue)];
 	c = c(end:-1:1,:);
-
+    
+end
 
