@@ -50,5 +50,6 @@ function h = plot_distribution( dist, loc, wid, col )
     h.m = plot( loc+mw*[-1,1], dist.m*[1,1], '-', 'Color', col.med, 'LineWidth', 2 );
 
     %h.a = plot( loc, dist.a, '+', 'Color', col.avg, 'MarkerSize', 7 );
+    %h.a = plot( loc, dist.a, 'r+' );
     
 end
