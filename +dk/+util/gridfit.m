@@ -16,6 +16,8 @@ function [h,l] = gridfit( nelem, lhratio )
     % should not happen, but just to be sure
     if h*l < nelem
         l = l+1;
+    elseif (h-1)*l >= nelem
+        h = h-1;
     end
     
 end

@@ -89,11 +89,11 @@ function [h,color_scale] = image( img, varargin )
     % set color-scale
     if isempty(color_scale)
     [p1,p99] = dk.util.deal_vector(prctile( img(:), [1 99] ));
-    if p99 < -eps
+    if (p1 < -eps) && (p99 > eps)
+        color_scale = [-1 1];
+    elseif p1 < -eps
         color_scale   = [-1 0];
         cmap_unsigned = flipud(cmap_unsigned); % reverse colormap
-    elseif (p1 < -eps) && (p99 > eps)
-        color_scale = [-1 1];
     else
         color_scale = [0 1];
     end
