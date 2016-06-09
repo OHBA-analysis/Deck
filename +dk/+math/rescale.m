@@ -12,7 +12,7 @@ function Y = rescale( X, range, method )
     switch lower(method)
     
         case 'linear'
-            Y = m + (M-m)*(X-xmin)/(xmax-xmin);
+            Y = m + (M-m)*(X-xmin)/max( xmax-xmin, eps );
             
         otherwise
             error('Unknown method "%s".',method);
