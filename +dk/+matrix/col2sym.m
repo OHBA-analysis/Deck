@@ -15,7 +15,7 @@ function S = col2sym( C, strict )
     end
     assert( abs(n - floor(n)) < 1e-6, 'Bad number of rows in input.' );
     
-    S = zeros(n,n,s);
+    S = zeros(n,n,s,class(C));
     I = dk.matrix.symindex(n,strict);
     if strict, I = I + eye(n); end
     
