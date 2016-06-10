@@ -6,12 +6,15 @@ function z = sample( x, y, n )
 %
 % JH
 
-    y = cumsum(y);
-    a = y(1);
-    b = y(end);
+    x = [x(:); x(1)];
+    y = cumsum(y(:));
+    y = [0; y] / y(end);
     
-    q = linspace(a,b,numel(x));
-    z = interp1( y, x, q, 'pchip' );
-    z = interp1( q, z, a + (b-a)*rand(1,n), 'pchip' );
+    u = rand(n,1);
+    k = dk.math.upper_bound( y, u );
+    k = k(:);
+    
+    w = (u - y(k-1)) ./ max( y(k)-y(k-1), eps );
+    z = (1-w) .* x(k-1) + w .* x(k);
     
 end
