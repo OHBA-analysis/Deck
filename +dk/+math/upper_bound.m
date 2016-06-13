@@ -15,7 +15,7 @@ function rowid = upper_bound( vals, query )
 %
 % This method uses binary search for an efficient search within the columns of the value matrix.
 % The price to pay for this efficiency is that elements within each column have to be sorted.
-% This can be used eg for importance sampling.
+% This can be used eg for distribution sampling.
 %
 % 
 % Example:

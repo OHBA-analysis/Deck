@@ -14,7 +14,7 @@ function [dist,xtic] = distplot( data, wid )
     % compute and draw distributions
     dist = cell(1,nd);
     step = ceil(wid);
-    xtic = step * (0.5 : 1 : nd);
+    xtic = 0.5 + step * (0:nd-1);
     
     for i = 1:nd
         dist{i} = distribution( data(:,i) );
