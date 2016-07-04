@@ -4,7 +4,7 @@ classdef ImageBox < handle
 % The selector choices are the titles of the images. Selection can be set externally.
 %
 
-    properties
+    properties (SetAccess = private)
         handles;
         images;
     end
@@ -24,7 +24,7 @@ classdef ImageBox < handle
         
         function clear(self)
             self.handles = struct();
-            self.images  = {};
+            self.images  = [];
         end
                 
         function n = get.n_images(self)
@@ -41,24 +41,22 @@ classdef ImageBox < handle
             end
         end
         
-        function set_images(self,img)
+        function set_images(self,data)
         %
-        % Input images should be a cell of struct with fields:
-        %   data
-        %       Required field, contains the image matrix.
-        %   title
-        %       Required field, the title of the image as will appear in the popup menu.
-        %   caxis
-        %       Optional field, with the min and max color values.
-        %   colormap
-        %       Optional field, with a colormap name or nx3 colormap array.
+        % Input data should be a struct-array with fields:
+        %   img
+        %       Required image (matrix or cell array).
+        %   name
+        %       Required name of the image as will appear in the popup menu.
+        %   opt
+        %       Required structure of options for dk.ui.image
         
-            assert( iscell(img), 'Input should be a cell of structs.' );
-            self.images = img;
+            assert( isstruct(img), 'Input should be a struct-array.' );
+            self.images = data;
             
             if self.check_handle('popup')
                 
-                self.handles.popup.String = cellfun( @(x) x.title, self.images, 'UniformOutput', false );
+                self.handles.popup.String = arrayfun( @(x) x.name, self.images, 'UniformOutput', false );
                 self.select_image(1);
                 
             end
@@ -82,20 +80,11 @@ classdef ImageBox < handle
                 
                 % get corresponding image
                 hdl = self.handles.image;
-                img = self.images{num};
+                dat = self.images(num);
                 
                 % display this image
                 set( ancestor(hdl,'figure'), 'currentaxes', hdl );
-                
-                imagesc( img.data );
-                set(gca,'xtick',[],'ytick',[]); title( img.title );
-                
-                if isfield(img,'caxis')
-                    colorbar; caxis(img.caxis);
-                end
-                if isfield(img,'colormap')
-                    colormap( hdl, img.colormap );
-                end
+                dk.ui.image( dat.img, dat.opt );
                 
                 % update the selector
                 self.handles.popup.Value = num;
@@ -113,15 +102,15 @@ classdef ImageBox < handle
             
             % build the selector
             if self.n_images == 0
-                titles = {'--'};
+                tstr = {'---'};
             else
-                titles = cellfun( @(x) x.title, self.images, 'UniformOutput', false );
+                tstr = arrayfun( @(x) x.name, self.images, 'UniformOutput', false );
             end
             
             self.handles.popup = uicontrol( ...
                 'parent', self.handles.box, ...
                 'style', 'popup', ...
-                'string', titles, ...
+                'string', tstr, ...
                 'callback', @self.callback_select ...
             );
         

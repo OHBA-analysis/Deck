@@ -60,12 +60,12 @@ function [h,color_scale] = image( img, varargin )
         % resize image if needed
         img = check_size(img,maxsize);
         
-        % if image was reized, adapt x and y
+        % if image was resized, adapt x and y
         if size(img,1) ~= ny, y = interp1( linspace(0,1,ny), y, linspace(0,1,size(img,1)) ); end
         if size(img,2) ~= nx, x = interp1( linspace(0,1,nx), x, linspace(0,1,size(img,2)) ); end
         
         % draw image
-        imagesc(x,y,img); set(gca,'YDir','normal');
+        h = imagesc(x,y,img); set(gca,'YDir','normal');
         
         % round values for display
         %x = dk.math.round( x(get(gca,'xtick')), 1 );

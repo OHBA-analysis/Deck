@@ -1,11 +1,11 @@
 classdef SelectBox < handle
 %
-% A horizontal box with a selector (popup menu) at the left of a confirm button.
-% The relative widths can be changed via the field relative_widths. 
+% A horizontal box with a selector (popup menu) on the left, and a confirm button on the right.
+% The relative widths can be changed via the method set_widths. 
 % The separation between the popup menu and the button is 10pts wide.
 %
 
-    properties
+    properties (SetAccess = private)
         handles;
         choices;
     end
@@ -36,7 +36,7 @@ classdef SelectBox < handle
             
             val = NaN; name = '';
             
-            if self.check_handle('popup')
+            if self.check_ui()
                 val  = self.handles.popup.Value;
                 name = self.handles.popup.String{val};
             end
@@ -47,7 +47,7 @@ classdef SelectBox < handle
             assert( iscell(choices), 'Choices should be a cell.' );
             self.choices = choices;
             
-            if self.check_handle('popup')
+            if self.check_ui()
                 self.handles.popup.String = choices;
                 self.handles.popup.Value  = 1;
             end
@@ -60,16 +60,27 @@ classdef SelectBox < handle
             if nargin < 3, button = -1; end
             if nargin < 2, selector = -3; end
             
-            if self.check_handle('popup')
+            if self.check_ui()
                 self.handles.box.Widths = [selector sep button];
             end
             
         end
         
-        function build(self,parent,button_callback,varargin)
+        function set_height(self,h)
+            
+            if self.check_ui()
+                self.handles.popup.Position(4) = h;
+                self.handles.button.Position(4) = h;
+            end
+            
+        end
+        
+        function build(self,parent,callback,varargin)
         %
         % You can specify key-value options for the popup menu.
         %
+        
+            if nargin < 3 || isempty(callback), callback = @dk.pass; end
             
             % create a horizontal box
             self.handles.box = uix.HBox( 'parent', parent, 'spacing', 5, 'padding', 7 );
@@ -98,7 +109,7 @@ classdef SelectBox < handle
             self.handles.button = uicontrol( ...
                 'parent', self.handles.box, ...
                 'string', 'Select', ...
-                'callback', button_callback ...
+                'callback', callback ...
             );
         
             % set widths
@@ -112,6 +123,10 @@ classdef SelectBox < handle
         
         function ok = check_handle(self,name)
             ok = isfield( self.handles, name ) && ishandle( self.handles.(name) );
+        end
+        
+        function ok = check_ui(self)
+            ok = self.check_handle('popup') && self.check_handle('button');
         end
         
     end
