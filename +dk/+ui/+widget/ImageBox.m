@@ -1,8 +1,8 @@
 classdef ImageBox < handle
 %
 % A vertical box with a selector (popup menu) on top of an image axes.
-% The selector choices are the titles of the images. Selection can be set externally.
 %
+% JH
 
     properties (SetAccess = private)
         handles;
@@ -26,32 +26,37 @@ classdef ImageBox < handle
             self.handles = struct();
             self.images  = [];
         end
-                
+       
+        % Get number of images.
         function n = get.n_images(self)
             n = numel(self.images);
         end
         
-        function [val,name] = current_selection(self)
+        % Return the index and name of the currently selected image.
+        % If the UI is not open, the index is NaN and the name is empty.
+        function [idx,name] = current_selection(self)
             
-            val = NaN; name = '';
+            idx = NaN; name = '';
             
             if self.check_handle('popup')
-                val  = self.handles.popup.Value;
-                name = self.handles.popup.String{val};
+                idx  = self.handles.popup.Value;
+                name = self.handles.popup.String{idx};
             end
         end
         
-        function set_images(self,data)
+        % Set the images.
         %
         % Input data should be a struct-array with fields:
         %   img
-        %       Required image (matrix or cell array).
+        %       Image (matrix or cell array).
         %   name
-        %       Required name of the image as will appear in the popup menu.
+        %       Name of the image as will appear in the popup menu.
         %   opt
-        %       Required structure of options for dk.ui.image
+        %       Structure of options for dk.ui.image.
+        % 
+        function self = set_images(self,data)
         
-            assert( isstruct(img), 'Input should be a struct-array.' );
+            assert( isstruct(img) && all(isfield(img,{'img','name','opt'})), 'Bad input data.' );
             self.images = data;
             
             if self.check_handle('popup')
@@ -63,18 +68,19 @@ classdef ImageBox < handle
             
         end
         
-        function set_heights(self,selector,sep)
+        % Set the height of the selector (default 30px).
+        function self = set_heights(self,selector)
             
-            if nargin < 3, sep = 5; end
             if nargin < 2, selector = 30; end
             
             if self.check_handle('image')
-                self.handles.box.Heights = [selector,sep,-1];
+                self.handles.box.Heights = [selector,-1];
             end
             
         end
         
-        function select_image(self,num)
+        % Select image by index and update the popup selector and image axes.
+        function self = select_image(self,num)
             
             if self.check_handle('image')
                 
@@ -93,12 +99,12 @@ classdef ImageBox < handle
             
         end
         
-        function build(self,parent,varargin)
-        %
-        % You can specify key-value options for the popup (see uicontrol, popup).
+        % Build the image box in the input parent handle.
+        % Additional inputs as set as properties of the popup selector.
+        function self = build(self,parent,varargin)
             
             % create a vertical box
-            self.handles.box = uix.VBox( 'parent', parent, 'padding', 10 );
+            self.handles.box = uix.VBox( 'parent', parent, 'spacing', 10, 'padding', 5 );
             
             % build the selector
             if self.n_images == 0
@@ -111,11 +117,8 @@ classdef ImageBox < handle
                 'parent', self.handles.box, ...
                 'style', 'popup', ...
                 'string', tstr, ...
-                'callback', @self.callback_select ...
+                'callback', @self.cb_select ...
             );
-        
-            % empty separator
-            uix.Empty('parent',self.handles.box);
         
             % set popup options
             if nargin > 2
@@ -141,7 +144,7 @@ classdef ImageBox < handle
             ok = isfield( self.handles, name ) && ishandle( self.handles.(name) );
         end
         
-        function callback_select(self,hobj,edata)
+        function cb_select(self,hobj,edata)
             
             % retrieve selection from the box
             val = hobj.Value;

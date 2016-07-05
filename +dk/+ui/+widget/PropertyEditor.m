@@ -1,5 +1,27 @@
 classdef PropertyEditor < handle
-    
+%
+% Property editor with pre-formated fields in a uitable.
+%
+% Example usage:
+%
+% editor = dk.ui.widget.PropertyEditor() ...
+%     .set_field_numeric_vector ('a') ...
+%     .set_field_logical        ('b') ...
+%     .set_field_string         ('c') ...
+%     .set_field_numeric        ('d') ...
+% ;
+% 
+% param = struct( 'a', [1 2 3], 'b', 0, 'c', 'Hey', 'd', pi );
+% ufunc = @(p) disp(p);
+% 
+% editor.build( ...
+%     uipanel( 'parent', figure(), 'title', 'Settings' ), ...
+%     param, ufunc ...
+% );
+%
+%
+% JH
+
     properties
         format;
     end
@@ -30,7 +52,7 @@ classdef PropertyEditor < handle
         end
         
         % manually trigger user-specified callback function
-        function apply(self)
+        function self = apply(self)
             self.handles.callback( self.get_data() );
         end
         
@@ -41,7 +63,7 @@ classdef PropertyEditor < handle
         end
         
         % set/get uitable property
-        function set_prop(self,varargin)
+        function self = set_prop(self,varargin)
             set( self.handles.table, varargin{:} );
         end
         function x = get_prop(self,varargin)
@@ -49,7 +71,7 @@ classdef PropertyEditor < handle
         end
         
         % set/get data
-        function set_data(self,data)
+        function self = set_data(self,data)
             self.handles.table.Data = self.data_export(data);
         end
         function data = get_data(self)
@@ -61,7 +83,7 @@ classdef PropertyEditor < handle
     % define formatted fields
     methods
         
-        function rem_field(self,field)
+        function self = rem_field(self,field)
             self.format = rmfield( self.format, field );
         end
         
@@ -115,7 +137,7 @@ classdef PropertyEditor < handle
         end
         
         % build the property editor in the parent's handle
-        function build(self,parent,data,callback)
+        function self = build(self,parent,data,callback)
             
             self.handles.callback = callback;
             self.handles.parent   = parent;

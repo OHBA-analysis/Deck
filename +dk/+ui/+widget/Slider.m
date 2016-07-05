@@ -1,5 +1,9 @@
 classdef Slider < handle
-    
+%
+% Range slider with editable display (horizontal layout).
+%
+% JH
+
     properties
         callback;
     end
@@ -25,8 +29,9 @@ classdef Slider < handle
             self.callback = @dk.pass;
         end
         
+        % Return the current value of the slider object., or NaN if the UI is not open.
         function val = get_value(self)
-            
+        
             val = NaN;
             
             if self.check_handle('slider')
@@ -34,7 +39,10 @@ classdef Slider < handle
             end
         end
         
-        function set_value(self,val)
+        % Set the value of the slider and update the display.
+        % If the method is called with value, the value is automatically clamped in the slider's min/max range.
+        % If the method is called without value, the textbox is updated to display the current slider value.
+        function self = set_value(self,val)
             
             assert( self.check_ui(), 'UI not ready.' );
             
@@ -49,7 +57,9 @@ classdef Slider < handle
             
         end
         
-        function set_range(self,range,step)
+        % Set the range of the slider.
+        % Note: this resets the state of slider to the first value in the range.
+        function self = set_range(self,range,step)
             
             % set range
             assert( isnumeric(range) && numel(range)==2, 'Range should be a 1x2 vector.' );
@@ -78,19 +88,21 @@ classdef Slider < handle
             
         end
         
-        function set_widths(self,slider,text,sep)
+        % Set the widths of the slider and the text display.
+        % By default, the slider is 3 times larger than the text display.
+        function self = set_widths(self,slider,text)
             
-            if nargin < 4, sep = 10; end
             if nargin < 3, text = -1; end
             if nargin < 2, slider = -3; end
             
             if self.check_handle('box')
-                self.handles.box.Widths = [slider sep text];
+                self.handles.box.Widths = [slider,text];
             end
             
         end
         
-        function set_height(self,h)
+        % Set the height of the slider and text display.
+        function self = set_height(self,h)
             
             if self.check_ui()
                 self.handles.slider.Position(4) = h;
@@ -99,13 +111,12 @@ classdef Slider < handle
             
         end
         
-        function build(self,parent,callback,varargin)
-        %
-        % You can specify key-value options for the popup menu.
-        %
+        % Build the slider into parent handle.
+        % If a callback function is specified, it is called at each slider/textbox update with the latest value selected.
+        function self = build(self,parent,callback)
             
             % create a horizontal box
-            self.handles.box = uix.HBox( 'parent', parent, 'spacing', 5, 'padding', 7 );
+            self.handles.box = uix.HBox( 'parent', parent, 'spacing', 10, 'padding', 5 );
             
             % set function callback if any
             if nargin < 3 || isempty(callback), callback = @dk.pass; end
@@ -113,22 +124,9 @@ classdef Slider < handle
             
             % create the slider
             self.handles.slider = uicontrol( 'parent', self.handles.box, 'style', 'slider', 'callback', @self.callback_slide );
-        
-            % separator between them
-            uix.Empty('parent',self.handles.box);
             
             % create textbox
             self.handles.text = uicontrol( 'parent', self.handles.box, 'style', 'edit', 'callback', @self.callback_text );
-        
-            % set textbox options
-            if nargin > 3
-                opt  = struct(varargin{:});
-                fopt = fieldnames(opt);
-                for i = 1:numel(fopt)
-                    f = fopt{i};
-                    self.handles.text.(f) = opt.(f);
-                end
-            end
         
             % set widths
             self.set_widths();
@@ -161,7 +159,7 @@ classdef Slider < handle
             
             val = str2num(hobj.String);
             
-            % update text box
+            % update slider and text box
             self.set_value(val);
             
             % trigger callback
@@ -169,6 +167,7 @@ classdef Slider < handle
             
         end
         
+        % Update the slider range/step/value and textbox string using object properties.
         function update_ui(self)
             
             if self.check_ui()

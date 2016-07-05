@@ -1,8 +1,14 @@
 classdef FrameStack < handle
 %
-% A vertical box with a selector (popup menu) on top of an image axes.
-% The selector choices are the titles of the images. Selection can be set externally.
+% Vertical box with a slider + play button on top of image axes.
 %
+% Example usage:
+%
+% frames = rand(100,100,35); 
+% fstack = dk.ui.widget.FrameStack( figure ).set_frames(frames).select_frame(13);
+% fstack.framerate = 10; % in Hz
+%
+% JH
 
     properties
         framerate;
@@ -36,6 +42,7 @@ classdef FrameStack < handle
             self.playing   = false;
         end
                 
+        % Get current number of frames
         function n = get.n_frames(self)
             if isempty(self.frames)
                 n = 0; 
@@ -44,6 +51,8 @@ classdef FrameStack < handle
             end
         end
         
+        % Return index of currently selected frame.
+        % If the UI is not open, the index is NaN.
         function num = current_frame(self)
             
             num = NaN;
@@ -53,7 +62,10 @@ classdef FrameStack < handle
             
         end
         
-        function set_frames(self,frames,framerate,options)
+        % Set the frames (3d array).
+        % The framerate should be specified in Hz and corresponds to the speed at which frames will be played.
+        % The options should be a structure of display options used by dk.ui.image.
+        function self = set_frames(self,frames,framerate,options)
         
             if nargin < 4, options = struct(); end
             if nargin < 3, framerate = 1; end
@@ -71,18 +83,21 @@ classdef FrameStack < handle
             
         end
         
-        function set_heights(self,controls,sep)
+        % Set the height of the controls (default 30px).
+        function self = set_heights(self,controls)
             
-            if nargin < 3, sep = 15; end
             if nargin < 2, controls = 30; end
             
             if self.check_ui
-                self.handles.box.Heights = [controls,sep,-1];
+                self.handles.box.Heights = [controls,-1];
             end
             
         end
         
-        function select_frame(self,num,fast)
+        % Select frame by number and update slider and display.
+        % If input 'fast' is true, the new frame is displayed by updating the existing image axes CData.
+        % If it is false, then playing is interrupted and dk.ui.image is called with the display options.
+        function self = select_frame(self,num,fast)
             
             if nargin < 3, fast = false; end
             if self.n_frames > 0 && self.check_ui
@@ -114,10 +129,11 @@ classdef FrameStack < handle
             
         end
         
-        function build(self,parent)
+        % Build frame-stack in input parent handle.
+        function self = build(self,parent)
         
             % create a vertical box
-            self.handles.box = uix.VBox( 'parent', parent, 'padding', 5 );
+            self.handles.box = uix.VBox( 'parent', parent, 'spacing', 10, 'padding', 5 );
             
             % build controls
             self.handles.controls = uix.HBox( 'parent', self.handles.box, 'spacing', 10 );
@@ -137,10 +153,7 @@ classdef FrameStack < handle
             );
         
             self.handles.controls.Widths = [ 40 -1 30 ];
-        
-            % empty separator
-            uix.Empty('parent',self.handles.box);
-        
+            
             % create axes for image
             self.handles.axes = axes( 'parent', uicontainer('parent',self.handles.box) );
             
@@ -161,6 +174,7 @@ classdef FrameStack < handle
             ok = self.check_handle('axes') && self.check_handle('slider') && self.check_handle('button');
         end
         
+        % Update slider min/max/step/value and text display based on current properties
         function update_ui(self)
             
             if self.check_ui
@@ -178,15 +192,18 @@ classdef FrameStack < handle
             
         end
         
+        % Select image based on slider value
         function cb_slider(self,hobj,varargin)
             self.select_frame( hobj.Value );
         end
         
+        % Select image based on textbox value
         function cb_text(self,hobj,varargin)
             num = dk.math.clamp( round(str2num( hobj.String )), [1,self.n_frames] );
             self.select_frame(num);
         end
         
+        % Trigger start/stop frame playing.
         function cb_button(self,varargin)
             if self.playing
                 self.cb_stop(); 
