@@ -10,7 +10,7 @@ function [imfs,status] = huang_transform( data, varargin )
     
     % allocate memory
     data = data(:);
-    data = data .* tukeywin(numel(data),opt_taper); % bohanwin or chebwin could be alternatives
+    %data = data .* tukeywin(numel(data),opt_taper); % bohanwin or chebwin could be alternatives
     imfs = cell(1,opt_max_imf);
     iter = 0;
     
@@ -57,9 +57,9 @@ end
 
 function [lmin,lmax] = local_extrema( x )
 
-    dx = diff(x,1,1);
-    zc = [dx(1:end-1) .* dx(2:end) <= 0; 1];
-    le = [ -dx(1); zc .* dx ];
+    dx = diff(x,1,1); % x(t+1)-x(t)
+    zc = [dx(1:end-1) .* dx(2:end) <= 0; 1]; % zero-crossings (add 1 to include last point)
+    le = [ -dx(1); zc .* dx ]; % derivative at crossing (add -dx(1) to include first point)
     
     lmin = find( le < 0 );
     lmax = find( le > 0 );
@@ -96,7 +96,6 @@ function h = do_sift( x )
     emax = interp1( lmax, x(lmax), t, 'pchip' );
     
     % do the sift
-    m = (emin + emax) / 2;
-    h = x - m;
+    h = x - (emin + emax)/2;
     
 end
