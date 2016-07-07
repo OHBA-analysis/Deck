@@ -22,19 +22,17 @@ function [Hxy,Hx,Hy] = joint_entropy( x, y, nbins )
     x = x(:);
     y = y(:);
     
-    % Set minimum value to 0
+    % Get bin indices 
     l = min(min(x),min(y));
-    x = x-l;
-    y = y-l;
-    
-    % Get bin indices given maximum value
     u = max(max(x),max(y));
-    x = 1+floor( nbins*x/u );
-    y = 1+floor( nbins*y/u );
+    d = max( u-l, eps );
+    
+    x = 1+floor( nbins*(x-l)/d );
+    y = 1+floor( nbins*(y-l)/d );
     m = nbins+1;
     
     % Entropy function
-    entfun = @(z) -dot( z, log2(z+eps) );
+    entfun = @(z) max( 0, -dot( z, log2(z+eps) ) );
     
     % Joint-entropy
     idx = 1:n;

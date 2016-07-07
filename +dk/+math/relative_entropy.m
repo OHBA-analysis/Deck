@@ -13,22 +13,20 @@ function [KL,Px,Py] = relative_entropy( x, y, nbins )
     x = x(:);
     y = y(:);
     
-    % Set minimum value to 0
+    % Get bin indices
     l = min(min(x),min(y));
-    x = x-l;
-    y = y-l;
-    
-    % Get bin indices given maximum value
     u = max(max(x),max(y));
-    x = 1+floor( nbins*x/u );
-    y = 1+floor( nbins*y/u );
+    d = max( u-l, eps );
+    
+    x = 1+floor( nbins*(x-l)/d );
+    y = 1+floor( nbins*(y-l)/d );
     m = nbins+1;
     
     % Get marginal entropies
-    Px = accumarray( x, 1, [1,m] )/n;
-    Py = accumarray( y, 1, [1,m] )/n;
+    Px = accumarray( x, 1, [m,1] )/n;
+    Py = accumarray( y, 1, [m,1] )/n;
 
     % Compute KL divergence
-    KL = -dot( Px, log2(Py+eps)-log2(Px+eps) );
+    KL = max( 0, -dot( Px, log2(Py+eps)-log2(Px+eps) ) );
     
 end

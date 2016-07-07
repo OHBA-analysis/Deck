@@ -11,12 +11,15 @@ function [Hx,Px] = entropy( x, nbins )
     % Reshape, rescale and bin data
     x = x(:);
     n = numel(x);
+    
     l = min(x);
-    x = 1 + floor( nbins*(x - l)/(max(x)-l) );
+    u = max(x);
+    
+    x = 1 + floor( nbins*(x - l)/max(eps,u-l) );
     m = nbins+1;
     
     % Compute entropy
-    Px = accumarray( x, 1, [1,m] )/n;
-    Hx = -dot( Px, log2(Px+eps) );
+    Px = accumarray( x, 1, [m,1] )/n;
+    Hx = max( 0, -dot( Px, log2(Px+eps) ) );
 
 end
