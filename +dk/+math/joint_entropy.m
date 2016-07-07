@@ -34,7 +34,7 @@ function [Hxy,Hx,Hy] = joint_entropy( x, y, nbins )
     m = nbins+1;
     
     % Entropy function
-    entfun = @(z) -dot( x, log2(z+eps) );
+    entfun = @(z) -dot( z, log2(z+eps) );
     
     % Joint-entropy
     idx = 1:n;
