@@ -23,22 +23,26 @@ function L = array2latex( values, rows, cols )
         error('Nope');
     end
     
+    % Dimensions
+    [nr,nc] = size(V);
+    
     % Add columns and rows
     if ~isempty(cols)
-        V = vertcat( cols, V );
+        V = vertcat( reshape(cols,[1,nc]), V );
     end
     if ~isempty(rows)
+        rows = reshape(rows,[nr,1]);
         if ~isempty(cols)
             rows = vertcat( {''}, rows );
         end
         V = horzcat( rows, V );
     end
     
+    % Update dimensions
+    [nr,nc] = size(V);
+    
     % Find the largest field in each column
     width = cellfun(@length,V);
-    
-    % Allocate output
-    [nr,nc] = size(V);
     
     s = [0,cumsum( max(width,[],1)+4 )];
     L = repmat( ' ', [nr,s(end)] );
