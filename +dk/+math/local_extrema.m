@@ -37,7 +37,7 @@ function [lmin,lmax] = local_extrema( x, inc_endpoints )
         plot( lmin, x(lmin), 'bo' );
         plot( lmax, x(lmax), 'ro' ); hold off;
         
-        title('Showing local maxima');
+        title('Showing local extrema');
         legend('Data','Local min','Local max');
         
     end
