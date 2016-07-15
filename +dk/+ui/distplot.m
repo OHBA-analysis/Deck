@@ -9,31 +9,52 @@ function [dist,xtic] = distplot( data, wid )
     color.avg = hsv2rgb([200/360 1 0.9]/100); % blue
 
     % number of columns
-    nd = size(data,2);
+    if iscell(data)
+        nd = numel(data);
+    else
+        nd = size(data,2);
+    end
     
     % compute and draw distributions
     dist = cell(1,nd);
     step = ceil(wid);
     xtic = 0.5 + step * (0:nd-1);
     
+    q99 = -Inf;
+    q01 =  Inf;
+    
     for i = 1:nd
-        dist{i} = distribution( data(:,i) );
+        [dist{i},v] = distribution( data, i );
         plot_distribution( dist{i}, xtic(i), wid, color );
+        
+        q99 = max( q99, prctile(v,99) );
+        q01 = min( q01, prctile(v,1) );
     end
     
+    % adjust y-axis limits
+    q99 = 1.1*q99;
+    q01 = 0.9*q01;
+    
     % prevent drawing over, and set tick labels
-    hold off; set(gca,'xtick',xtic,'xticklabel',arrayfun(@num2str,1:nd,'UniformOutput',false));
+    hold off; ylim([q01 q99]);
+    set(gca,'xtick',xtic,'xticklabel',arrayfun(@num2str,1:nd,'UniformOutput',false));
     
     % concatenate distributions as a struct array
     dist = [dist{:}];
 
 end
 
-function dist = distribution( x )
+function [dist,v] = distribution( dat, k )
 
-    [dist.y,dist.x] = ksdensity(x,[],'NumPoints',50);
-    dist.m = median(x);
-    dist.a = mean(x);
+    if iscell(dat)
+        v = dat{k}(:);
+    else
+        v = dat(:,k);
+    end
+
+    [dist.y,dist.x] = ksdensity(v,[],'NumPoints',50);
+    dist.m = median(v);
+    dist.a = mean(v);
     
 end
 
