@@ -5,6 +5,7 @@ function output = array2string( values, format, varargin )
     % parse options
     opt = dk.obj.kwArgs( varargin{:} );
 
+        format   = lower(format); % format of the string output
         numFmt   = opt.get( 'num', '%g' ); % format used to print numeric values
         rowNames = opt.get( 'row', {} );
         colNames = opt.get( 'col', {} );
@@ -36,7 +37,7 @@ function output = array2string( values, format, varargin )
     
     % Add columns
     if ~isempty(colNames)
-        switch lower(format)
+        switch format
             case {'default','latex','tex'}
                 V = vertcat( reshape(colNames,[1,nc]), V );
                 rowpad = {''};
@@ -60,7 +61,7 @@ function output = array2string( values, format, varargin )
     [nr,nc] = size(V);
     
     % Set separators depending on the format
-    switch lower(format)
+    switch format
         
         case {'default'}
             sep.beg = ' ';
@@ -102,6 +103,13 @@ function output = array2string( values, format, varargin )
         if c < nc
             output(:,(stride(c)+colwid(c)):(stride(c+1)-1) ) = repmat( sep.val, [nr,1] );
         end
+    end
+    
+    % Last edit
+    switch format
+        case 'default'
+            output(1,1) = '[';
+            output(end,end-2) = ']';
     end
 
 end

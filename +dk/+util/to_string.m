@@ -35,6 +35,10 @@ function s = to_string( v, fmt )
                 s = dk.util.array2string( double(v), [], 'num', '%d' );
         end
         
+    % Input is a cell, apply to each element (returns a cell of strings)
+    elseif iscell(v)
+        s = cellfun( @(x) dk.util.to_string(x,fmt), v, 'UniformOutput', false );
+        
     % Other unsupported cases
     else
         error( 'Dont know how to convert value to string.' );
