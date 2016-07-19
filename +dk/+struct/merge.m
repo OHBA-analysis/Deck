@@ -1,9 +1,9 @@
-function a = mergestruct( varargin )
+function a = merge( varargin )
 %
 % Example:
 %   a.foo = struct('a',42); b.bar = 'hello'; c.foo = struct('c',5);
-%   nonrecursive = dk.util.mergestruct( a, b, c ); nonrecursive.foo
-%   recursive = dk.util.mergestruct( a, b, c, true ); recursive.foo
+%   nonrecursive = dk.struct.merge( a, b, c ); nonrecursive.foo
+%   recursive = dk.struct.merge( a, b, c, true ); recursive.foo
 %
 % JH
 
@@ -24,7 +24,7 @@ function a = mergestruct( varargin )
     if nmerge > 2
         
         for k = nmerge:-1:2
-            to_merge{k-1} = dk.util.mergestruct( to_merge{k-1}, to_merge{k}, recursive );
+            to_merge{k-1} = dk.struct.merge( to_merge{k-1}, to_merge{k}, recursive );
         end
         a = to_merge{1};
         
@@ -42,7 +42,7 @@ function a = mergestruct( varargin )
             
             f = F{i};
             if recursive && isfield(a,f) && isstruct(a(j).(f)) && isstruct(b(j).(f))
-                a(j).(f) = dk.util.mergestruct( a(j).(f), b(j).(f), true );
+                a(j).(f) = dk.struct.merge( a(j).(f), b(j).(f), true );
             else
                 a(j).(f) = b(j).(f);
             end

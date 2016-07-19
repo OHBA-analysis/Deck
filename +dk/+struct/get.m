@@ -1,4 +1,4 @@
-function default = get_field( s, fname, default )
+function default = get( s, fname, default )
 %
 % Get a field value from a structure if the field exists.
 % If not, return the default value specified.

@@ -1,14 +1,14 @@
-function varargout = struct2vars( s, varname_handle )
+function varargout = to_vars( s, varname_handle )
 %
 % Turn the fields of a structure into variables with the same names.
 % For instance:
 %   a = struct('foo',1,'bar','baz');
-%   struct2vars( a );
+%   dk.struct.to_vars( a );
 %
 % will create variables foo=1 and bar='baz' in the caller's scope.
 % The second argument (function handle), can be used to process the
 % variables' name. For instance:
-%   struct2vars( a, @(x) ['tmp_' x] );
+%   dk.struct.to_vars( a, @(x) ['tmp_' x] );
 %
 % will create variables tmp_foo and tmp_bar instead.
 %

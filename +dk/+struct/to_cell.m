@@ -1,6 +1,6 @@
-function c = struct2cell( s, recursive )
+function c = to_cell( s, recursive )
 %
-% c = struct2cell( s, recursive=false )
+% c = dk.struct.to_cell( s, recursive=false )
 %
 % Build a cell{ key, value } from a structure.
 % Structure-arrays are not supported, but the script won't fail if the recursive flag is on, 
@@ -21,7 +21,7 @@ function c = struct2cell( s, recursive )
         c{2*i  } = s.( f{i} );
         
         if recursive && isstruct(c{2*i}) && numel(c{2*i}) == 1
-            c{2*i} = dk.util.struct2cell( c{2*i} );
+            c{2*i} = dk.struct.to_cell( c{2*i} );
         end
         
     end

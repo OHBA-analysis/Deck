@@ -70,7 +70,7 @@ classdef kwArgs < handle
         
         % convert parsed inputs as a cell of inputs that can typically be passed to a function
         function args = to_cell(self)
-            args = dk.util.struct2cell(self.parsed);
+            args = dk.struct.to_cell(self.parsed);
         end
         
         function parse(self,varargin)
@@ -99,7 +99,7 @@ classdef kwArgs < handle
                 
             elseif isstruct(args)
                 assert( numel(args) == 1, 'Struct arrays are not accepted.' );
-                self.parse( dk.util.struct2cell(args) );
+                self.parse( dk.struct.to_cell(args) );
                 
             elseif isa(args,'dk.obj.kwArgs')
                 self.copy(args);
@@ -113,7 +113,7 @@ classdef kwArgs < handle
             
             p = self.parsed;
             self.parse(varargin{:});
-            self.parsed = dk.util.mergestruct( p, self.parsed );
+            self.parsed = dk.struct.merge( p, self.parsed );
             
         end
         

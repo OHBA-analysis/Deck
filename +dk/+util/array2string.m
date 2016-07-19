@@ -14,12 +14,12 @@ function output = array2string( values, format, varargin )
     if isnumeric(values) || islogical(values)
         
         assert( ismatrix(values), 'Sorry, multidimensional arrays are not supported.' );
-        V = arrayfun( @(x) dk.util.to_string(x,numFmt), values, 'UniformOutput', false );
+        V = arrayfun( @(x) dk.to_string(x,numFmt), values, 'UniformOutput', false );
         
     elseif iscell(values)
         
         assert( ismatrix(values), 'Sorry, multidimensional arrays are not supported.' );
-        V = cellfun( @(x) dk.util.to_string(x,numFmt), values, 'UniformOutput', false );
+        V = cellfun( @(x) dk.to_string(x,numFmt), values, 'UniformOutput', false );
         
     elseif istable(values)
         

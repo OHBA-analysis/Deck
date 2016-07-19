@@ -19,7 +19,7 @@ function c = compare( v1, v2 )
         
         while c && (i <= n)
             for j = 1:numel(f)
-                c = c && dk.util.compare( v1(i).(f{j}), v2(i).(f{j}) );
+                c = c && dk.compare( v1(i).(f{j}), v2(i).(f{j}) );
             end
             i = i+1;
         end
@@ -31,7 +31,7 @@ function c = compare( v1, v2 )
         i = 1;
         
         while c && (i <= n)
-            c = c && dk.util.compare( v1{i}, v2{i} );
+            c = c && dk.compare( v1{i}, v2{i} );
             i = i+1;
         end
         

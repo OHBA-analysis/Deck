@@ -1,4 +1,4 @@
-function v = structvals( s )
+function v = values( s )
 % v = STRUCTVALS( s )
 %
 % Returns a N x M cell-array where N is the size of the input struct-array and M is the number of fields.

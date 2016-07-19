@@ -1,6 +1,6 @@
-function grid = structgrid( row_field, row_vals, col_field, col_vals )
+function sg = grid( row_field, row_vals, col_field, col_vals )
 %
-% Example: dk.util.structgrid( 'row.foo', {'a','b','c'}, 'col', [1 2 3 4] )
+% Example: dk.struct.grid( 'row.foo', {'a','b','c'}, 'col', [1 2 3 4] )
 % Limitation: only one (sub)field can be defined in each dimension for now...
 %
 % JH
@@ -30,12 +30,12 @@ function grid = structgrid( row_field, row_vals, col_field, col_vals )
     cval = get_accessor( col_vals );
     
     % allocate output and assign values for each field
-    grid = repmat( mock, nrows, ncols );
+    sg = repmat( mock, nrows, ncols );
     for r = 1:nrows
     for c = 1:ncols
         
-        grid(r,c) = subsasgn( grid(r,c), row_field, rval(row_vals,r) );
-        grid(r,c) = subsasgn( grid(r,c), col_field, cval(col_vals,c) );
+        sg(r,c) = subsasgn( sg(r,c), row_field, rval(row_vals,r) );
+        sg(r,c) = subsasgn( sg(r,c), col_field, cval(col_vals,c) );
         
     end
     end

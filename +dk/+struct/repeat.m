@@ -1,6 +1,6 @@
-function s = repstruct( fields, varargin )
+function s = repeat( fields, varargin )
 %
-% s = repstruct( fields, varargin )
+% s = dk.struct.repeat( fields, varargin )
 %
 % Create a struct-array with specified fields.
 % This is equivalent to repmat( struct('field1',[],'field2',[],...), varargin{:} ).

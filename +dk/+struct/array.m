@@ -1,7 +1,7 @@
-function out = structarray( varargin )
+function sa = array( varargin )
 %
 % Example: 
-%   a = dk.util.structarray( 'foo.bar', [1 2 3], 'baz', {[0 1], 'hello', struct()} )
+%   a = dk.struct.array( 'foo.bar', [1 2 3], 'baz', {[0 1], 'hello', struct()} )
 %   cellfun( @(x) x.bar, {a.foo} )
 %   {a.baz}
 %
@@ -27,14 +27,14 @@ function out = structarray( varargin )
     end
     
     % allocate output and assign values for each field
-    out = repmat( mock, ns, 1 );
+    sa = repmat( mock, ns, 1 );
     for i = 1:nf
         f = dk.util.string2substruct(fields{i});
         
         if iscell(values{i})
-            for j = ns:-1:1, out(j) = subsasgn( out(j), f, values{i}{j} ); end
+            for j = ns:-1:1, sa(j) = subsasgn( sa(j), f, values{i}{j} ); end
         else
-            for j = ns:-1:1, out(j) = subsasgn( out(j), f, values{i}(j) ); end
+            for j = ns:-1:1, sa(j) = subsasgn( sa(j), f, values{i}(j) ); end
         end
     end
     

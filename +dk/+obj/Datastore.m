@@ -48,7 +48,7 @@ classdef Datastore < handle
 
             % extract specific variables
             if nargin > 2
-                data = cellfun( @(n) dk.get_field( data, n, [] ), varargin, 'UniformOutput', false );
+                data = cellfun( @(n) dk.struct.get( data, n, [] ), varargin, 'UniformOutput', false );
 
                 if nargout == 1 && nargin > 3
                     varargout{1} = cell2struct( data, varargin, 2 );

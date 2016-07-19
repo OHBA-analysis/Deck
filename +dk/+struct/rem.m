@@ -1,4 +1,4 @@
-function s = rem_field( s, varargin )
+function s = rem( s, varargin )
 %
 % Remove a field value from a structure if the field exists.
 % If not, don't throw an error.

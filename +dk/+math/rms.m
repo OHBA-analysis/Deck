@@ -19,6 +19,6 @@ function r = rms( X, dims, dimm )
     if nargin < 3, dimm = 1; end
     if nargin < 2, dims = 2; end
     
-    r = sqrt(mean( sum(X .* conj(X),dims), dimm ));
+    r = sqrt(mean( dot(X,conj(X),dims), dimm ));
 
 end

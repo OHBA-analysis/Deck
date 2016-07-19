@@ -1,4 +1,4 @@
-function str = bool2str( val )
+function str = bool2string( val )
 
     if val
         str = 'true';

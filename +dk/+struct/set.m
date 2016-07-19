@@ -1,4 +1,4 @@
-function s = set_field( s, fname, value )
+function s = set( s, fname, value )
 %
 % Set a field value in a structure if it is not set.
 
