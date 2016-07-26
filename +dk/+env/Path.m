@@ -17,11 +17,11 @@ classdef Path < dk.env.AbstractManager
         end
         
         function commit(self)
-           path(strjoin( self.list.list, pathsep )); 
+           path(strjoin( self.list, pathsep )); 
         end
         
-        function reload(self)
-            self.list.assign(strsplit( path, pathsep ));
+        function self = reload(self)
+            self.list = strsplit( path, pathsep );
         end
         
     end

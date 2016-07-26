@@ -21,11 +21,11 @@ classdef Library < dk.env.AbstractManager
         end
         
         function commit(self)
-           setenv( self.name, strjoin( self.list.list, pathsep )); 
+           setenv( self.name, strjoin( self.list, pathsep )); 
         end
         
-        function reload(self)
-            self.list.assign(strsplit( getenv(self.name), pathsep ));
+        function self = reload(self)
+            self.list = strsplit( getenv(self.name), pathsep );
         end
         
     end

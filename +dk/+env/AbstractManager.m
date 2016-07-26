@@ -23,30 +23,28 @@ classdef AbstractManager < handle
         
         % Clear the list
         function clear(self)
-            self.list  = dk.obj.List();
+            self.list = {};
         end
         
         % Get the number of elements in the list
         function n = get.len(self)
-            n = self.list.len;
+            n = numel(self.list);
         end
         
         % Check whether l is presently in the list
         function yes = has(self,l)
-            yes = self.list.has(l);
+            yes = ismember(self.list,l);
         end
         
         % Sanitise directory names
         function l = sanitise(self,l)
             
             if ischar(l)
-                l = fullfile(l,filesep); % force ending slash
-                l = l(1:end-1); % remove it
+                % remove trailing slash
+                l = fullfile(l,filesep);
+                l = l(1:end-1);
             else
-                n = numel(l);
-                for i = 1:n
-                    l{i} = self.sanitise(l{i});
-                end
+                l = cellfun( @self.sanitise, l, 'UniformOutput', false );
             end
         end
         
@@ -56,52 +54,38 @@ classdef AbstractManager < handle
             ok = true;
             if ischar(l)
                 if ~dk.fs.is_dir(l)
-                    warning( '[dk.env] "%s" is not a valid directory, operation aborted.', l );
+                    warning( '[dk.env] "%s" is not a valid directory, will be ignored.', l );
                     ok = false;
                 end
             else
-                n = numel(l);
-                for i = 1:n
-                    ok = ok && self.check( l{i} );
-                end
+                ok = cellfun( @self.check, l );
             end
         end
         
         % Append, prepend, remove
-        function append(self,x,no_duplicate)
+        function self = append(self,x)
             
-            if nargin < 3, no_duplicate=true; end
+            x = self.sanitise(x);
+            if ischar(x), x = {x}; end
+            x = x(self.check(x));
+            assert(iscellstr(x));
             
-            if ischar(x)
-                x = self.sanitise(x);
-                if self.check(x) && ~(no_duplicate && self.has(x))
-                    self.list.append(x);
-                end
-            else
-                n = numel(x);
-                for i = 1:n
-                    self.append(x{i},no_duplicate);
-                end
-            end
+            self.list = union( self.list, x );
+            
         end
-        function prepend(self,x,no_duplicate)
+        function self = prepend(self,x)
             
-            if nargin < 3, no_duplicate=true; end
+            x = self.sanitise(x);
+            if ischar(x), x = {x}; end
+            x = x(self.check(x));
+            assert(iscellstr(x));
             
-            if ischar(x)
-                x = self.sanitise(x);
-                if self.check(x) && ~(no_duplicate && self.has(x))
-                    self.list.prepend(x);
-                end
-            else
-                n = numel(x);
-                for i = 1:n
-                    self.prepend(x{i},no_duplicate);
-                end
-            end
+            self.list = union( x, self.list );
+            
         end
-        function remove(self,x)
-            self.list.remove_all(x);
+        function self = remove(self,x)
+            occ = ismember( self.list, x );
+            self.list = self.list(~occ);
         end
         
     end
