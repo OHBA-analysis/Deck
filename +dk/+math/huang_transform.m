@@ -10,6 +10,8 @@ function [imfs,status] = huang_transform( data, varargin )
     
     % allocate memory
     data = data(:);
+    %meandata = mean(data);
+    %data = data-meandata;
     %data = data .* tukeywin(numel(data),opt_taper); % bohanwin or chebwin could be alternatives
     imfs = cell(1,opt_max_imf);
     iter = 0;

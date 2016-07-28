@@ -39,8 +39,8 @@ function [ph,fh] = plot_prctile( x, y, lo, hi, popts, fopts )
     y_md = median(y,1);
     
     if n >= 3
-        y_lo = prctile( y, lo );
-        y_hi = prctile( y, hi );
+        y_lo = prctile( y, lo, 1 );
+        y_hi = prctile( y, hi, 1 );
         fh = fill( horzcat(x,fliplr(x)), horzcat(y_hi,fliplr(y_lo)), color_red, fopts{:} ); hold on;
     end
     ph = plot( x, y_md, popts{:} ); hold off;
