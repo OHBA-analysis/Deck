@@ -10,7 +10,7 @@ function vol2gif( filename, volume, delay, imsize )
     if nargin < 3, delay = 0.1; end
     
     % make sure it has the correct extension
-    filename = dk.string.set_ext(filename,'gif');
+    filename = dk.str.set_ext(filename,'gif');
     
     % convert to 256 graylevels
     volume  = round(256*mat2gray(volume));

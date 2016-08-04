@@ -1,9 +1,10 @@
-function s = size()
+function s = size( varargin )
 % 
-% Return the size of the screen in pixels.
+% Return the size of all screens in pixels.
 %
-% Contact: jhadida [at] fmrib.ox.ac.uk
+% JH
 
-    s = get(0,'screensize');
-    s = [ s(4), s(3) ];
+    s = dk.ui.screen.info(varargin{:});
+    s = vertcat( s.size );
+    
 end

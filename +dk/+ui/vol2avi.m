@@ -3,7 +3,7 @@ function vol2avi( filename, volume, fps, imsize )
     if nargin < 3, fps = 30; end
     
     % open movie file
-    writer = VideoWriter( dk.string.set_ext(filename,'avi') );
+    writer = VideoWriter( dk.str.set_ext(filename,'avi') );
     writer.FrameRate = fps;
     writer.open();
     

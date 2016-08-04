@@ -1,11 +1,13 @@
-function maximise( fig )
-% 
-% Maximise the window of figure "fig".
-% 
-% Contact: jhadida [at] fmrib.ox.ac.uk
+function maximise( f )
+%
+% Maximise figure f on the correct screen.
+%
+% JH
 
-    unit = fig.Units;
-    set( fig, 'Units', 'normalized', 'outerposition', [0 0 1 1] );
-    fig.Units = unit;
+    u = get(f,'units'); set(f,'units','pixels');
+    [~,~,sn] = dk.ui.fig.position(f);
+    s = get( 0, 'MonitorPositions' );
+    set( f, 'outerposition', s(sn,:) );
+    set(f,'units',u);
 
 end
