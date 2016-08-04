@@ -4,14 +4,12 @@ function [imfs,status] = huang_transform( data, varargin )
     opt = dk.obj.kwArgs(varargin{:});
     
         opt_sd_thresh  = opt.get( 'sd_thresh', 0.25 );
-        opt_max_imf    = opt.get( 'max_imf', 200 );
+        opt_max_imf    = opt.get( 'max_imf', 50 );
         opt_min_energy = opt.get( 'min_energy', 1e-6 );
-        opt_taper      = opt.get( 'taper', 0.25 );
+        %opt_taper      = opt.get( 'taper', 0.25 );
     
     % allocate memory
     data = data(:);
-    %meandata = mean(data);
-    %data = data-meandata;
     %data = data .* tukeywin(numel(data),opt_taper); % bohanwin or chebwin could be alternatives
     imfs = cell(1,opt_max_imf);
     iter = 0;

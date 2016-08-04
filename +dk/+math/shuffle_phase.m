@@ -1,8 +1,8 @@
-function vals = randomise_phase( vals )
+function vals = shuffle_phase( vals )
 %
-% Create a random signal with the same Fourier spectrum as the input by phase randomisation.
+% Shuffle the Fourier phase of input signals.
 %
-% JH based on code by RA
+% JH
 
     % input should be Ntimes x Nsignals
     [nt,ns] = size(vals);
@@ -22,17 +22,24 @@ function vals = randomise_phase( vals )
         
         % randomise unique coefficients
         orig_coef = fourier(random_idx == 1,:);
-        rand_coef = orig_coef .* exp( 1i * 2*pi*rand(n_unique_freq,ns) );
+        shuf_coef = angle(orig_coef);
+        
+        for i = 1:ns
+            shuf_coef(:,i) = abs(orig_coef(:,i)) .* exp( 1i * shuf_coef(randperm(n_unique_freq),i) );
+        end
         
         % apply the duplication properly
-        fourier(random_idx== 1,:) = rand_coef;
-        fourier(random_idx==-1,:) = conj(flipud(rand_coef));
+        fourier(random_idx== 1,:) = shuf_coef;
+        fourier(random_idx==-1,:) = conj(flipud(shuf_coef));
         
     else
         
         % randomise all apart from DC
         random_idx = [0;ones(nt-1,1)];
-        fourier(random_idx,:) = fourier(random_idx,:) .* exp( 1i * 2*pi*rand(nt-1,ns) );
+        coef_phase = angle(fourier(random_idx,:));
+        for i = 1:ns
+            fourier(random_idx,i) = abs(fourier(random_idx,i)) .* exp( 1i * coef_phase(randperm(nt-1),i) );
+        end
         
     end
     
