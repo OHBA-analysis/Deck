@@ -10,18 +10,32 @@ function resize( f, height, width )
     end
     
     [~,hw,sn] = dk.ui.fig.position(f);
-    sc = dk.ui.screen.centre(sn);
+    si = dk.ui.screen.info(sn);
     
     if isempty(height)
-        height = hw(1);
+        if width > 1
+            height = hw(1);
+        else
+            height = hw(1)/si.size(1);
+        end
     end
     if isempty(width)
-        width = hw(2);
+        if height > 1
+            width = hw(2);
+        else
+            width = hw(2)/si.size(2);
+        end
+    end
+    
+    hw = [height,width];
+    if all( hw > 1 )
+        wh = fliplr(hw);
+    else
+        wh = fliplr(hw .* si.size);
     end
 
-    wh = [width,height];
     u = get(f,'units'); set(f,'units','pixels');
-    set( f, 'position', [ sc-wh/2, wh ] );
+    set( f, 'position', [ si.centre-wh/2, wh ] );
     set(f,'units',u);
 
 end
