@@ -22,14 +22,14 @@ function sa = array( varargin )
     % create empty structure to allocate output
     mock = struct();
     for i = 1:nf
-        f    = dk.util.string2substruct(fields{i});
+        f    = dk.str.to_substruct(fields{i});
         mock = subsasgn( mock, f, [] );
     end
     
     % allocate output and assign values for each field
     sa = repmat( mock, ns, 1 );
     for i = 1:nf
-        f = dk.util.string2substruct(fields{i});
+        f = dk.str.to_substruct(fields{i});
         
         if iscell(values{i})
             for j = ns:-1:1, sa(j) = subsasgn( sa(j), f, values{i}{j} ); end

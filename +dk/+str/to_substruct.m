@@ -1,8 +1,8 @@
-function sub = string2substruct( str )
+function sub = to_substruct( str )
 %
 % Converts a string corresponding to an access to a variable to the corresponding substruct.
 % Example:
-%   s = dk.util.string2substruct( 'foo(2).bar.baz{13}.arg(1,2,3)' )
+%   s = dk.str.to_substruct( 'foo(2).bar.baz{13}.arg(1,2,3)' )
 %   t = subsasgn( struct(), s, 3 )
 %
 % JH

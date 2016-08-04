@@ -5,7 +5,7 @@ function [yes,target] = is_symlink( name )
 % Contact: jhadida [at] fmrib.ox.ac.uk
     
     % Remove trailing separators for directories
-    name = dk.string.rstrip( name, filesep );
+    name = dk.str.rstrip( name, filesep );
     
     % Check for link
     s = unix(sprintf('test -L "%s"',name));

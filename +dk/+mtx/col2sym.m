@@ -1,6 +1,6 @@
 function S = col2sym( C, strict )
 %
-% This is the inverse function of dk.matrix.sym2col.
+% This is the inverse function of dk.mtx.sym2col.
 
     assert( ismatrix(C), 'Expected a matrix in input.' );
     if nargin < 2, strict = false; end
@@ -16,7 +16,7 @@ function S = col2sym( C, strict )
     assert( abs(n - floor(n)) < 1e-6, 'Bad number of rows in input.' );
     
     S = zeros(n,n,s,class(C));
-    I = dk.matrix.symindex(n,strict);
+    I = dk.mtx.symindex(n,strict);
     if strict, I = I + eye(n); end
     
     for i = 1:s

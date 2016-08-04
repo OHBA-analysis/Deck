@@ -6,7 +6,7 @@ function str = capwords( str, lower_other )
 
     if nargin < 2, lower_other = false; end
 
-    str = dk.string.singlespaces(str);
+    str = dk.str.singlespaces(str);
     loc = regexp(str,'( \w)','end');
     loc = [1 loc];
     str(loc) = upper(str(loc));

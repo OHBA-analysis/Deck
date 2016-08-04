@@ -5,7 +5,7 @@ function str = capfirst( str, lower_other )
 
     if nargin < 2, lower_other = false; end
 
-    str = dk.string.singlespaces(str);
+    str = dk.str.singlespaces(str);
     str(1) = upper(str(1));
     
     if lower_other

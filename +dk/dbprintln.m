@@ -1,6 +1,6 @@
 function dbprintln( fmt, varargin )    
-if dk.debug.enabled
+if dk.dbg.enabled
     dbstack(1);
-    fprintf( ['[dk.debug] ' fmt '\n'], varargin{:} );
+    fprintf( ['[dk.dbg] ' fmt '\n'], varargin{:} );
 end
 end

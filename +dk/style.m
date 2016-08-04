@@ -6,7 +6,7 @@ function s = style( name )
         return;
     end
 
-    name = fullfile( dk.string.set_ext( name, 'mat' ) );
+    name = fullfile( dk.str.set_ext( name, 'mat' ) );
     dk.println('[dk] Loading style "%s".',name);
     s = load(fullfile( dk.path, 'style', name ));
     

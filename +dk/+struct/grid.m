@@ -11,8 +11,8 @@ function sg = grid( row_field, row_vals, col_field, col_vals )
     ncols = numel(col_vals);
     
     % process fieldnames
-    row_field = dk.util.string2substruct(row_field);
-    col_field = dk.util.string2substruct(col_field);
+    row_field = dk.str.to_substruct(row_field);
+    col_field = dk.str.to_substruct(col_field);
     
     % create empty structure to allocate output
     mock = subsasgn( struct(), row_field, [] );

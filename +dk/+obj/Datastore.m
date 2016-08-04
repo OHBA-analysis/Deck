@@ -21,7 +21,7 @@ classdef Datastore < handle
         end
         
         function f = matfile(self,varargin)
-            f = dk.string.set_ext( self.file(varargin{:}), 'mat' );
+            f = dk.str.set_ext( self.file(varargin{:}), 'mat' );
         end
         
         function f = save(self,name,varargin)
