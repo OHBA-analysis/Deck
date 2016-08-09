@@ -1,6 +1,6 @@
 function compile_mex( comp, varargin )
 
     comp.mex_file = true;
-    mex_utils.compile( comp, varargin{:} );
+    dk.mx.compile( comp, varargin{:} );
     
 end

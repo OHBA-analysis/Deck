@@ -119,6 +119,14 @@ classdef Compiler < handle
                 self.command.append(self.out_name);
             end
             
+            % Remove duplicates
+            self.flags  .remove_duplicates();
+            self.undef  .remove_duplicates();
+            self.lpath  .remove_duplicates();
+            self.lib    .remove_duplicates();
+            self.ipath  .remove_duplicates();
+            self.files  .remove_duplicates();
+            
             % Flags
             if self.flags.len
                 self.command.append([ 'CXXFLAGS="$CXXFLAGS ' strjoin(self.flags.list) '"' ]);

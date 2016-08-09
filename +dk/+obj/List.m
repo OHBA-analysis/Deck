@@ -68,6 +68,11 @@ classdef List < handle
             self.list = self.list(~b);
         end
         
+        % Remove duplicates
+        function self = remove_duplicates(self)
+            self.list = unique(self.list);
+        end
+        
         % Find the first element that matches
         function b = has(self,e)
             b = ismember(e,self.list);
