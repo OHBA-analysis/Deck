@@ -1,0 +1,44 @@
+{ 
+    // When this config was created
+    "date": "",
+
+    /**
+     * Information needed for execution.
+     */
+    "exec" : {
+        // Name of the derived class (eg my.nested.DerivedClass)
+        "class": "",
+        // Edited by the configure() function
+        "jobs": [],
+        // Edited by the configure() function
+        "workers": [],
+        // Leave empty, this is edited dynamically when calling mapred_build
+        "options": {}
+    },
+
+    /**
+     * Information needed for submission to the cluster.
+     */
+    "cluster" : {
+        // Name of the job once submitted
+        "name": "mapred",
+        // Queue to which the job will be submited
+        "queue": "long.q",
+        // E-mail to which notifications should be sent (no mail if empty)
+        "email": "",
+        // Mail option flags - [b]egin, [e]nd, [a]bort, [s]uspend, [n]o mail
+        "mailopt": "n"
+    },
+
+    /**
+     * Paths involved in the execution.
+     */
+    "folders" : {
+        // Where startup.m lives.
+        "start": "", 
+        // Where the .m file with your derived class can be called (default to start if empty)
+        "work": "",  
+        // The folder used to store the data
+        "save": ""
+    }
+}
