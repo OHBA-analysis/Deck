@@ -1,5 +1,5 @@
 function wassert( condition, fmt, varargin )
-    if ~(condition)
+    if ~all(logical(condition))
         warning( fmt, varargin{:} );
     end
 end
