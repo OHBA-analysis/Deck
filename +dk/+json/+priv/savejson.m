@@ -1,4 +1,4 @@
-function json=save(rootname,obj,varargin)
+function json=savejson(rootname,obj,varargin)
 %
 % json=savejson(rootname,obj,filename)
 %    or

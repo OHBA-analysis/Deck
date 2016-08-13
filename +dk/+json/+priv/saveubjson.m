@@ -1,4 +1,4 @@
-function json=saveub(rootname,obj,varargin)
+function json=saveubjson(rootname,obj,varargin)
 %
 % json=saveubjson(rootname,obj,filename)
 %    or

@@ -1,7 +1,8 @@
 classdef MapReduce < handle
     
-    properties (Abstract)
+    properties (Abstract,Constant)
         name
+        id
     end
     
     methods (Abstract)
@@ -41,16 +42,22 @@ classdef MapReduce < handle
         function output = run_job( self, workerid, jobid, config )
             
             % create folder for storage if it doesn't already exist
-            jobfolder = fullfile( config.folder, sprintf('job_%d',jobid) );
+            jobfolder = fullfile( config.folders.save, sprintf('job_%d',jobid) );
             if ~dk.fs.is_dir( jobfolder )
                 dk.assert( mkdir(jobfolder), 'Could not create folder "%s".', jobfolder );
             end
             
+            % parse options
+            options = config.exec.options;
+            if isempty(options)
+                options = struct();
+            end
+
             % update info
             info.worker  = workerid;
             info.job     = jobid;
-            info.inputs  = config.jobs(jobid);
-            info.options = config.options;
+            info.inputs  = config.exec.jobs(jobid);
+            info.options = options;
             info.status  = 'running';
             info.start   = get_timestamp();
             info.stop    = '';
@@ -59,7 +66,7 @@ classdef MapReduce < handle
             
             % run job
             try
-                output = self.process(config.inputs,jobfolder,config.options);
+                output = self.process( info.inputs, jobfolder, info.options );
                 info.status = 'done';
             catch ME
                 output = [];
@@ -76,22 +83,18 @@ classdef MapReduce < handle
         function output = run_worker( self, folder, workerid )
             
             % load config (contains options)
-            config  = dk.json.load(fullfile( folder, 'config/config.json' ));
-            
+            config = self.load_running_config(folder);
+
             % set worker id from environment if not provided
             if nargin < 3
                 workerid = get_task_id();
             end
             
-            % save the folder from where the config was loaded
-            % this allows to move the folder around without affecting the processing
-            config.folder  = folder;
-            
             % get all jobs to run
-            jobids = config.workers{workerid};
+            jobids = config.exec.workers{workerid};
             njobs  = numel(jobids);
             
-            dk.println('[MapReduce.START] Worker #%d');
+            dk.println('[MapReduce.START] Worker #%d',workerid);
             dk.println('         folder : %s',pwd);
             dk.println('           host : %s',dk.env.hostname);
             dk.println('           date : %s',get_timestamp);
@@ -112,16 +115,82 @@ classdef MapReduce < handle
             end
             
             % save output file
-            outfile = fullfile( folder, sprintf('worker_%d_output.mat',workerid) );
+            outfile = fullfile( folder, sprintf( config.files.worker, workerid ) );
             dk.println('\n\t Saving output file to "%s" (%s)...',outfile,get_timestamp);
             save( outfile, '-v7.3', 'output' );
             
             fprintf('\n\n');
-            dk.println('[MapReduce.STOP] Worker #%d');
+            dk.println('[MapReduce.STOP] Worker #%d',workerid);
             dk.println('          date : %s',get_timestamp);
             dk.println('        output : %s',outfile);
             dk.println('----------------\n');
             
+        end
+
+        function output = run_reduce( self, folder )
+
+            % load config (contains options)
+            config = self.load_running_config(folder);
+
+            % prepare output
+            njobs    = numel(config.exec.jobs);
+            nworkers = numel(config.exec.workers);
+            outfile  = fullfile( folder, config.files.reduce );
+
+            dk.println('[MapReduce.START] Reduce');
+            dk.println('         folder : %s',pwd);
+            dk.println('           host : %s',dk.env.hostname);
+            dk.println('           date : %s',get_timestamp);
+            dk.println('       nworkers : %d',nworkers);
+            dk.println('-----------------\n');
+
+            if dk.fs.is_file(outfile)
+                warning( 'Reduce file "%s" already exists, outputs will be merged.', outfile );
+                output = load(outfile);
+                output = output.output;
+                assert( numel(output)==njobs, 'Wrong number of jobs in existing reduce file, aborting.' );
+            else
+                output = cell( 1, njobs );
+            end
+
+            % concatenate outputs
+            timer = dk.time.Timer();
+            for i = 1:nworkers
+
+                workerfile = fullfile( folder, sprintf( config.files.worker, i ) );
+                try 
+                    workerdata = load( workerfile );
+                    output( config.exec.workers{i} ) = workerdata.output;
+                    dk.println('Worker %d/%d merged, timeleft %s...',i,nworkers,timer.timeleft_str(i/nworkers));
+                catch
+                    dk.println('Worker %d/%d... FAILED',i,nworkers);
+                end
+            end
+
+            % save output file
+            dk.println('\n\t Saving reduced file to "%s" (%s)...',outfile,get_timestamp);
+            save( outfile, '-v7.3', 'output' );
+
+            fprintf('\n\n');
+            dk.println('[MapReduce.STOP] Reduce');
+            dk.println('          date : %s',get_timestamp);
+            dk.println('        output : %s',outfile);
+            dk.println('----------------\n');
+
+        end
+
+        function config = load_running_config( self, folder )
+
+            % load config (contains options)
+            config = dk.json.load(fullfile( folder, 'config/config.json' ));
+
+            % make sure the ID is correct
+            assert( strcmp(config.id,self.id), 'ID mismatch between class and running config.' );
+            
+            % save the folder from where the config was loaded
+            % this allows to move the folder around without affecting the processing
+            config.folder = folder;
+
         end
         
         function config = create_config( self, className, nworkers, options )

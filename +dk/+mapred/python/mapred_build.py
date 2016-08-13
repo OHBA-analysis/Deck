@@ -1,53 +1,31 @@
 #!/bin/env/python
 
-import sys
-import time
-import json
-import shutil
-import argparse
 import os
+import sys
+import argparse
 import string
-
-# Template scripts
-tpl_task_map = string.Template('matlab -singleCompThread -nodisplay -r "cd $StartDir; startup; cd $WorkDir; mr = $ClassName(); mr.run_worker($SaveDir);exit;"')
-
-
-
-# From http://stackoverflow.com/a/3041990/472610
-def query_yes_no( question, default=None ):
-    
-    # Set prompt depending on default
-    if default is None:
-        prompt = " (yes/no) "
-    elif default == "yes":
-        prompt = " ([yes]/no) "
-    elif default == "no":
-        prompt = " (yes/[no]) "
-    else:
-        raise ValueError("Invalid default answer: '%s'" % default)
-
-    # Ask question until a valid answer is given
-    valid = {"yes": True, "no": False}
-    while True:
-        sys.stdout.write(question + prompt)
-        choice = raw_input().strip().lower()
-        if default is not None and choice == '':
-            return valid[default]
-        elif choice in valid:
-            return valid[choice]
-        else:
-            sys.stdout.write("Please respond either 'yes' or 'no'.\n")
+import mapred_utils as util
 
 
 # Check configuration contains all the required fields
-def check_config( cfg ):
+def check_validity( cfg ):
 
     # Check that all fields are there
-    assert { 'date', 'exec', 'folder' } <= set(cfg), '[root] Missing field(s).'
+    assert { 'id', 'cluster', 'exec', 'files', 'folders' } <= set(cfg), '[root] Missing field(s).'
     
-    # Check date
-    tmp = cfg['date']
-    assert isinstance(tmp,str) and tmp, '[date] Empty or invalid string.'
+    # Check id
+    tmp = cfg['id']
+    assert isinstance(tmp,str) and tmp, '[id] Empty or invalid string.'
+
+    # Check cluster
+    tmp = cfg['cluster']
+    valid_queues = ['veryshort', 'short', 'long', 'verylong', 'bigmem', 'cuda']
+    valid_mailopts = ['b','e','a','s']
+    assert { 'jobname', 'queue', 'email', 'mailopt' } <= set(tmp), '[cluster] Missing field(s).'
+    assert isinstance(tmp['jobname'],str) and tmp['jobname'], '[cluster.jobname] Empty or invalid string.'
+    assert isinstance(tmp['email'],str) and tmp['email'], '[cluster.email] Empty or invalid string.'
+    assert tmp['queue'] in valid_queues, '[cluster.queue] Invalid queue.'
+    assert tmp['mailopt'] in valid_mailopts, '[cluster.mailopt] Invalid mailopt.'
 
     # Check exec
     tmp = cfg['exec']
@@ -58,147 +36,178 @@ def check_config( cfg ):
     assert isinstance(tmp['options'],dict), '[exec.options] Invalid options.'
     assert sum(map( len, tmp['workers'] )) == len(tmp['jobs']), '[exec] Jobs/workers size mismatch.'
 
-    # Check cluster
-    tmp = cfg['cluster']
-    valid_queues = ['veryshort', 'short', 'long', 'verylong', 'bigmem', 'cuda']
-    valid_mailopts = ['b','e','a','s']
-    assert { 'name', 'queue', 'email', 'mailopt' } <= set(tmp), '[cluster] Missing field(s).'
-    assert isinstance(tmp['name'],str) and tmp['name'], '[cluster.name] Empty or invalid string.'
-    assert isinstance(tmp['email'],str), '[cluster.email] Invalid string.'
-    assert tmp['queue'] in valid_queues, '[cluster.queue] Invalid queue.'
-    assert tmp['mailopt'] in valid_mailopts, '[cluster.mailopt] Invalid mailopt.'
+    # Check files
+    tmp = cfg['files']
+    assert { 'reduced', 'worker' } <= set(tmp), '[files] Missing field(s).'
+    assert isinstance(tmp['reduced'],str) and tmp['reduced'], '[files.reduced] Empty or invalid string.'
+    assert isinstance(tmp['worker'],str) and tmp['worker'], '[files.worker] Empty or invalid string.'
+    try:
+        tpl = tmp['worker'] % (1)
+    except:
+        raise "[files.worker] Worker filename cannot be formatted."
 
-    # Check folder
-    tmp = cfg['folder']
-    assert { 'start', 'work', 'save' } <= set(tmp), '[folder] Missing field(s).'
-    assert isinstance(tmp['start'],str) and tmp['start'], '[cluster.start] Empty or invalid string.'
-    assert isinstance(tmp['save'],str) and tmp['save'], '[cluster.save] Empty or invalid string.'
-    assert isinstance(tmp['work'],str), '[cluster.work] Invalid string.' 
+    # Check folders
+    tmp = cfg['folders']
+    assert { 'start', 'work', 'save' } <= set(tmp), '[folders] Missing field(s).'
+    assert isinstance(tmp['start'],str) and tmp['start'], '[folders.start] Empty or invalid string.'
+    assert isinstance(tmp['save'],str) and tmp['save'], '[folders.save] Empty or invalid string.'
+    assert isinstance(tmp['work'],str), '[folders.work] Invalid string.' 
+
 
 # Check existing output folder
 def check_existing(cfg):
 
-    folder = cfg['folder']['save']
+    folder = cfg['folders']['save']
     if os.path.isdir(folder):
+
+        # If the reduced file already exists
+        redfile = os.path.join( folder, cfg['files']['reduced'] )
+        assert not os.path.isfile(redfile), \
+            'Reduced file "%s" already exists, either back it up or change "files.reduced" field.' % (redfile)
+
+        # If any of the workers outputs already exists
+        nworkers = len(cfg['exec']['workers'])
+        for i in xrange(nworkers):
+            workerfile = os.path.join( folder, cfg['files']['worker'] % (i+1) )
+            assert not os.path.isfile(workerfile), \
+                'Worker file "%s" already exists, either back it up or change "files.worker" field.' % (workerfile)
 
         # If there is an existing config ..
         cfgfile = os.path.join( folder, 'config/config.json' )
-        if os.path.isdir(cfgfile):
+        if os.path.isfile(cfgfile):
 
             # .. make sure it is compatible with the current one
             other = json.load(cfgfile)
+            assert other['id'] == cfg['id'], \
+                'Id mismatch with existing configuration "%s".' % (cfgfile)
             assert len(other['exec']['jobs']) == len(cfg['exec']['jobs']), \
-                'Inconsistency with existing configuration "%s".' % (cfgfile)
+                'Number of jobs mismatch with existing configuration "%s".' % (cfgfile)
             
-        # Return true if the folder already exists
-        return True
-    else:
-        return False
+            # format options as strings for comparison
+            opt_new = json.dumps( cfg['exec']['options'], indent=4 )
+            opt_old = json.dumps( other['exec']['options'], indent=4 )
+
+            # Return true if the folder already exists
+            return util.query_yes_no( """
+            An other configuration was found in folder '%s', and it looks compatible with the current one.
+            Going through with this build might result in OVERWRITING existing results. 
+            The options in the current configuration are:
+            %s
+
+            The options in the existing configuration are:
+            %s
+
+            Do you wish to proceed with the build?""" % ( folder, opt_new, opt_old ), "no" )
+    
+    return True
 
 
+# Write new config to save folder
+def make_config( cfg, folder ):
 
-# Parse inputs
-parser = argparse.ArgumentParser( prog=sys.argv[0] )
-parser.add_argument('config', nargs=1, help='Configuration file to be built')
-parser.add_argument('-n','--nosubmit', help='Do not submit after the build.', action='store_true')
+    # copy the whole config
+    other = dict(cfg)
 
-args = parser.parse_args()
+    # creat config folder if it doesnt exist
+    cfg_folder = os.path.join( folder, 'config' )
+    if not os.path.isdir( cfg_folder ):
+        os.makedirs( cfg_folder )
+
+    # link and filename
+    cfg_name  = 'config_%s.json' % (util.sortable_timestamp())
+    link_file = os.path.join( cfg_folder, 'config.json' )
+    cfg_file  = os.path.join( cfg_folder, cfg_name )
+
+    util.write_json( cfg_file, other )
+    util.relink( link_file, cfg_name )
 
 
-# Load and check config
-config = json.load(args.config)
+# Template scripts
+tpl_map = string.Template("""matlab -singleCompThread -nodisplay -r "cd '${startdir}'; startup; cd '${workdir}'; obj = ${classname}(); obj.run_worker('${savedir}',${workerid}); exit;" """)
+tpl_reduce = string.Template("""matlab -singleCompThread -nodisplay -r "cd '${startdir}'; startup; cd '${workdir}'; obj = ${classname}(); obj.run_reduce('${savedir}'); exit;" """)
+tpl_submit = string.Template("""#!/bin/bash
 
-check_config(config)
-check_existing(config)
+# remove info in all job subfolders
+for folder in job_*; do
+    [ -f $${folder}/info.json ] && rm -f $${folder}/info.json 
+done
 
+# submit map/reduce job to the cluster
+jid=$$(fsl_sub -q ${queue}.q -M ${email} -m ${mailopt} -N ${jobname} -l "${logdir}" -t "${mapscript}")
+fsl_sub -j $${jid} -q ${queue}.q -M ${email} -m ${mailopt} -N ${jobname} -l "${logdir}" "${redscript}"
+""")
 
-# Edit and save config
+# Write scripts according to current config
+def make_scripts( cfg, folder ):
 
-pepper_dir = os.path.split(os.path.realpath(__file__))[0] # Main repo directory
-main_conf = os.path.join(pepper_dir,'pepper.conf')
+    # default configuration
+    workdir = cfg['folders']['work']
+    if not workdir:
+        workdir = cfg['folders']['start']
 
-if os.path.isfile('pepper.conf'): 
-	conf_name = 'pepper.conf'
-elif os.path.isfile(main_conf):
-	conf_name = main_conf
-else:
-	print"Config file 'pepper.conf' was not found!"
-	with open(main_conf,'w') as f:
-		f.write("code_dir = '<<< EDIT PEPPER.CONF FIRST>>>' # Folder where your startup.m lives\n")
-		f.write("user_email = 'me@server.com' # Email address for job notifications\n")
-		f.write("default_jobname = 'pepper' # If you don't specify a job name, this will be used automatically\n")
-	print "Wrote default config file"
-	print main_conf
-	print "Edit it and try again"
-	sys.exit()
+    # substitution values from config
+    sub = dict(cfg['cluster'])
+    sub.update({
+          'savedir': cfg['folders']['save'],
+         'startdir': cfg['folders']['start'],
+          'workdir': workdir,
+        'classname': cfg['exec']['class'],
+           'logdir': 'logs',
+        'mapscript': 'map.sh',
+        'redscript': 'reduce.sh'
+    })
 
-execfile(conf_name) # Load user config
+    # put the scripts together
+    nworkers = len(cfg['exec']['workers'])
+    scripts['map.sh'] = "\n".join([ tpl_map.substitute(sub,workerid=(i+1)) for i in xrange(nworkers) ]) 
+    scripts['reduce.sh'] = tpl_reduce.substitute(sub)
+    scripts['submit'] = tpl_submit.substitute(sub)
 
-if not os.path.isdir(code_dir):
-	print "Code directory not found: %s" % (code_dir)
-	sys.exit()
-if not os.path.isfile(os.path.join(code_dir,'startup.m')):
-	print "Startup file %s not found" % (os.path.isfile(os.path.join(code_dir,'startup.m')))
-	print "This file must exist, even if it is empty"
-	sys.exit()
+    # create log folder
+    logdir = os.path.join( folder, 'logs' )
+    if not os.path.isdir(logdir):
+        os.mkdir(logdir)
 
-def get_foldername(fname):
-	if os.path.exists(fname):
-		fname = fname + '_' + time.strftime('%Y%m%d') # Append the date
+    # create scripts
+    for name,text in scripts.iteritems():
+        sname = os.path.join(folder,sname)
+        with open( sname, 'w' ) as f:
+            f.write(text)
+        
+    # make submit executable
+    util.make_executable(os.path.join(folder,'submit'))
+        
 
-	if os.path.exists(fname):
-		idx = 1
-		fname = fname + '_' + str(idx); # Append a counter
-		while os.path.exists(fname):
-			idx += 1
-			fname = fname[:-1] + str(idx);
+# Success message
+msg_success = """
+Successful build (%d jobs across %d workers). To submit to the cluster, run:
+    %s
+"""
 
-	return fname
+if __name__ == '__main__':
 
-parser = argparse.ArgumentParser(prog='submit')
-parser.add_argument('n_workers', nargs=1, help='Number of workers')
-parser.add_argument('filename', nargs=1, help='Name of .m file storing Pepper object to be run')
-parser.add_argument('--argstring', nargs=1,default=['()'], help='Pepper argument string')
-parser.add_argument('--queue', default=['short'], nargs=1, help='Queue name: [veryshort, short, long, verylong, bigmem]') # Short is appropriate because longer jobs will throw an error within 4 hours rather than 24
-parser.add_argument('--mailto', default=[user_email], nargs=1, help='Email address for notifications')
-parser.add_argument('--name', default=[default_jobname], nargs=1, help='Job name')
-parser.add_argument('--mail_conditions', default=['n'], nargs=1, help='Mail condition flags - [b]egin, [e]nd, [a]bort, [s]uspend, [n]o mail. Default "n"')
+    parser = argparse.ArgumentParser( prog=sys.argv[0] )
+    parser.add_argument('config', nargs=1, help='Configuration file to be built')
+    args = parser.parse_args()
 
-args = parser.parse_args()
-fname = args.filename[0]
-pep_argstring = args.argstring[0]
+    config = util.read_json(args.config)
+    check_validity(config)
 
-if (not pep_argstring.startswith('(')) or (not pep_argstring.endswith(')')) or ('"' in pep_argstring):
-	print("Argument string should start and end with brackets, and use single quotes internally")
-	sys.exit()
+    if check_existing(config):
 
-if not fname.endswith('.m'):
-	print("Input file should have a .m extension")
-	sys.exit()
-n_workers = int(args.n_workers[0])
-pepper_name = os.path.splitext(fname)[0];
-folder_name = get_foldername(pepper_name);
-work_dir = os.path.abspath(folder_name);
-os.mkdir(work_dir)
-shutil.copyfile(fname,os.path.join(work_dir,fname))
-os.mkdir(os.path.join(work_dir,'logs'))
-os.mkdir(os.path.join(work_dir,'worker_files'))
+        # Create save folder
+        folder = config['folders']['save']
+        if not os.path.isdir( folder ):
+            os.makedirs( folder )
 
-# Now, write the job file
-with open(os.path.join(work_dir,'worker_commands.sh'),'w') as f:
-	for i in xrange(1,n_workers+1):
-		f.write('sleep $[ ( $RANDOM %% 20 )  + 1 ]s && matlab -singleCompThread -nojvm -nodisplay -r "cd %s; startup; cd %s; pep = %s%s; pep.cluster_run(%d,%d);exit;"\n' % (code_dir,work_dir,pepper_name,pep_argstring,i,n_workers))
+        # Create config 
+        make_config( config, folder )
 
-with open(os.path.join(work_dir,'assemble.sh'),'w') as f:
-	f.write('matlab -singleCompThread -nojvm -nodisplay -r "cd %s; startup; cd %s; pep = %s%s; pep.assemble();exit;"\n' % (code_dir,work_dir,pepper_name,pep_argstring))
+        # Create scripts
+        make_scripts( config, folder )
 
-with open(os.path.join(work_dir,'fsl_sub_command.sh'),'w') as f:
-	f.write("jid=`/opt/fmrib/fsl/bin/fsl_sub -q %s.q -M %s -m %s -N %s -l %s -t %s`\n" % (args.queue[0],args.mailto[0],args.mail_conditions[0],args.name[0],os.path.join(work_dir,'logs'),os.path.join(work_dir,'worker_commands.sh')))
-	f.write("/opt/fmrib/fsl/bin/fsl_sub -j $jid -q %s.q -M %s -m %s -N %s -l %s %s\n" % (args.queue[0],args.mailto[0],args.mail_conditions[0],args.name[0],os.path.join(work_dir,'logs'),os.path.join(work_dir,'assemble.sh')))
+        # Success message
+        njobs = len(cfg['exec']['jobs'])
+        nworkers = len(cfg['exec']['workers'])
+        print success_msg % ( njobs, nworkers, os.path.join(folder,'submit') )
 
-os.system('chmod u+x %s' % os.path.join(work_dir,'fsl_sub_command.sh'))
-os.system('chmod u+x %s' % os.path.join(work_dir,'worker_commands.sh'))
-os.system('chmod u+x %s' % os.path.join(work_dir,'assemble.sh'))
-os.system('bash %s >> /dev/null' % os.path.join(work_dir,'fsl_sub_command.sh'))
-
-print "Job submitted - %s" % work_dir

@@ -21,6 +21,7 @@
 *.mexa*
 *.mat
 
-# Flattened sources
+# Other
 dk_flat
+**/.vscode
 
