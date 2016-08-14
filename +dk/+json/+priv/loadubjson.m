@@ -1,4 +1,4 @@
-function data = loadub(fname,varargin)
+function data = loadubjson(fname,varargin)
 %
 % data=loadubjson(fname,opt)
 %    or

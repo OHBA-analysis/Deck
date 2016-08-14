@@ -1,0 +1,28 @@
+{ 
+    "id": "",
+
+    "cluster" : {
+        "jobname": "mapred",
+        "queue": "long",
+        "email": "",
+        "mailopt": "n"
+    },
+
+    "exec" : {
+        "class": "",
+        "jobs": [],
+        "workers": [],
+        "options": {}
+    },
+
+    "files" : {
+        "reduced": "reduced.mat",
+        "worker": "worker_%d_output.mat"
+    },
+
+    "folders" : {
+        "start": "", 
+        "work": "",  
+        "save": ""
+    }
+}
