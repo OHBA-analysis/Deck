@@ -1,4 +1,4 @@
-function y = truncate( x, s )
+function y = trunc( x, s )
 %
 % Truncate input to s signficant digits away from 0.
     

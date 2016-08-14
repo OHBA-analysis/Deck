@@ -31,7 +31,7 @@ function init( className, tplName, tplOpt, jsonOpt )
     % format templates
     tplOpt.Class = file;
     tplOpt.Name = className;
-    tplOpt.ID = dk.mapred.dateid();
+    tplOpt.ID = dk.time.datestr('longstamp');
     tplm = format_template( tplm, tplOpt );
     
     tplj.id = tplOpt.ID;

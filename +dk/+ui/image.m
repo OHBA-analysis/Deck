@@ -12,7 +12,7 @@ function [h,color_scale] = image( img, varargin )
     label_c        = opt.get('clabel',         '' );
     remove_ticks   = opt.get('remove_ticks',   isempty(label_x) && isempty(label_y) );
     
-    scale_func     = opt.get('scale_func',     @(x) max(abs(dk.math.truncate(x(:),2))) );
+    scale_func     = opt.get('scale_func',     @(x) max(abs(dk.math.trunc(x(:),2))) );
     cmap_name      = opt.get('cmap',          'bgr' );
     subpos         = opt.get('subplot',       {} );
     

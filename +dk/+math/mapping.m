@@ -1,7 +1,6 @@
 function ind = mapping( values, index, method )
 %
-% Assign a color to each element in vector "values" using the colormap cmap.
-% cmap should be a nx3 matrix with n typically on the order of 100.
+% Interpolate index in [0,1] as mapping to range of values using method.
 
     if nargin < 3, method = 'linear'; end
     
