@@ -7,10 +7,6 @@ classdef ${Class} < dk.mapred.Abstract
 
     methods
 
-        % constructor
-        function self = ${Class}()
-        end
-
         function inputs = get_inputs(self,index)
 
             inputs = linspace(0,2*pi,100);

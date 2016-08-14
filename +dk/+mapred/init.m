@@ -25,14 +25,14 @@ function init( className, tplName, tplOpt, jsonOpt )
     end
     
     % load templates
-    tplm = dk.fs.gets(fullfile( tplfolder, [tplName '.m'] ));
+    tplm = dk.str.Template(fullfile( tplfolder, [tplName '.m'] ),true);
     tplj = dk.json.load(fullfile( tplfolder, [tplName '.mapred.json'] ));
     
     % format templates
     tplOpt.Class = file;
     tplOpt.Name = className;
     tplOpt.ID = dk.time.datestr('longstamp');
-    tplm = format_template( tplm, tplOpt );
+    tplm = tplm.substitute( tplOpt );
     
     tplj.id = tplOpt.ID;
     tplj.exec.class = tplOpt.Name;
@@ -43,15 +43,5 @@ function init( className, tplName, tplOpt, jsonOpt )
     % save formatted templates
     dk.fs.puts( fullfile([fileName '.m']), tplm, true );
     dk.json.save( fullfile([fileName '.mapred.json']), tplj );
-
-end
-
-function str = format_template( str, sub )
-
-    fields = fieldnames(sub);
-    for i = 1:numel(fields)
-        f = fields{i};
-        str = strrep( str, ['${' f '}'], sub.(f) );
-    end
 
 end
