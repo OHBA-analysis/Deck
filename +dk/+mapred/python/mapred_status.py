@@ -1,15 +1,15 @@
-#!/bin/env/python
+#!/usr/bin/env python
 
 import os
 import argparse
 import mapred_utils as util
 from datetime import datetime as date
 from datetime import timedelta
-import dateutil.parser as dateparser
+from dateutil import parser as dateparser
 
 
 # Search for config file in current directory
-def search_config():
+def find_config():
 
     # Look for config folder
     if os.path.isdir( 'config' ):
@@ -44,43 +44,43 @@ def time_remaining( startstamp, fraction ):
 def worker_progress( folder, workerid, jobids ):
 
     # Analyse status for each job in worker
-    pgr = { 'running': 0.0, 'done': 0.0, 'fail': 0.0, 'total': len(jobids) }
-    for i in jobids:
-        info = read_info(folder,i)
+    pgr = { 'running': 0.0, 'done': 0.0, 'failed': 0.0, 'total': len(jobids) }
+    for job in jobids:
+        info = read_info(folder,job)
         if info:
             pgr[ info['status'].lower() ] += 1
 
     # Estimate remaining time
-    info = read_info(folder,jobid[0])
+    info = read_info(folder,jobids[0])
     if not info:
         remaining = '<undefined>'
     else:
-        remaining = str(time_remaining( info['start'], pgr['done']/max(0.5,pgr['total']-pgr['fail']) ))
+        remaining = str(time_remaining( info['start'], pgr['done']/max(0.5,pgr['total']-pgr['failed']) ))
 
     print """
     Worker #%d [ %d %%, timeleft: %s ]
-     + total : %d
-     + done  : %d
-     + fail  : %d
+     + total  : %d
+     + done   : %d
+     + failed : %d
     """ % ( 
-        workerid, 100.0 * (pgr['done']+pgr['fail'])/pgr['total'], remaining, 
-        pgr['total'], pgr['done'], pgr['fail'] 
+        workerid, 100.0 * (pgr['done']+pgr['failed'])/pgr['total'], remaining, 
+        pgr['total'], pgr['done'], pgr['failed'] 
     )
 
 
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser( prog=sys.argv[0] )
+    parser = argparse.ArgumentParser( prog='mapres_status' )
     parser.add_argument('config', nargs=1, default=[''], help='Configuration file (search for it if omitted)')
     args = parser.parse_args()
 
     # Get config file and read it
-    cfgfile = args.config
+    cfgfile = args.config[0]
     if not cfgfile:
-        cfgfile = search_config()
+        cfgfile = find_config()
 
-    config = read_json(cfgfile)
+    config = util.read_json(cfgfile)
     folder = config['folders']['save']
 
     # Analyse workers progress

@@ -1,8 +1,8 @@
-#!/bin/env/python
 
 import time
 import json
 import stat
+import sys
 import os
 
 # From http://stackoverflow.com/a/3041990/472610
@@ -40,7 +40,8 @@ def matlab_timestamp():
 # Make a file executable
 def make_executable( filename ):
     if os.path.isfile(filename):
-        os.chmod(filename,stat.S_IXUSR)
+        st = os.stat(filename)
+        os.chmod( filename, st.st_mode | stat.S_IXUSR )
 
 # Relink symbolic link
 def relink( linkfile, newtarget ):
@@ -48,6 +49,10 @@ def relink( linkfile, newtarget ):
         os.unlink(linkfile)
 
     os.symlink( newtarget, linkfile )
+
+# Test is something is a string
+def is_string( x, notempty=True ):
+    return isinstance(x,basestring) and ( not notempty or x )
 
 # Write JSON object to file
 def write_json( filename, obj ):

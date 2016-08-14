@@ -1,9 +1,9 @@
-#!/bin/env/python
+#!/usr/bin/env python
 
 import os
-import sys
 import argparse
 import string
+import json
 import mapred_utils as util
 
 
@@ -15,22 +15,22 @@ def check_validity( cfg ):
     
     # Check id
     tmp = cfg['id']
-    assert isinstance(tmp,str) and tmp, '[id] Empty or invalid string.'
+    assert util.is_string(tmp), '[id] Empty or invalid string.'
 
     # Check cluster
     tmp = cfg['cluster']
     valid_queues = ['veryshort', 'short', 'long', 'verylong', 'bigmem', 'cuda']
-    valid_mailopts = ['b','e','a','s']
+    valid_mailopts = ['b','e','a','s','n']
     assert { 'jobname', 'queue', 'email', 'mailopt' } <= set(tmp), '[cluster] Missing field(s).'
-    assert isinstance(tmp['jobname'],str) and tmp['jobname'], '[cluster.jobname] Empty or invalid string.'
-    assert isinstance(tmp['email'],str) and tmp['email'], '[cluster.email] Empty or invalid string.'
+    assert util.is_string(tmp['jobname']), '[cluster.jobname] Empty or invalid string.'
+    assert util.is_string(tmp['email']), '[cluster.email] Empty or invalid string.'
     assert tmp['queue'] in valid_queues, '[cluster.queue] Invalid queue.'
     assert tmp['mailopt'] in valid_mailopts, '[cluster.mailopt] Invalid mailopt.'
 
     # Check exec
     tmp = cfg['exec']
     assert { 'class', 'jobs', 'workers', 'options' } <= set(tmp), '[exec] Missing field(s).'
-    assert isinstance(tmp['class'],str) and tmp['class'], '[exec.class] Empty or invalid string.'
+    assert util.is_string(tmp['class']), '[exec.class] Empty or invalid string.'
     assert isinstance(tmp['jobs'],list) and tmp['jobs'], '[exec.jobs] Empty or invalid list.'
     assert isinstance(tmp['workers'],list) and tmp['workers'], '[exec.workers] Empty or invalid list.'
     assert isinstance(tmp['options'],dict), '[exec.options] Invalid options.'
@@ -39,8 +39,8 @@ def check_validity( cfg ):
     # Check files
     tmp = cfg['files']
     assert { 'reduced', 'worker' } <= set(tmp), '[files] Missing field(s).'
-    assert isinstance(tmp['reduced'],str) and tmp['reduced'], '[files.reduced] Empty or invalid string.'
-    assert isinstance(tmp['worker'],str) and tmp['worker'], '[files.worker] Empty or invalid string.'
+    assert util.is_string(tmp['reduced']), '[files.reduced] Empty or invalid string.'
+    assert util.is_string(tmp['worker']), '[files.worker] Empty or invalid string.'
     try:
         tpl = tmp['worker'] % (1)
     except:
@@ -49,12 +49,21 @@ def check_validity( cfg ):
     # Check folders
     tmp = cfg['folders']
     assert { 'start', 'work', 'save' } <= set(tmp), '[folders] Missing field(s).'
-    assert isinstance(tmp['start'],str) and tmp['start'], '[folders.start] Empty or invalid string.'
-    assert isinstance(tmp['save'],str) and tmp['save'], '[folders.save] Empty or invalid string.'
-    assert isinstance(tmp['work'],str), '[folders.work] Invalid string.' 
+    assert util.is_string(tmp['start']), '[folders.start] Empty or invalid string.'
+    assert util.is_string(tmp['save']), '[folders.save] Empty or invalid string.'
+    assert util.is_string(tmp['work'],False), '[folders.work] Invalid string.' 
 
 
 # Check existing output folder
+msg_warning = """WARNING:
+    Another configuration was found in folder '%s', and it looks compatible with the current one.
+    Going through with this build might result in OVERWRITING existing results. 
+    The options in the current configuration are:\n%s
+
+    The options in the existing configuration are:\n%s
+
+    Do you wish to proceed with the build?"""
+
 def check_existing(cfg):
 
     folder = cfg['folders']['save']
@@ -77,7 +86,7 @@ def check_existing(cfg):
         if os.path.isfile(cfgfile):
 
             # .. make sure it is compatible with the current one
-            other = json.load(cfgfile)
+            other = util.read_json(cfgfile)
             assert other['id'] == cfg['id'], \
                 'Id mismatch with existing configuration "%s".' % (cfgfile)
             assert len(other['exec']['jobs']) == len(cfg['exec']['jobs']), \
@@ -88,16 +97,7 @@ def check_existing(cfg):
             opt_old = json.dumps( other['exec']['options'], indent=4 )
 
             # Return true if the folder already exists
-            return util.query_yes_no( """
-            An other configuration was found in folder '%s', and it looks compatible with the current one.
-            Going through with this build might result in OVERWRITING existing results. 
-            The options in the current configuration are:
-            %s
-
-            The options in the existing configuration are:
-            %s
-
-            Do you wish to proceed with the build?""" % ( folder, opt_new, opt_old ), "no" )
+            return util.query_yes_no( msg_warning % ( folder, opt_new, opt_old ), "no" )
     
     return True
 
@@ -112,6 +112,7 @@ def make_config( cfg, folder ):
     cfg_folder = os.path.join( folder, 'config' )
     if not os.path.isdir( cfg_folder ):
         os.makedirs( cfg_folder )
+        print 'Created folder "%s".' % (cfg_folder)
 
     # link and filename
     cfg_name  = 'config_%s.json' % (util.sortable_timestamp())
@@ -159,9 +160,11 @@ def make_scripts( cfg, folder ):
 
     # put the scripts together
     nworkers = len(cfg['exec']['workers'])
-    scripts['map.sh'] = "\n".join([ tpl_map.substitute(sub,workerid=(i+1)) for i in xrange(nworkers) ]) 
-    scripts['reduce.sh'] = tpl_reduce.substitute(sub)
-    scripts['submit'] = tpl_submit.substitute(sub)
+    scripts = {
+           'map.sh': "\n".join([ tpl_map.substitute(sub,workerid=(i+1)) for i in xrange(nworkers) ]),
+        'reduce.sh': tpl_reduce.substitute(sub),
+           'submit': tpl_submit.substitute(sub)
+    }
 
     # create log folder
     logdir = os.path.join( folder, 'logs' )
@@ -170,7 +173,7 @@ def make_scripts( cfg, folder ):
 
     # create scripts
     for name,text in scripts.iteritems():
-        sname = os.path.join(folder,sname)
+        sname = os.path.join(folder,name)
         with open( sname, 'w' ) as f:
             f.write(text)
         
@@ -186,19 +189,31 @@ Successful build (%d jobs across %d workers). To submit to the cluster, run:
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser( prog=sys.argv[0] )
+    parser = argparse.ArgumentParser( prog='mapres_build' )
     parser.add_argument('config', nargs=1, help='Configuration file to be built')
     args = parser.parse_args()
 
-    config = util.read_json(args.config)
+    # Try different extensions in case it's missing
+    config = args.config[0]
+    if os.path.isfile(config + '.mapred.json'):
+        config = config + '.mapred.json'
+    elif os.path.isfile(config + '.json'):
+        config = config + '.json'
+    else:
+        assert os.path.isfile(config), 'File "%s" not found.' % (config)
+
+    # Load config and validate it
+    config = util.read_json(config)
     check_validity(config)
 
+    # Process it
     if check_existing(config):
 
         # Create save folder
         folder = config['folders']['save']
         if not os.path.isdir( folder ):
             os.makedirs( folder )
+            print 'Created folder "%s".' % (folder)
 
         # Create config 
         make_config( config, folder )
@@ -207,7 +222,7 @@ if __name__ == '__main__':
         make_scripts( config, folder )
 
         # Success message
-        njobs = len(cfg['exec']['jobs'])
-        nworkers = len(cfg['exec']['workers'])
-        print success_msg % ( njobs, nworkers, os.path.join(folder,'submit') )
+        njobs = len(config['exec']['jobs'])
+        nworkers = len(config['exec']['workers'])
+        print msg_success % ( njobs, nworkers, os.path.join(folder,'submit') )
 

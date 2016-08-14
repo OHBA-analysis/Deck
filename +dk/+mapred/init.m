@@ -1,23 +1,57 @@
-function init( fileName, tplName, className )
+function init( className, tplName, tplOpt, jsonOpt )
+%
+% dk.mapred.init( className, tplName, jsonOpt, tplOpt )
+%
+% className : name of the class as it would be called from console (eg 'foo.bar.Baz')
+% tplName   : template name (eg 'default')
+% jsonOpt   : structure to be merged with the json config
+% tplOpt    : structure with additional substitutions for the template
+%
+% JH
 
-    if nargin < 3, className = fileName; end
+    tplfolder = fullfile( dk.mapred.path, 'templates' );
+    if nargin < 2 || isempty(tplName), tplName = 'default'; end
+    if nargin < 3 || isempty(tplOpt), tplOpt = struct(); end
     
-    tplfolder = fullfile( dk.mapred.path, 'template' );
-    
-    % Parse filename
-    [folder,file,ext] = fileparts(fileName);
-    
-    assert( isempty(exp) || strcmp(ext,'.m'), 'Filename extension should be .m' );
     assert( isempty(strfind(className,' ')) && isempty(strfind(className,pathsep)), 'Invalid class name.' );
     assert( dk.fs.is_file(fullfile( tplfolder, [tplName '.m'] )), 'Unknown template.' );
     
-    % Create folder if needed
-    if ~dk.fs.is_dir(folder)
+    % create folder if needed
+    fileName = dk.mapred.name2relpath( className );
+    [folder,file] = fileparts(fileName);
+    if ~isempty(folder) && ~dk.fs.is_dir(folder)
         dk.assert( mkdir(folder), 'Could not create folder "%s".', folder );
+        dk.println( 'Created folder "%s".', folder );
     end
     
-    % Load tempalte
-    dk.assert( copyfile( fullfile(tplfolder,[tplName '.m']), fullfile(folder,[file '.m']) ), 'Could not copy template file.' );
-    dk.assert( copyfile( fullfile(tplfolder,[tplName '.json']), fullfile(folder,[file '.json']) ), 'Could not copy template file.' );
+    % load templates
+    tplm = dk.fs.gets(fullfile( tplfolder, [tplName '.m'] ));
+    tplj = dk.json.load(fullfile( tplfolder, [tplName '.mapred.json'] ));
+    
+    % format templates
+    tplOpt.Class = file;
+    tplOpt.Name = className;
+    tplOpt.ID = dk.mapred.dateid();
+    tplm = format_template( tplm, tplOpt );
+    
+    tplj.id = tplOpt.ID;
+    tplj.exec.class = tplOpt.Name;
+    if nargin > 3
+        tplj = dk.struct.merge( tplj, jsonOpt );
+    end
+    
+    % save formatted templates
+    dk.fs.puts( fullfile([fileName '.m']), tplm, true );
+    dk.json.save( fullfile([fileName '.mapred.json']), tplj );
+
+end
+
+function str = format_template( str, sub )
+
+    fields = fieldnames(sub);
+    for i = 1:numel(fields)
+        f = fields{i};
+        str = strrep( str, ['${' f '}'], sub.(f) );
+    end
 
 end

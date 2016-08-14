@@ -1,19 +1,21 @@
-classdef $Name < dk.mapred.Abstract
+classdef ${Class} < dk.mapred.Abstract
 
-    properties
-        name = '$Name';
+    properties (Constant)
+        name = '${Name}';
+        id = '${ID}';
     end
 
     methods
 
         % constructor
-        function self = $Name()
+        function self = ${Class}()
         end
 
         function inputs = get_inputs(self,index)
 
-            inputs = arrayfun( @(x) struct('x',x), linspace(0,2*pi,100), 'UniformOutput', false );
-            inputs = [inputs{:}];
+            inputs = linspace(0,2*pi,100);
+            %inputs = arrayfun( @(x) struct('x',x), inputs, 'UniformOutput', false );
+            %inputs = [inputs{:}];
 
             if nargin > 1
                 inputs = inputs(index);
@@ -22,6 +24,8 @@ classdef $Name < dk.mapred.Abstract
         end
 
         function output = process(self,inputs,folder,varargin)
+
+            if nargin < 3, folder=[]; end
 
             % parse options
             opt = dk.obj.kwArgs( varargin{:} );
@@ -43,14 +47,10 @@ classdef $Name < dk.mapred.Abstract
             end
 
             % save data to folder
-            savename = fullfile( folder, sprintf('output_%s.mat',opt_mode) ); 
-            save( savename, '-v7', 'output' );
-
-        end
-
-        function configure( self, nworkers )
-
-            
+            if ~isempty(folder)
+                savename = fullfile( folder, sprintf('output_%s.mat',opt_mode) ); 
+                save( savename, '-v7', 'output' );
+            end
 
         end
 

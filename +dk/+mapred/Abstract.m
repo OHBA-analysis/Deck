@@ -1,4 +1,4 @@
-classdef MapReduce < handle
+classdef Abstract < handle
     
     properties (Abstract,Constant)
         name
@@ -21,24 +21,56 @@ classdef MapReduce < handle
         %
         output = process(self,inputs,folder,varargin);
         
-        % First arg should be the number of workers among which the jobs should be distributed.
-        %
-        % This function should call create_config internally with the name of the derived class.
-        %
-        configure(self,nworkers,varargin);
-        
     end
     
     methods
 
         function cfg = load_config(self)
-            cfg = dk.json.load([self.name '.mapred']);
+            cfg = dk.json.load(self.config_file);
+        end
+
+        function cfg = configure(self,nworkers,varargin)
+
+            cfg     = self.load_config();
+            inputs  = self.get_inputs();
+            njobs   = numel(inputs);
+            workers = split_jobs( njobs, nworkers );
+            options = dk.obj.kwArgs(varargin{:});
+            
+            % edit the exec field
+            cfg.exec.class   = self.name;
+            cfg.exec.jobs    = inputs;
+            cfg.exec.workers = workers;
+            cfg.exec.options = options.parsed;
+
+            % save edited config
+            dk.println('[MapReduce] Configuration edited in "%s".',self.config_file);
+            dk.json.save(self.config_file,cfg);
+
         end
         
     end
     
     methods (Hidden)
         
+        function f = config_file(self)
+            f = [dk.mapred.name2relpath(self.name) '.mapred.json'];
+        end
+
+        function config = load_running_config( self, folder )
+
+            % load config (contains options)
+            config = dk.json.load(fullfile( folder, 'config/config.json' ));
+
+            % make sure the ID is correct
+            assert( strcmp(config.id,self.id), 'ID mismatch between class and running config.' );
+            
+            % save the folder from where the config was loaded
+            % this allows to move the folder around without affecting the processing
+            config.folder = folder;
+
+        end
+
         function output = run_job( self, workerid, jobid, config )
             
             % create folder for storage if it doesn't already exist
@@ -47,7 +79,7 @@ classdef MapReduce < handle
                 dk.assert( mkdir(jobfolder), 'Could not create folder "%s".', jobfolder );
             end
             
-            % parse options
+            % parse options and make sure it's a struct
             options = config.exec.options;
             if isempty(options)
                 options = struct();
@@ -162,6 +194,7 @@ classdef MapReduce < handle
                     workerdata = load( workerfile );
                     output( config.exec.workers{i} ) = workerdata.output;
                     dk.println('Worker %d/%d merged, timeleft %s...',i,nworkers,timer.timeleft_str(i/nworkers));
+                    % delete( worderfile );
                 catch
                     dk.println('Worker %d/%d... FAILED',i,nworkers);
                 end
@@ -177,38 +210,6 @@ classdef MapReduce < handle
             dk.println('        output : %s',outfile);
             dk.println('----------------\n');
 
-        end
-
-        function config = load_running_config( self, folder )
-
-            % load config (contains options)
-            config = dk.json.load(fullfile( folder, 'config/config.json' ));
-
-            % make sure the ID is correct
-            assert( strcmp(config.id,self.id), 'ID mismatch between class and running config.' );
-            
-            % save the folder from where the config was loaded
-            % this allows to move the folder around without affecting the processing
-            config.folder = folder;
-
-        end
-        
-        function config = create_config( self, className, nworkers, options )
-            
-            config  = self.load_config();
-            inputs  = self.get_inputs();
-            njobs   = numel(inputs);
-            workers = split_jobs( njobs, nworkers );
-            
-            % edit the exec field
-            config.exec.class   = className;
-            config.exec.jobs    = inputs;
-            config.exec.workers = workers;
-            config.exec.options = options;
-
-            % save edited config
-            dk.json.save([self.name '.mapred'],config);
-            
         end
         
     end
