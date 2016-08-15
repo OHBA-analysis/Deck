@@ -27,6 +27,7 @@ classdef Abstract < handle
 
         function cfg = load_config(self)
             cfg = dk.json.load(self.config_file);
+            cfg = fix_config(cfg);
         end
 
         function cfg = configure(self,nworkers,varargin)
@@ -61,6 +62,7 @@ classdef Abstract < handle
 
             % load config (contains options)
             config = dk.json.load(fullfile( folder, 'config/config.json' ));
+            config = fix_config(config);
 
             % make sure the ID is correct
             assert( strcmp(config.id,self.id), 'ID mismatch between class and running config.' );
@@ -241,4 +243,14 @@ function jobids = split_jobs( njobs, nworkers )
         jobids{i} = (1+jobstrides(i)):jobstrides(i+1);
     end
     
+end
+
+% apply corrections because of crap JSON parsing
+function config = fix_config(config)
+
+    % make sure the workers are stored in a cell
+    if ~iscell(config.exec.workers)
+        config.exec.workers = arrayfun( @(x) x, config.exec.workers, 'UniformOutput', false );
+    end
+
 end

@@ -7,7 +7,7 @@ function data = loadjson(fname,varargin)
 % parse a JSON (JavaScript Object Notation) file or string
 %
 % authors:Qianqian Fang (fangq<at> nmr.mgh.harvard.edu)
-% created on 2011/09/09, including previous works from 
+% created on 2011/09/09, including previous works from
 %
 %         Nedialko Krouchev: http://www.mathworks.com/matlabcentral/fileexchange/25713
 %            created on 2009/11/02
@@ -22,19 +22,19 @@ function data = loadjson(fname,varargin)
 % input:
 %      fname: input file name, if fname contains "{}" or "[]", fname
 %             will be interpreted as a JSON string
-%      opt: a struct to store parsing options, opt can be replaced by 
+%      opt: a struct to store parsing options, opt can be replaced by
 %           a list of ('param',value) pairs - the param string is equivallent
-%           to a field in opt. opt can have the following 
+%           to a field in opt. opt can have the following
 %           fields (first in [.|.] is the default)
 %
 %           opt.SimplifyCell [0|1]: if set to 1, loadjson will call cell2mat
-%                         for each element of the JSON data, and group 
+%                         for each element of the JSON data, and group
 %                         arrays based on the cell2mat rules.
 %           opt.FastArrayParser [1|0 or integer]: if set to 1, use a
-%                         speed-optimized array parser when loading an 
-%                         array object. The fast array parser may 
+%                         speed-optimized array parser when loading an
+%                         array object. The fast array parser may
 %                         collapse block arrays into a single large
-%                         array similar to rules defined in cell2mat; 0 to 
+%                         array similar to rules defined in cell2mat; 0 to
 %                         use a legacy parser; if set to a larger-than-1
 %                         value, this option will specify the minimum
 %                         dimension to enable the fast array parser. For
@@ -56,65 +56,67 @@ function data = loadjson(fname,varargin)
 %      dat=loadjson(['examples' filesep 'example1.json'],'SimplifyCell',1)
 %
 % license:
-%     BSD License, see LICENSE_BSD.txt files for details 
+%     BSD License, see LICENSE_BSD.txt files for details
 %
 % -- this function is part of JSONLab toolbox (http://iso2mesh.sf.net/cgi-bin/index.cgi?jsonlab)
 %
 
-global pos inStr len  esc index_esc len_esc isoct arraytoken
+    global pos inStr len esc index_esc len_esc isoct arraytoken
 
-if(regexp(fname,'^\s*(?:\[.+\])|(?:\{.+\})\s*$','once'))
-   string=fname;
-elseif(exist(fname,'file'))
-   try
-       string = fileread(fname);
-   catch
-       try
-           string = urlread(['file://',fname]);
-       catch
-           string = urlread(['file://',fullfile(pwd,fname)]);
-       end
-   end
-else
-   error('input file does not exist');
-end
-
-pos = 1; len = length(string); inStr = string;
-isoct=exist('OCTAVE_VERSION','builtin');
-arraytoken=find(inStr=='[' | inStr==']' | inStr=='"');
-jstr=regexprep(inStr,'\\\\','  ');
-escquote=regexp(jstr,'\\"');
-arraytoken=sort([arraytoken escquote]);
-
-% String delimiters and escape chars identified to improve speed:
-esc = find(inStr=='"' | inStr=='\' ); % comparable to: regexp(inStr, '["\\]');
-index_esc = 1; len_esc = length(esc);
-
-opt=dk.json.varargin2struct(varargin{:});
-
-if(dk.json.opt('ShowProgress',0,opt)==1)
-    opt.progressbar_=waitbar(0,'loading ...');
-end
-jsoncount=1;
-while pos <= len
-    switch(next_char)
-        case '{'
-            data{jsoncount} = parse_object(opt);
-        case '['
-            data{jsoncount} = parse_array(opt);
-        otherwise
-            error_pos('Outer level structure must be an object or an array');
+    if(regexp(fname,'^\s*(?:\[.+\])|(?:\{.+\})\s*$','once'))
+        string=fname;
+    elseif(exist(fname,'file'))
+        try
+            string = fileread(fname);
+        catch
+            try
+                string = urlread(['file://',fname]);
+            catch
+                string = urlread(['file://',fullfile(pwd,fname)]);
+            end
+        end
+    else
+        error('input file does not exist');
     end
-    jsoncount=jsoncount+1;
-end % while
 
-jsoncount=length(data);
-if(jsoncount==1 && iscell(data))
-    data=data{1};
-end
+    pos = 1; len = length(string); inStr = string;
+    isoct=exist('OCTAVE_VERSION','builtin');
+    arraytoken=find(inStr=='[' | inStr==']' | inStr=='"');
+    jstr=regexprep(inStr,'\\\\','  ');
+    escquote=regexp(jstr,'\\"');
+    arraytoken=sort([arraytoken escquote]);
 
-if(isfield(opt,'progressbar_'))
-    close(opt.progressbar_);
+    % String delimiters and escape chars identified to improve speed:
+    esc = find(inStr=='"' | inStr=='\' ); % comparable to: regexp(inStr, '["\\]');
+    index_esc = 1; len_esc = length(esc);
+
+    opt=dk.json.varargin2struct(varargin{:});
+
+    if(dk.json.opt('ShowProgress',0,opt)==1)
+        opt.progressbar_=waitbar(0,'loading ...');
+    end
+    jsoncount=1;
+    while pos <= len
+        switch(next_char)
+            case '{'
+                data{jsoncount} = parse_object(opt);
+            case '['
+                data{jsoncount} = parse_array(opt);
+            otherwise
+                error_pos('Outer level structure must be an object or an array');
+        end
+        jsoncount=jsoncount+1;
+    end % while
+
+    jsoncount=length(data);
+    if(jsoncount==1 && iscell(data))
+        data=data{1};
+    end
+
+    if(isfield(opt,'progressbar_'))
+        close(opt.progressbar_);
+    end
+    
 end
 
 %%-------------------------------------------------------------------------
@@ -140,11 +142,12 @@ function object = parse_object(varargin)
     if(isstruct(object))
         object=struct2jdata(object);
     end
+end
+
 
 %%-------------------------------------------------------------------------
-
 function object = parse_array(varargin) % JSON array is written in row-major order
-global pos inStr isoct
+    global pos inStr isoct
     parse_char('[');
     object = cell(0, 1);
     dim2=[];
@@ -155,7 +158,7 @@ global pos inStr isoct
     end
 
     if next_char ~= ']'
-	if(dk.json.opt('FastArrayParser',1,varargin{:})>=1 && arraydepth>=dk.json.opt('FastArrayParser',1,varargin{:}))
+        if(dk.json.opt('FastArrayParser',1,varargin{:})>=1 && arraydepth>=dk.json.opt('FastArrayParser',1,varargin{:}))
             [endpos, e1l, e1r]=matching_bracket(inStr,pos);
             arraystr=['[' inStr(pos:endpos)];
             arraystr=regexprep(arraystr,'"_NaN_"','NaN');
@@ -164,33 +167,33 @@ global pos inStr isoct
             arraystr(arraystr==sprintf('\r'))=[];
             %arraystr=regexprep(arraystr,'\s*,',','); % this is slow,sometimes needed
             if(~isempty(e1l) && ~isempty(e1r)) % the array is in 2D or higher D
-        	astr=inStr((e1l+1):(e1r-1));
-        	astr=regexprep(astr,'"_NaN_"','NaN');
-        	astr=regexprep(astr,'"([-+]*)_Inf_"','$1Inf');
-        	astr(astr==sprintf('\n'))=[];
-        	astr(astr==sprintf('\r'))=[];
-        	astr(astr==' ')='';
-        	if(isempty(find(astr=='[', 1))) % array is 2D
+                astr=inStr((e1l+1):(e1r-1));
+                astr=regexprep(astr,'"_NaN_"','NaN');
+                astr=regexprep(astr,'"([-+]*)_Inf_"','$1Inf');
+                astr(astr==sprintf('\n'))=[];
+                astr(astr==sprintf('\r'))=[];
+                astr(astr==' ')='';
+                if(isempty(find(astr=='[', 1))) % array is 2D
                     dim2=length(sscanf(astr,'%f,',[1 inf]));
-        	end
+                end
             else % array is 1D
-        	astr=arraystr(2:end-1);
-        	astr(astr==' ')='';
-        	[obj, count, errmsg, nextidx]=sscanf(astr,'%f,',[1,inf]);
-        	if(nextidx>=length(astr)-1)
+                astr=arraystr(2:end-1);
+                astr(astr==' ')='';
+                [obj, count, errmsg, nextidx]=sscanf(astr,'%f,',[1,inf]);
+                if(nextidx>=length(astr)-1)
                     object=obj;
                     pos=endpos;
                     parse_char(']');
                     return;
-        	end
+                end
             end
             if(~isempty(dim2))
-        	astr=arraystr;
-        	astr(astr=='[')='';
-        	astr(astr==']')='';
-        	astr(astr==' ')='';
-        	[obj, count, errmsg, nextidx]=sscanf(astr,'%f,',inf);
-        	if(nextidx>=length(astr)-1)
+                astr=arraystr;
+                astr(astr=='[')='';
+                astr(astr==']')='';
+                astr(astr==' ')='';
+                [obj, count, errmsg, nextidx]=sscanf(astr,'%f,',inf);
+                if(nextidx>=length(astr)-1)
                     object=reshape(obj,dim2,numel(obj)/dim2)';
                     pos=endpos;
                     parse_char(']');
@@ -198,49 +201,50 @@ global pos inStr isoct
                         waitbar(pos/length(inStr),pbar,'loading ...');
                     end
                     return;
-        	end
+                end
             end
             arraystr=regexprep(arraystr,'\]\s*,','];');
-	else
+        else
             arraystr='[';
-	end
+        end
         try
-           if(isoct && regexp(arraystr,'"','once'))
+            if(isoct && regexp(arraystr,'"','once'))
                 error('Octave eval can produce empty cells for JSON-like input');
-           end
-           object=eval(arraystr);
-           pos=endpos;
-        catch
-         while 1
-            newopt=dk.json.varargin2struct(varargin{:},'JSONLAB_ArrayDepth_',arraydepth+1);
-            val = parse_value(newopt);
-            object{end+1} = val;
-            if next_char == ']'
-                break;
             end
-            parse_char(',');
-         end
+            object=eval(arraystr);
+            pos=endpos;
+        catch
+            while 1
+                newopt=dk.json.varargin2struct(varargin{:},'JSONLAB_ArrayDepth_',arraydepth+1);
+                val = parse_value(newopt);
+                object{end+1} = val;
+                if next_char == ']'
+                    break;
+                end
+                parse_char(',');
+            end
         end
     end
     if(dk.json.opt('SimplifyCell',0,varargin{:})==1)
-      try
-        oldobj=object;
-        object=cell2mat(object')';
-        if(iscell(oldobj) && isstruct(object) && numel(object)>1 && dk.json.opt('SimplifyCellArray',1,varargin{:})==0)
-            object=oldobj;
-        elseif(size(object,1)>1 && ismatrix(object))
-            object=object';
+        try
+            oldobj=object;
+            object=cell2mat(object')';
+            if(iscell(oldobj) && isstruct(object) && numel(object)>1 && dk.json.opt('SimplifyCellArray',1,varargin{:})==0)
+                object=oldobj;
+            elseif(size(object,1)>1 && ismatrix(object))
+                object=object';
+            end
+        catch
         end
-      catch
-      end
     end
     parse_char(']');
-    
+
     if(pbar>0)
         waitbar(pos/length(inStr),pbar,'loading ...');
     end
-%%-------------------------------------------------------------------------
+end
 
+%%-------------------------------------------------------------------------
 function parse_char(c)
     global pos inStr len
     pos=skip_whitespace(pos,inStr,len);
@@ -250,9 +254,9 @@ function parse_char(c)
         pos = pos + 1;
         pos=skip_whitespace(pos,inStr,len);
     end
+end
 
 %%-------------------------------------------------------------------------
-
 function c = next_char
     global pos inStr len
     pos=skip_whitespace(pos,inStr,len);
@@ -261,19 +265,20 @@ function c = next_char
     else
         c = inStr(pos);
     end
+end
 
 %%-------------------------------------------------------------------------
-
 function newpos=skip_whitespace(pos,inStr,len)
     newpos=pos;
     while newpos <= len && isspace(inStr(newpos))
         newpos = newpos + 1;
     end
+end
 
 %%-------------------------------------------------------------------------
 function str = parseStr(varargin)
     global pos inStr len  esc index_esc len_esc
- % len, ns = length(inStr), keyboard
+    % len, ns = length(inStr), keyboard
     if inStr(pos) ~= '"'
         error_pos('String starting with " expected at position %d');
     else
@@ -332,9 +337,9 @@ function str = parseStr(varargin)
         end
     end
     error_pos('End of file while expecting end of inStr');
+end
 
 %%-------------------------------------------------------------------------
-
 function num = parse_number(varargin)
     global pos inStr isoct
     currstr=inStr(pos:min(pos+30,end));
@@ -349,16 +354,16 @@ function num = parse_number(varargin)
         end
     end
     pos = pos + delta-1;
+end
 
 %%-------------------------------------------------------------------------
-
 function val = parse_value(varargin)
     global pos inStr len
-    
+
     if(isfield(varargin{1},'progressbar_'))
         waitbar(pos/len,varargin{1}.progressbar_,'loading ...');
     end
-    
+
     switch(inStr(pos))
         case '"'
             val = parseStr(varargin{:});
@@ -392,8 +397,9 @@ function val = parse_value(varargin)
             end
     end
     error_pos('Value expected at position %d');
-%%-------------------------------------------------------------------------
+end
 
+%%-------------------------------------------------------------------------
 function error_pos(msg)
     global pos inStr len
     poShow = max(min([pos-15 pos-1 pos pos+20],len),1);
@@ -401,17 +407,17 @@ function error_pos(msg)
         poShow(3:4) = poShow(2)+[0 -1];  % display nothing after
     end
     msg = [sprintf(msg, pos) ': ' ...
-    inStr(poShow(1):poShow(2)) '<error>' inStr(poShow(3):poShow(4)) ];
+        inStr(poShow(1):poShow(2)) '<error>' inStr(poShow(3):poShow(4)) ];
     error( ['JSONparser:invalidFormat: ' msg] );
+end
 
 %%-------------------------------------------------------------------------
-
 function str = valid_field(str)
-global isoct
-% From MATLAB doc: field names must begin with a letter, which may be
-% followed by any combination of letters, digits, and underscores.
-% Invalid characters will be converted to underscores, and the prefix
-% "x0x[Hex code]_" will be added if the first character is not a letter.
+    global isoct
+    % From MATLAB doc: field names must begin with a letter, which may be
+    % followed by any combination of letters, digits, and underscores.
+    % Invalid characters will be converted to underscores, and the prefix
+    % "x0x[Hex code]_" will be added if the first character is not a letter.
     pos=regexp(str,'^[^A-Za-z]','once');
     if(~isempty(pos))
         if(~isoct)
@@ -441,56 +447,60 @@ global isoct
         end
     end
     %str(~isletter(str) & ~('0' <= str & str <= '9')) = '_';
+end
 
 %%-------------------------------------------------------------------------
 function endpos = matching_quote(str,pos)
-len=length(str);
-while(pos<len)
-    if(str(pos)=='"')
-        if(~(pos>1 && str(pos-1)=='\'))
-            endpos=pos;
-            return;
-        end        
+    len=length(str);
+    while(pos<len)
+        if(str(pos)=='"')
+            if(~(pos>1 && str(pos-1)=='\'))
+                endpos=pos;
+                return;
+            end
+        end
+        pos=pos+1;
     end
-    pos=pos+1;
+    error('unmatched quotation mark');
 end
-error('unmatched quotation mark');
+
 %%-------------------------------------------------------------------------
 function [endpos, e1l, e1r, maxlevel] = matching_bracket(str,pos)
-global arraytoken
-level=1;
-maxlevel=level;
-endpos=0;
-bpos=arraytoken(arraytoken>=pos);
-tokens=str(bpos);
-len=length(tokens);
-pos=1;
-e1l=[];
-e1r=[];
-while(pos<=len)
-    c=tokens(pos);
-    if(c==']')
-        level=level-1;
-        if(isempty(e1r))
-            e1r=bpos(pos);
+    global arraytoken
+    level=1;
+    maxlevel=level;
+    endpos=0;
+    bpos=arraytoken(arraytoken>=pos);
+    tokens=str(bpos);
+    len=length(tokens);
+    pos=1;
+    e1l=[];
+    e1r=[];
+    while(pos<=len)
+        c=tokens(pos);
+        if(c==']')
+            level=level-1;
+            if(isempty(e1r))
+                e1r=bpos(pos);
+            end
+            if(level==0)
+                endpos=bpos(pos);
+                return
+            end
         end
-        if(level==0)
-            endpos=bpos(pos);
-            return
+        if(c=='[')
+            if(isempty(e1l))
+                e1l=bpos(pos);
+            end
+            level=level+1;
+            maxlevel=max(maxlevel,level);
         end
-    end
-    if(c=='[')
-        if(isempty(e1l))
-            e1l=bpos(pos);
+        if(c=='"')
+            pos=matching_quote(tokens,pos+1);
         end
-        level=level+1;
-        maxlevel=max(maxlevel,level);
+        pos=pos+1;
     end
-    if(c=='"')
-        pos=matching_quote(tokens,pos+1);
+    if(endpos==0)
+        error('unmatched "]"');
     end
-    pos=pos+1;
-end
-if(endpos==0) 
-    error('unmatched "]"');
 end
