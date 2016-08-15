@@ -140,7 +140,7 @@ function object = parse_object(varargin)
     end
     parse_char('}');
     if(isstruct(object))
-        object=struct2jdata(object);
+        object=dk.json.priv.struct2jdata(object);
     end
 end
 
