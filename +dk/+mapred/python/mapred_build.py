@@ -6,7 +6,6 @@ import string
 import json
 import mapred_utils as util
 
-
 # Check configuration contains all the required fields
 def check_validity( cfg ):
 
@@ -34,6 +33,12 @@ def check_validity( cfg ):
     assert isinstance(tmp['jobs'],list) and tmp['jobs'], '[exec.jobs] Empty or invalid list.'
     assert isinstance(tmp['workers'],list) and tmp['workers'], '[exec.workers] Empty or invalid list.'
     assert isinstance(tmp['options'],dict), '[exec.options] Invalid options.'
+
+    # Because of bad Matlab JSON lib, workers can be a list of ints instead of a list of lists
+    if not isinstance( tmp['workers'][0], list ):
+        cfg['exec']['workers'] = [ [x] for x in cfg['exec']['workers'] ]
+        tmp =  cfg['exec']
+    
     assert sum(map( len, tmp['workers'] )) == len(tmp['jobs']), '[exec] Jobs/workers size mismatch.'
 
     # Check files
