@@ -12,10 +12,12 @@ fi
 
 
 # Move things to bindir
-for f in python/*.py; do
+cd python
+for f in *.py; do
     cp $f "${bindir}/$f"
     chmod +x "${bindir}/$f"
 done 
+cd ..
 
 # Print message about PATH
 echo ""
