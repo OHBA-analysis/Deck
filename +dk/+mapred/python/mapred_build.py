@@ -176,15 +176,14 @@ def make_scripts( cfg, folder ):
     if not os.path.isdir(logdir):
         os.mkdir(logdir)
 
-    # create scripts
+    # create scripts and make executable
     for name,text in scripts.iteritems():
         sname = os.path.join(folder,name)
         with open( sname, 'w' ) as f:
             f.write(text)
         
-    # make submit executable
-    util.make_executable(os.path.join(folder,'submit'))
-        
+        util.make_executable(sname)
+    
 
 # Success message
 msg_success = """
