@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 # Create bin dir
 if [ $# -lt 1 ]; then
     bindir="${HOME}/local/bin"
@@ -9,7 +8,6 @@ else
 fi
 
 [ ! -d $bindir ] && mkdir -p $bindir
-
 
 # Move things to bindir
 cd python
