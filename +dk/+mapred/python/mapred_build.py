@@ -139,8 +139,11 @@ for folder in job_*; do
 done
 
 # submit map/reduce job to the cluster
-jid=$$(fsl_sub -q ${queue}.q -M ${email} -m ${mailopt} -N ${jobname} -l "${logdir}" -t "${mapscript}")
-fsl_sub -j $${jid} -q ${queue}.q -M ${email} -m ${mailopt} -N ${jobname} -l "${logdir}" "${redscript}"
+mid=$$(fsl_sub -q ${queue}.q -M ${email} -m ${mailopt} -N ${jobname} -l "${logdir}" -t "${mapscript}")
+rid=$$(fsl_sub -j $${mid} -q ${queue}.q -M ${email} -m ${mailopt} -N ${jobname} -l "${logdir}" "${redscript}")
+
+# Show IDs
+echo "Submitted map with ID $${mid} and reduce with ID $${rid}. Use qstat and mapred_status to monitor the progress."
 """)
 
 # Write scripts according to current config
@@ -166,8 +169,8 @@ def make_scripts( cfg, folder ):
     # put the scripts together
     nworkers = len(cfg['exec']['workers'])
     scripts = {
-           'map.sh': "\n".join([ tpl_map.substitute(sub,workerid=(i+1)) for i in xrange(nworkers) ]),
-        'reduce.sh': tpl_reduce.substitute(sub),
+           'map.sh': "\n".join([ tpl_map.substitute(sub,workerid=(i+1)) for i in xrange(nworkers) ]) + "\n",
+        'reduce.sh': tpl_reduce.substitute(sub) + "\n",
            'submit': tpl_submit.substitute(sub)
     }
 
