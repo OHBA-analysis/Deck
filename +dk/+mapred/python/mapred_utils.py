@@ -69,11 +69,11 @@ def find_config():
 
     # Look for config folder
     if os.path.isdir( 'config' ):
-        return os.path.join( os.path.getcwd(), 'config/config.json' )
+        return os.path.join( os.getcwd(), 'config/config.json' )
 
     # Look for config.json file
     if os.path.isfile( 'config.json' ):
-        return os.path.join( os.path.getcwd(), 'config.json' )
+        return os.path.join( os.getcwd(), 'config.json' )
 
     # Don't know what else to do
     raise "Could not find configuration file!"
