@@ -20,7 +20,7 @@ if __name__ == '__main__':
     folder = config['folders']['save']
 
     # Create subfolder
-    subfolder = os.path.join( folder, 'data', config.name )
+    subfolder = os.path.join( folder, 'data', args.name[0] )
     assert not os.path.isdir(subfolder), 'Folder "%s" already exists, aborting.' % (subfolder)
     os.makedirs( subfolder )
 
@@ -28,10 +28,11 @@ if __name__ == '__main__':
     nworkers = len(config['exec']['workers'])
     moved = []
     for i in xrange(nworkers):
-        workerfile = os.path.join( folder, config['files']['worker'] % (i+1) )
+        workername = config['files']['worker'] % (i+1)
+        workerfile = os.path.join( folder, workername )
         if os.path.isfile(workerfile):
             moved.append(workerfile)
-            os.rename( workerfile, os.path.join(subfolder,workerfile) )
+            os.rename( workerfile, os.path.join(subfolder,workername) )
 
     # Write summary
     print 'Moved %d files to folder "%s":' % ( len(moved), subfolder )

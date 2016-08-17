@@ -147,7 +147,7 @@ echo "Submitted map with ID $${mid} and reduce with ID $${rid}. Use qstat and ma
 """)
 tpl_runworker = string.Template("""#!/bin/bash
 
-if [ $# -lt 1 ]; then
+if [ $$# -lt 1 ]; then
     echo "Usage: runworker <WorkerID>"
 fi
 
