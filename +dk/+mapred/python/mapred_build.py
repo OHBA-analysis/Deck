@@ -151,10 +151,12 @@ if [ $$# -lt 1 ]; then
     echo "Usage: runworker <WorkerID>"
 fi
 
-nohup nice \\
-    matlab -singleCompThread -nodisplay -r "cd '${startdir}'; startup; cd '${workdir}'; obj = ${classname}(); obj.run_worker('${savedir}',$$1); exit;" \\
-    >| "${logdir}/runworker_$${1}.log" 2>&1 &
+pid=$$(nohup nice \\
+    matlab -singleCompThread -nodisplay \\
+    -r "cd '${startdir}'; startup; cd '${workdir}'; obj = ${classname}(); obj.run_worker('${savedir}',$$1); exit;" \\
+    >| "${logdir}/runworker_$${1}.log" 2>&1 & );
 
+echo "Running with pid $${pid}."
 """)
 
 # Write scripts according to current config
