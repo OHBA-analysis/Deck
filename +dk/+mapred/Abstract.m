@@ -73,7 +73,10 @@ classdef Abstract < handle
 
         end
 
-        function output = run_job( self, workerid, jobid, config )
+        function [output,failed] = run_job( self, workerid, jobid, config )
+            
+            % not failed if the processing runs without error
+            failed = true;
             
             % create folder for storage if it doesn't already exist
             jobfolder = fullfile( config.folders.save, sprintf('job_%d',jobid) );
@@ -98,10 +101,11 @@ classdef Abstract < handle
             info.errmsg  = '';
             dk.json.save( fullfile(jobfolder,'info.json'), info );
             
-            % run job
+            % processing
             try
                 output = self.process( info.inputs, jobfolder, info.options );
                 info.status = 'done';
+                failed = false;
             catch ME
                 output = [];
                 info.status = 'failed';
@@ -141,7 +145,8 @@ classdef Abstract < handle
             for i = 1:njobs
                 jobid = jobids(i);
                 try
-                    output{i} = self.run_job( workerid, jobid, config );
+                    [output{i},failed] = self.run_job( workerid, jobid, config ); 
+                    assert(~failed); % force exception to issue FAIL message
                     dk.println('Job #%d (%d/%d, timeleft %s)...',jobid,i,njobs,timer.timeleft_str(i/njobs));
                 catch
                     dk.println('Job #%d (%d/%d)... FAILED',jobid,i,njobs);
