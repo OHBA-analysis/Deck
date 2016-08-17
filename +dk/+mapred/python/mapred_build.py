@@ -145,6 +145,17 @@ rid=$$(fsl_sub -j $${mid} -q ${queue}.q -M ${email} -m ${mailopt} -N ${jobname} 
 # Show IDs
 echo "Submitted map with ID $${mid} and reduce with ID $${rid}. Use qstat and mapred_status to monitor the progress."
 """)
+tpl_runworker = string.Template("""#!/bin/bash
+
+if [ $# -lt 1 ]; then
+    echo "Usage: runworker <WorkerID>"
+fi
+
+nohup nice \\
+    matlab -singleCompThread -nodisplay -r "cd '${startdir}'; startup; cd '${workdir}'; obj = ${classname}(); obj.run_worker('${savedir}',$$1); exit;" \\
+    >| "${logdir}/runworker_$${1}.log" 2>&1 &
+
+""")
 
 # Write scripts according to current config
 def make_scripts( cfg, folder ):
@@ -171,6 +182,7 @@ def make_scripts( cfg, folder ):
     scripts = {
            'map.sh': "\n".join([ tpl_map.substitute(sub,workerid=(i+1)) for i in xrange(nworkers) ]) + "\n",
         'reduce.sh': tpl_reduce.substitute(sub) + "\n",
+        'runworker': tpl_runworker.substitute(sub),
            'submit': tpl_submit.substitute(sub)
     }
 

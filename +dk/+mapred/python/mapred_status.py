@@ -8,21 +8,6 @@ from datetime import timedelta
 from dateutil import parser as dateparser
 
 
-# Search for config file in current directory
-def find_config():
-
-    # Look for config folder
-    if os.path.isdir( 'config' ):
-        return os.path.join( os.path.getcwd(), 'config/config.json' )
-
-    # Look for config.json file
-    if os.path.isfile( 'config.json' ):
-        return os.path.join( os.path.getcwd(), 'config.json' )
-
-    # Don't know what else to do
-    raise "Could not find configuration file!"
-
-
 # Read job information
 def read_info( folder, jobid ):
     infofile = os.path.join( folder, 'job_' + str(jobid), 'info.json' )
@@ -78,7 +63,7 @@ if __name__ == '__main__':
     # Get config file and read it
     cfgfile = args.config[0]
     if not cfgfile:
-        cfgfile = find_config()
+        cfgfile = util.find_config()
 
     config = util.read_json(cfgfile)
     folder = config['folders']['save']
