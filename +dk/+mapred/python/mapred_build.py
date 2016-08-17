@@ -206,6 +206,8 @@ if __name__ == '__main__':
         config = config + '.mapred.json'
     elif os.path.isfile(config + '.json'):
         config = config + '.json'
+    elif os.path.isfile(config + 'apred.json'):
+        config = config + 'apred.json'
     else:
         assert os.path.isfile(config), 'File "%s" not found.' % (config)
 
