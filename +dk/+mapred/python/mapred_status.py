@@ -6,7 +6,7 @@ import mapred_utils as util
 from datetime import datetime as date
 from datetime import timedelta
 from dateutil import parser as dateparser
-
+from termcolor import colored
 
 # Read job information
 def read_info( folder, jobid ):
