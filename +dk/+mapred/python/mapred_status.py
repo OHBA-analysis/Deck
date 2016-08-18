@@ -18,12 +18,13 @@ def read_info( folder, jobid ):
 def time_remaining( startstamp, fraction ):
 
     # estimate remaining time in seconds
-    remaining = date.now() - dateparser.parse(startstamp)
-    remaining = remaining.total_seconds()
-    remaining = remaining/fraction - remaining
-
-    return timedelta( seconds=remaining )
-
+    if fraction > 0:
+        remaining = date.now() - dateparser.parse(startstamp)
+        remaining = remaining.total_seconds()
+        remaining = remaining/float(fraction) - remaining
+        return timedelta( seconds=remaining ) 
+    else:
+        return None
 
 # Worker progress report
 def worker_progress( folder, workerid, jobids ):
@@ -42,15 +43,21 @@ def worker_progress( folder, workerid, jobids ):
     else:
         remaining = str(time_remaining( info['start'], pgr['done']/max(0.5,pgr['total']-pgr['failed']) ))
 
+    head = 'Worker #%d [ %d %%, timeleft: %s ]' % \
+        ( workerid, 100.0 * (pgr['done']+pgr['failed'])/pgr['total'], remaining )
+    
+    if pgr['failed'] > 0:
+        print colored(head,'white','on_red',attrs=['bold','blink'])
+    elif pgr['done'] == pgr['total']:
+        print colored(head,'green',attrs=['bold'])
+    else:
+        print head
+
     print """
-    Worker #%d [ %d %%, timeleft: %s ]
      + total  : %d
      + done   : %d
      + failed : %d
-    """ % ( 
-        workerid, 100.0 * (pgr['done']+pgr['failed'])/pgr['total'], remaining, 
-        pgr['total'], pgr['done'], pgr['failed'] 
-    )
+    """ % ( pgr['total'], pgr['done'], pgr['failed'] )
 
 
 
