@@ -47,7 +47,7 @@ def worker_progress( folder, workerid, jobids ):
         ( workerid, 100.0 * (pgr['done']+pgr['failed'])/pgr['total'], remaining )
     
     if pgr['failed'] > 0:
-        print colored(head,'white','on_red',attrs=['bold','blink'])
+        print colored(head,'white','on_red',attrs=['bold'])
     elif pgr['done'] == pgr['total']:
         print colored(head,'green',attrs=['bold'])
     else:
