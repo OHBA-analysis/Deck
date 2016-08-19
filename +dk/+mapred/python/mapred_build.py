@@ -129,8 +129,8 @@ def make_config( cfg, folder ):
 
 
 # Template scripts
-tpl_map = string.Template("""matlab -singleCompThread -nodisplay -r "cd '${startdir}'; startup; cd '${workdir}'; obj = ${classname}(); obj.run_worker('${savedir}',${workerid}); exit;" """)
-tpl_reduce = string.Template("""matlab -singleCompThread -nodisplay -r "cd '${startdir}'; startup; cd '${workdir}'; obj = ${classname}(); obj.run_reduce('${savedir}'); exit;" """)
+tpl_map = string.Template("""matlab -singleCompThread -nodisplay -r "cd '${startdir}'; startup; cd '${workdir}'; obj = ${classname}(); obj.run_worker('${savedir}',${workerid}); exit(0);" """)
+tpl_reduce = string.Template("""matlab -singleCompThread -nodisplay -r "cd '${startdir}'; startup; cd '${workdir}'; obj = ${classname}(); obj.run_reduce('${savedir}'); exit(0);" """)
 tpl_submit = string.Template("""#!/bin/bash
 
 # remove info in all job subfolders
