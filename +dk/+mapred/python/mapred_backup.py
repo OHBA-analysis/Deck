@@ -17,7 +17,8 @@ if __name__ == '__main__':
         cfgfile = util.find_config()
 
     config = util.read_json(cfgfile)
-    folder = config['folders']['save']
+    #folder = config['folders']['save']
+    folder = os.getcwd()
 
     # Create subfolder
     subfolder = os.path.join( folder, 'data', args.name[0] )
