@@ -254,8 +254,11 @@ end
 function config = fix_config(config)
 
     % make sure the workers are stored in a cell
+    assert( iscell(config.exec.workers) || ismatrix(config.exec.workers), 'Unexpected worker type.' );
+    
     if ~iscell(config.exec.workers)
-        config.exec.workers = arrayfun( @(x) x, config.exec.workers, 'UniformOutput', false );
+        n = size(config.exec.workers,1);
+        config.exec.workers = arrayfun( @(k) config.exec.workers(k,:), 1:n, 'UniformOutput', false );
     end
 
 end
