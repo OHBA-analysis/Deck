@@ -40,7 +40,8 @@ function c = compare( v1, v2 )
         
     elseif isnumeric(v1)
         %c = isnumeric(v2) && (numel(v1) == numel(v2)) && all( v1(:) == v2(:) );
-        c = isnumeric(v2) && (numel(v1) == numel(v2)) && ( max(abs(v1(:)-v2(:))) < FP_THRESHOLD );
+        c = isnumeric(v2) && (numel(v1) == numel(v2)) && ...
+            ( isempty(v1) || max(abs(v1(:)-v2(:))) < FP_THRESHOLD );
     
     elseif islogical(v1)
         c = islogical(v2) && (numel(v1) == numel(v2)) && ~xor(v1,v2);
