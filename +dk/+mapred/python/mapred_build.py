@@ -212,6 +212,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser( prog='mapres_build' )
     parser.add_argument('config', nargs=1, help='Configuration file to be built')
+    parser.add_argument('--savedir', nargs=1, default=[''], help='Override save folder in config')
     args = parser.parse_args()
 
     # Try different extensions in case it's missing
@@ -232,11 +233,18 @@ if __name__ == '__main__':
     # Process it
     if check_existing(config):
 
+        # Save folder
+        folder = args.savedir[0]
+        if not folder:
+            folder = config['folders']['save']
+        else:
+            print 'Overriding configured savedir "%s" to "%s".' % (config['folders']['save'],folder)
+            config['folders']['save'] = folder
+
         # Create save folder
-        folder = config['folders']['save']
         if not os.path.isdir( folder ):
             os.makedirs( folder )
-            print 'Created folder "%s".' % (folder)
+            print 'Created savedir "%s".' % (folder)
 
         # Create config 
         make_config( config, folder )
