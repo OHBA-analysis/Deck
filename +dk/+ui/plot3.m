@@ -3,7 +3,7 @@ function p = plot3( varargin )
 % Simple proxy method that accepts nx3 arrays for 3d plots.
     
     is_nmat = @(x) ismatrix(x) && isnumeric(x);
-    is_nby3 = @(x) ismatrix(x) && size(x,2) == 3;
+    is_nby3 = @(x) is_nmat(x) && size(x,2) == 3;
     
     % if the three first outputs are numeric matrices, call plot3 normally
     if (nargin >= 3) && is_nmat(varargin{1}) && is_nmat(varargin{2}) && is_nmat(varargin{3})

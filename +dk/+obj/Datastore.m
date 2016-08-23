@@ -7,9 +7,18 @@ classdef Datastore < handle
     methods
         
         function self = Datastore(varargin)
+            self.clear();
             if nargin > 0
                 self.assign(varargin{:});
             end
+        end
+        
+        function clear(self)
+            self.folder = [];
+        end
+        
+        function y = ready(self)
+            y = ~isempty(self.folder);
         end
         
         function assign(self,folder)
