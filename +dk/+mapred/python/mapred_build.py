@@ -230,16 +230,16 @@ if __name__ == '__main__':
     config = util.read_json(config)
     check_validity(config)
 
-    # Process it
-    if check_existing(config):
+    # Save folder
+    folder = args.savedir[0]
+    if not folder:
+        folder = config['folders']['save']
+    else:
+        print 'Overriding configured savedir "%s" to "%s".' % (config['folders']['save'],folder)
+        config['folders']['save'] = folder
 
-        # Save folder
-        folder = args.savedir[0]
-        if not folder:
-            folder = config['folders']['save']
-        else:
-            print 'Overriding configured savedir "%s" to "%s".' % (config['folders']['save'],folder)
-            config['folders']['save'] = folder
+    # Process config
+    if check_existing(config):
 
         # Create save folder
         if not os.path.isdir( folder ):
