@@ -60,7 +60,6 @@ def worker_progress( folder, workerid, jobids ):
     """ % ( pgr['total'], pgr['done'], pgr['failed'] )
 
 
-
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser( prog='mapres_status' )
