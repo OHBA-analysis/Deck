@@ -26,7 +26,7 @@ function init( className, tplName, tplOpt, jsonOpt )
     
     % load templates
     tplm = dk.str.Template(fullfile( tplfolder, [tplName '.m'] ),true);
-    tplj = dk.json.load(fullfile( tplfolder, [tplName '.mapred.json'] ));
+    tplj = dk.json.read(fullfile( tplfolder, [tplName '.mapred.json'] ));
     
     % format templates
     tplOpt.Class = file;
@@ -42,6 +42,6 @@ function init( className, tplName, tplOpt, jsonOpt )
     
     % save formatted templates
     dk.fs.puts( fullfile([fileName '.m']), tplm, true );
-    dk.json.save( fullfile([fileName '.mapred.json']), tplj );
+    dk.json.write( fullfile([fileName '.mapred.json']), tplj );
 
 end

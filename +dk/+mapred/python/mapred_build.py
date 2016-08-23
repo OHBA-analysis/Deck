@@ -34,10 +34,10 @@ def check_validity( cfg ):
     assert isinstance(tmp['workers'],list) and tmp['workers'], '[exec.workers] Empty or invalid list.'
     assert isinstance(tmp['options'],dict), '[exec.options] Invalid options.'
 
-    # Because of bad Matlab JSON lib, workers can be a list of ints instead of a list of lists
-    if not isinstance( tmp['workers'][0], list ):
-        cfg['exec']['workers'] = [ [x] for x in cfg['exec']['workers'] ]
-        tmp =  cfg['exec']
+    # # Because of bad Matlab JSON lib, workers can be a list of ints instead of a list of lists
+    # if not isinstance( tmp['workers'][0], list ):
+    #     cfg['exec']['workers'] = [ [x] for x in cfg['exec']['workers'] ]
+    #     tmp =  cfg['exec']
     
     assert sum(map( len, tmp['workers'] )) == len(tmp['jobs']), '[exec] Jobs/workers size mismatch.'
 
@@ -216,12 +216,12 @@ if __name__ == '__main__':
 
     # Try different extensions in case it's missing
     config = args.config[0]
-    if os.path.isfile(config + '.mapred.json'):
-        config = config + '.mapred.json'
-    elif os.path.isfile(config + '.json'):
+    if os.path.isfile(config + '.json'):
         config = config + '.json'
     elif os.path.isfile(config + 'apred.json'):
         config = config + 'apred.json'
+    elif os.path.isfile(config + '.mapred.json'):
+        config = config + '.mapred.json'
     else:
         assert os.path.isfile(config), 'File "%s" not found.' % (config)
 

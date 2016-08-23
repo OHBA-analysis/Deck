@@ -26,8 +26,8 @@ classdef Abstract < handle
     methods
 
         function cfg = load_config(self)
-            cfg = dk.json.load(self.config_file);
-            cfg = fix_config(cfg);
+            cfg = dk.json.read(self.config_file);
+            %cfg = fix_config(cfg);
         end
 
         function cfg = configure(self,nworkers,varargin)
@@ -46,8 +46,35 @@ classdef Abstract < handle
 
             % save edited config
             dk.println('[MapReduce] Configuration edited in "%s".',self.config_file);
-            dk.json.save(self.config_file,cfg);
+            dk.json.write(self.config_file,cfg);
 
+        end
+        
+        function cfg = set_folders(self,start,work,save)
+            
+            cfg = self.load_config();
+            cfg.folders.start = start;
+            cfg.folders.work  = work;
+            cfg.folders.save  = save;
+            
+            % save edited config
+            dk.println('[MapReduce] Configuration edited in "%s".',self.config_file);
+            dk.json.write(self.config_file,cfg);
+            
+        end
+        
+        function cfg = set_cluster(self,jobname,queue,email,mailopt)
+            
+            cfg = self.load_config();
+            cfg.cluster.jobname = jobname;
+            cfg.cluster.queue   = queue;
+            cfg.folders.email   = email;
+            cfg.folders.mailopt = mailopt;
+            
+            % save edited config
+            dk.println('[MapReduce] Configuration edited in "%s".',self.config_file);
+            dk.json.write(self.config_file,cfg);
+            
         end
         
     end
@@ -61,8 +88,8 @@ classdef Abstract < handle
         function config = load_running_config( self, folder )
 
             % load config (contains options)
-            config = dk.json.load(fullfile( folder, 'config/config.json' ));
-            config = fix_config(config);
+            config = dk.json.read(fullfile( folder, 'config/config.json' ));
+            %config = fix_config(config);
 
             % make sure the ID is correct
             assert( strcmp(config.id,self.id), 'ID mismatch between class and running config.' );
@@ -99,7 +126,7 @@ classdef Abstract < handle
             info.start   = get_timestamp();
             info.stop    = '';
             info.errmsg  = '';
-            dk.json.save( fullfile(jobfolder,'info.json'), info );
+            dk.json.write( fullfile(jobfolder,'info.json'), info );
             
             % processing
             try
@@ -114,7 +141,7 @@ classdef Abstract < handle
             
             % update info
             info.stop = get_timestamp();
-            dk.json.save( fullfile(jobfolder,'info.json'), info );
+            dk.json.write( fullfile(jobfolder,'info.json'), info );
             
         end
         
