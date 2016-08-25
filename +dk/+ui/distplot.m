@@ -37,7 +37,7 @@ function [dist,xtic] = distplot( data, wid )
     
     % prevent drawing over, and set tick labels
     hold off; ylim([q01 q99]);
-    set(gca,'xtick',xtic,'xticklabel',arrayfun(@num2str,1:nd,'UniformOutput',false));
+    set(gca,'xtick',xtic,'xticklabel',dk.arrayfun(@num2str,1:nd,false));
     
     % concatenate distributions as a struct array
     dist = [dist{:}];

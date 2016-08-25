@@ -88,7 +88,7 @@ classdef kwArgs < handle
             if iscell(args)
                 
                 if ~self.CaseSensitive
-                    args(1:2:end) = cellfun( @lower, args(1:2:end), 'UniformOutput', false );
+                    args(1:2:end) = dk.cellfun( @lower, args(1:2:end), false );
                 end
                 
                 % don't do struct(args{:}) to avoid issues with cells and doublons

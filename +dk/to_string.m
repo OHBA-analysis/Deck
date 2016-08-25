@@ -37,7 +37,7 @@ function s = to_string( v, fmt )
         
     % Input is a cell, apply to each element (returns a cell of strings)
     elseif iscell(v)
-        s = cellfun( @(x) dk.to_string(x,fmt), v, 'UniformOutput', false );
+        s = dk.cellfun( @(x) dk.to_string(x,fmt), v, false );
         
     % Other unsupported cases
     else

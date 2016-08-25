@@ -28,6 +28,7 @@ classdef Datastore < handle
                 dk.assert( mkdir(folder), 'Could not create folder "%s".', folder );
                 dk.println('Created folder "%s".',folder);
             end
+            
             self.folder = dk.fs.realpath(folder);
         end
         
@@ -63,7 +64,7 @@ classdef Datastore < handle
 
             % extract specific variables
             if nargin > 2
-                data = cellfun( @(n) dk.struct.get( data, n, [] ), varargin, 'UniformOutput', false );
+                data = dk.cellfun( @(n) dk.struct.get( data, n, [] ), varargin, false );
 
                 if nargout == 1 && nargin > 3
                     varargout{1} = cell2struct( data, varargin, 2 );

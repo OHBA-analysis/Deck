@@ -35,7 +35,7 @@ classdef Template < handle
         function v = variables(self)
             
             v = regexp( self.text, '[^$]\$\{[\w\d_-]+\}', 'match' );
-            v = unique(cellfun( @(x) x(4:end-1), v, 'UniformOutput', false ));
+            v = unique(dk.cellfun( @(x) x(4:end-1), v, false ));
             if nargout == 0, cellfun(@disp,v); end
             
         end

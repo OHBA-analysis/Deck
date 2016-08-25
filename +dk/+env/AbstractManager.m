@@ -44,7 +44,7 @@ classdef AbstractManager < handle
                 l = fullfile(l,filesep);
                 l = l(1:end-1);
             else
-                l = cellfun( @self.sanitise, l, 'UniformOutput', false );
+                l = dk.cellfun( @self.sanitise, l, false );
             end
         end
         

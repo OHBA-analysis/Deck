@@ -285,7 +285,7 @@ function config = fix_config(config)
     
     if ~iscell(config.exec.workers)
         n = size(config.exec.workers,1);
-        config.exec.workers = arrayfun( @(k) config.exec.workers(k,:), 1:n, 'UniformOutput', false );
+        config.exec.workers = dk.arrayfun( @(k) config.exec.workers(k,:), 1:n, false );
     end
 
 end
