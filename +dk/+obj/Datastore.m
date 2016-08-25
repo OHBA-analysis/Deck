@@ -21,7 +21,13 @@ classdef Datastore < handle
             y = ~isempty(self.folder);
         end
         
-        function assign(self,folder)
+        function assign(self,folder,create)
+            if nargin < 3, create=false; end
+            
+            if create && ~dk.fs.is_dir(folder)
+                dk.assert( mkdir(folder), 'Could not create folder "%s".', folder );
+                dk.println('Created folder "%s".',folder);
+            end
             self.folder = dk.fs.realpath(folder);
         end
         
