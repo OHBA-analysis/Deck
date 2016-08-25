@@ -15,7 +15,7 @@ function [yes,target] = is_symlink( name )
     if yes
         target = strtrim(dk.fs.realpath(name));
     else
-        target = name;
+        target = '';
     end
     
 end

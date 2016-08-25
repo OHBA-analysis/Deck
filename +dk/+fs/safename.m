@@ -1,8 +1,8 @@
-function [safe,count] = name_safe( name, quiet )
+function [safe,count] = safename( name, quiet )
 % 
 % Append the input name with increasing numbers as long as the corresponding file already exists.
 %
-% Contact: jhadida [at] fmrib.ox.ac.uk
+% JH
 
     if nargin < 2, quiet = false; end
 
@@ -15,7 +15,7 @@ function [safe,count] = name_safe( name, quiet )
     end
     
     if ~quiet && count > 0
-        warning('[dk.fs.name_safe] Filename "%s" was changed to "%s" to prevent overwrite.',name,safe);
+        warning('[dk.fs.safename] Filename "%s" was changed to "%s" to prevent overwrite.',name,safe);
     end
     
 end

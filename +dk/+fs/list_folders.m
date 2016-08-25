@@ -2,10 +2,17 @@ function folders = list_folders( dirname, pattern )
 %
 % List folders in dirname matching the input pattern (default: non-hidden).
 %
-% Contact: jhadida [at] fmrib.ox.ac.uk
+% JH
 
+    if nargin < 1 || isempty(dirname), dirname=pwd; end
     if nargin < 2, pattern = '^[^\.].*'; end
+    
+    % undocummented feature
+    if islogical(dirname)
+        dirname = pwd;
+        if dirname, pattern = '.*'; end
+    end
 
-    folders = dk.fs.list_match( dirname, pattern, @dk.fs.is_dir );
+    folders = dk.fs.list_match( dirname, pattern, @(x)isdir(x) );
     
 end

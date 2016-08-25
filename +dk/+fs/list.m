@@ -1,8 +1,19 @@
-function files = list( dirname )
+function names = list( dirname, hidden )
+%
+% names = list( dirname, hidden=false )
 %
 % List everything in dirname, except names beginning with a dot (hidden).
+% If hidden is true, include hidden folder but exclude . and ..
 %
-% Contact: jhadida [at] fmrib.ox.ac.uk
+% JH
 
-    files = dk.fs.list_match( dirname, '^[^\.].*' );
+    if nargin < 1 || isempty(dirname), dirname=pwd; end
+    if nargin < 2, hidden=false; end
+    
+    if hidden
+        names = dk.fs.list_match( dirname, '.*' );
+    else
+        names = dk.fs.list_match( dirname, '^[^\.].*' );
+    end
+
 end

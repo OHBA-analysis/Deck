@@ -10,8 +10,8 @@ function [count,safe] = puts( name, txt, overwrite )
 
     % Handle overwrite
     if ~overwrite
-        [safe,ow] = dk.fs.name_safe(name);
-        if ow
+        [safe,ow] = dk.fs.safename(name,true);
+        if ow > 0
             warning('dk.fs.puts: File "%s" already exists, renaming to "%s".',name,safe);
         end
     else
