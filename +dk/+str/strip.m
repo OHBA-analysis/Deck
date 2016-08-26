@@ -10,11 +10,8 @@ function s = strip( s, chars )
 
     if nargin < 2, chars = ''; end
 
-    s = strtrim(s);
-    
-    if ~isempty(chars)
-        s = regexp( s, sprintf('^[%s]*(.*?)[%s]*$',chars,chars), 'tokens' );
-        s = s{1}{1};
-    end
+    chars = [chars '\s'];
+    s = regexp( s, sprintf('^[%s]*(.*?)[%s]*$',chars,chars), 'tokens', 'once' );
+    s = s{1};
 
 end
