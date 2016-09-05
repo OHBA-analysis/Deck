@@ -7,7 +7,7 @@ function r = ksreg( x, y, n, b, kerf, doplot )
 
     % sort input data
     [x,o] = sort(x(:));
-    y = y(o);
+    y = dk.to_col(y(o));
     
     % set a sensible number of points in output
     if nargin < 3 || isempty(n), n = 100; end

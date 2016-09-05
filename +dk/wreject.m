@@ -1,5 +1,5 @@
 function wreject( condition, fmt, varargin )
-    if any(logical(condition))
+    if dk.verbosity([],true)>=2 && any(logical(condition))
         warning( fmt, varargin{:} );
     end
 end

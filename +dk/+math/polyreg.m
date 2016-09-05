@@ -1,7 +1,8 @@
-function coef = polyreg( x, y, n, doplot )
+function [coef,rsq] = polyreg( x, y, n, doplot )
 %
 % Fits polynomial of degree n to input data.
 % Returns n+1 coefficients sorted from the highest power down. 
+% Second output is the adjusted r-squared.
 %
 % JH
 
@@ -9,10 +10,14 @@ function coef = polyreg( x, y, n, doplot )
     
     % format data suitably
     [x,o] = sort(x(:));
-    y = y(o);
+    y = dk.to_col(y(o));
     
     % run polyfit estimation
     coef = polyfit( x, y, n );
+    
+    % compute adjusted r-squared
+    rsq = y - polyval(coef,x);
+    rsq = 1 - sum(rsq.^2) / var(y) / (length(y)-length(coef)+1);
     
     % plot results
     if nargin < 4, doplot = nargout == 0; end
