@@ -1,5 +1,6 @@
 function info( fmt, varargin )
-if dk.verbosity([],true) >= 3
-    dk.println( ['[dk.INFO] ' fmt], varargin{:} );
+if dk.verb.get(true) >= dk.verb.get('info')
+    %dk.println( ['[dk.INFO] ' fmt], varargin{:} );
+    dk.println( fmt, varargin{:} );
 end
 end

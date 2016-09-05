@@ -26,7 +26,7 @@ classdef Datastore < handle
             
             if create && ~dk.fs.is_dir(folder)
                 dk.assert( mkdir(folder), 'Could not create folder "%s".', folder );
-                dk.println('Created folder "%s".',folder);
+                dk.info('Created folder "%s".',folder);
             end
             
             self.folder = dk.fs.realpath(folder);
@@ -50,7 +50,7 @@ classdef Datastore < handle
                 data = struct( varargin{:} );
             end
             
-            dk.println('[dk.datastore] Saving to "%s"...',f);
+            dk.info('[dk.datastore] Saving to "%s"...',f);
             save( f, '-v7', '-struct', 'data' );
             
         end
@@ -59,7 +59,7 @@ classdef Datastore < handle
             
             % load data
             name = self.matfile(name);
-            dk.println('[dk.datastore] Loading from "%s"...',name);
+            dk.info('[dk.datastore] Loading from "%s"...',name);
             data = load(name);
 
             % extract specific variables

@@ -1,5 +1,5 @@
 function warn( varargin )
-if dk.verbosity([],true) >= 2
+if dk.verb.get(true) >= dk.verb.get('warning')
     warning(varargin{:});
 end
 end
