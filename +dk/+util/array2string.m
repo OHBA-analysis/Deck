@@ -1,4 +1,17 @@
 function output = array2string( values, format, varargin )
+%
+% output = array2string( values, format, varargin )
+%
+% values  2d array or cell, or table of values
+% format  One of: matlab, latex or markdown (default is matlab)
+%
+% Additional arguments (key/value pairs):
+%
+%   num   Numerical format (default '%g')
+%   row   Row names (cellstring)
+%   col   Column names (cellstring)
+%
+% JH
 
     if nargin < 2 || isempty(format), format='default'; end
 
@@ -38,7 +51,7 @@ function output = array2string( values, format, varargin )
     % Add columns
     if ~isempty(colNames)
         switch format
-            case {'default','latex','tex'}
+            case {'matlab','latex','tex','default'}
                 V = vertcat( reshape(colNames,[1,nc]), V );
                 rowpad = {''};
             case {'markdown','md'}
@@ -63,7 +76,7 @@ function output = array2string( values, format, varargin )
     % Set separators depending on the format
     switch format
         
-        case {'default'}
+        case {'matlab','default'}
             sep.beg = ' ';
             sep.val = ', ';
             sep.row = '; ';
@@ -107,7 +120,7 @@ function output = array2string( values, format, varargin )
     
     % Last edit
     switch format
-        case 'default'
+        case {'matlab','default'}
             output(1,1) = '[';
             output(end,end-2) = ']';
     end

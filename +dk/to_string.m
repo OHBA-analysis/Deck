@@ -1,7 +1,19 @@
 function s = to_string( v, fmt )
 %
+% s = to_string( v, fmt )
+%
 % Convert input to string representation.
 % Second input is used to print numeric values.
+%
+% Inputs can be arrays (logical or numeric), in which case they should be 
+% printed in a way that can be copy-pasted in the console to define a new 
+% variable.
+%
+% If input is a cell, then to_string is called on each element and the function
+% returns a cellstring.
+%
+% If you want more control over the string representation of arrays, cell arrays 
+% and even tables, check out dk.util.array2string.
 %
 % JH
 

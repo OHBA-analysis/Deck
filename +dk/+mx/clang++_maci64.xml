@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+<!-- CXX="$XCRUN_DIR/xcrun -sdk macosx$SDKVER clang++" -->
 <config
     Name="Xcode Clang++"
     ShortName="Clang++"
@@ -26,10 +27,10 @@
         CMDLINE100="$CXX -c $DEFINES $INCLUDE $CXXFLAGS $OPTIM $SRC -o $OBJ"
         CMDLINE200="$LDXX $LDFLAGS $LINKOPTIM $LINKEXPORT $OBJS $CXXLIBS $LINKLIBS -o $EXE"
 
-        CXX="$XCRUN_DIR/xcrun -sdk macosx$SDKVER clang++"
+        CXX="clang++"
         DEFINES="$MATLABMEX"
         MATLABMEX="-DMATLAB_MEX_FILE "
-        CXXFLAGS="-fno-common -arch x86_64 -mmacosx-version-min=$SDKVER -fexceptions -isysroot $ISYSROOT -fobjc-arc -std=c++11 -stdlib=libc++"
+        CXXFLAGS="-fno-common -arch x86_64 -mmacosx-version-min=$SDKVER -fexceptions -isysroot $ISYSROOT -fobjc-arc -stdlib=libc++ -std=c++11"
         INCLUDE="-I&quot;$MATLABROOT/extern/include&quot; -I&quot;$MATLABROOT/simulink/include&quot;"
         CXXOPTIMFLAGS="-O3 -fwrapv -DNDEBUG"
         CXXDEBUGFLAGS="-g"
