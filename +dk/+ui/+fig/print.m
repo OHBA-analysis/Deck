@@ -45,14 +45,14 @@ function varargout = print(varargin)
 
     output_fname = fullfile(pathstr,[fname ext]);
 
-    ppm_original = get(gcf,'PaperPositionMode');
-    set(gcf,'PaperPositionMode','auto');
-    orig_renderer = get(gcf,'Renderer');
+    ppm_original = get(fhandle,'PaperPositionMode');
+    set(fhandle,'PaperPositionMode','auto');
+    orig_renderer = get(fhandle,'Renderer');
 
     switch ext
         case '.eps'
-            if strcmp(get(gcf,'Renderer'),'opengl')
-                set(gcf,'Renderer','painters')
+            if strcmp(get(fhandle,'Renderer'),'opengl')
+                set(fhandle,'Renderer','painters');
             end
             print(fhandle,'-r300','-depsc',output_fname);
         case {'.jpg','.jpeg'} 
@@ -69,8 +69,8 @@ function varargout = print(varargin)
 
     fprintf(1,'Image saved to %s\n',output_fname);
 
-    set(gcf,'PaperPositionMode',ppm_original);
-    set(gcf,'Renderer',orig_renderer);
+    set(fhandle,'PaperPositionMode',ppm_original);
+    set(fhandle,'Renderer',orig_renderer);
 
     if nargout > 0
         varargout{1} = output_fname;
