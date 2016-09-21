@@ -70,7 +70,7 @@ classdef AbstractManager < handle
             x = x(self.check(x));
             assert(iscellstr(x));
             
-            self.list = union( self.list, x );
+            self.list = union( self.list, x, 'stable' );
             
         end
         function self = prepend(self,x)
@@ -80,7 +80,7 @@ classdef AbstractManager < handle
             x = x(self.check(x));
             assert(iscellstr(x));
             
-            self.list = union( x, self.list );
+            self.list = union( x, self.list, 'stable' );
             
         end
         function self = remove(self,x)

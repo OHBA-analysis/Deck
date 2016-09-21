@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!-- CXX="$XCRUN_DIR/xcrun -sdk macosx$SDKVER clang++" -->
+<!-- CXX="$XCRUN_DIR/xcrun -sdk macosx$SDKVER clang++", Location="$XCODE_DIR" -->
 <config
-    Name="Xcode Clang++"
+    Name="Clang++"
     ShortName="Clang++"
     Manufacturer="Apple"
     Version=""
     Language="C++"
     Priority="A"
-    Location="$XCODE_DIR" >
+    Location="$CLANG_DIR" >
     <Details
         CompilerExecutable="$CXX"
         CompilerDefines="$DEFINES"
