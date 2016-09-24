@@ -212,12 +212,12 @@ Successful build (%d jobs across %d workers). To submit to the cluster, run:
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser( prog='mapres_build' )
-    parser.add_argument('config', nargs=1, help='Configuration file to be built')
-    parser.add_argument('--savedir', nargs=1, default=[''], help='Override save folder in config')
+    parser.add_argument('config', help='Configuration file to be built')
+    parser.add_argument('--savedir', default='', help='Override save folder in config')
     args = parser.parse_args()
 
     # Try different extensions in case it's missing
-    config = args.config[0]
+    config = args.config
     if os.path.isfile(config + '.json'):
         config = config + '.json'
     elif os.path.isfile(config + 'apred.json'):
@@ -232,7 +232,7 @@ if __name__ == '__main__':
     check_validity(config)
 
     # Save folder
-    folder = args.savedir[0]
+    folder = args.savedir
     if not folder:
         folder = config['folders']['save']
     else:

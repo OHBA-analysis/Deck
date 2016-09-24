@@ -7,12 +7,12 @@ import mapred_utils as util
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser( prog='mapres_backup' )
-    parser.add_argument('name', nargs=1, help='Name of the subfolder to create in the data directory')
-    parser.add_argument('--config', nargs=1, default=[''], help='Configuration file (will be searched if omitted)')
+    parser.add_argument('name', help='Name of the subfolder to create in the data directory')
+    parser.add_argument('--config', default='', help='Configuration file (will be searched if omitted)')
     args = parser.parse_args()
 
     # Get config file and read it
-    cfgfile = args.config[0]
+    cfgfile = args.config
     if not cfgfile:
         cfgfile = util.find_config()
 
@@ -20,7 +20,7 @@ if __name__ == '__main__':
     folder = os.getcwd()
 
     # Create subfolder
-    subfolder = os.path.join( folder, 'data', args.name[0] )
+    subfolder = os.path.join( folder, 'data', args.name )
     assert not os.path.isdir(subfolder), 'Folder "%s" already exists, aborting.' % (subfolder)
     os.makedirs( subfolder )
 
@@ -38,4 +38,3 @@ if __name__ == '__main__':
     print 'Moved %d files to folder "%s":' % ( len(moved), subfolder )
     for f in moved:
         print "\t" + f
-        

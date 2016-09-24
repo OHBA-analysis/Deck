@@ -22,7 +22,7 @@ def time_remaining( startstamp, fraction ):
         remaining = date.now() - dateparser.parse(startstamp)
         remaining = remaining.total_seconds()
         remaining = remaining/float(fraction) - remaining
-        return timedelta( seconds=remaining ) 
+        return timedelta( seconds=remaining )
     else:
         return None
 
@@ -45,7 +45,7 @@ def worker_progress( folder, workerid, jobids ):
 
     head = 'Worker #%d [ %d %%, timeleft: %s ]' % \
         ( workerid, 100.0 * (pgr['done']+pgr['failed'])/pgr['total'], remaining )
-    
+
     if pgr['failed'] > 0:
         print colored(head,'white','on_red',attrs=['bold'])
     elif pgr['done'] == pgr['total']:
@@ -63,11 +63,11 @@ def worker_progress( folder, workerid, jobids ):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser( prog='mapres_status' )
-    parser.add_argument('--config', nargs=1, default=[''], help='Configuration file (search for it if omitted)')
+    parser.add_argument('--config', default='', help='Configuration file (search for it if omitted)')
     args = parser.parse_args()
 
     # Get config file and read it
-    cfgfile = args.config[0]
+    cfgfile = args.config
     if not cfgfile:
         cfgfile = util.find_config()
 
