@@ -11,7 +11,7 @@ def check_validity( cfg ):
 
     # Check that all fields are there
     assert { 'id', 'cluster', 'exec', 'files', 'folders' } <= set(cfg), '[root] Missing field(s).'
-    
+
     # Check id
     tmp = cfg['id']
     assert util.is_string(tmp), '[id] Empty or invalid string.'
@@ -38,7 +38,7 @@ def check_validity( cfg ):
     # if not isinstance( tmp['workers'][0], list ):
     #     cfg['exec']['workers'] = [ [x] for x in cfg['exec']['workers'] ]
     #     tmp =  cfg['exec']
-    
+
     assert sum(map( len, tmp['workers'] )) == len(tmp['jobs']), '[exec] Jobs/workers size mismatch.'
 
     # Check files
@@ -56,13 +56,13 @@ def check_validity( cfg ):
     assert { 'start', 'work', 'save' } <= set(tmp), '[folders] Missing field(s).'
     assert util.is_string(tmp['start']), '[folders.start] Empty or invalid string.'
     assert util.is_string(tmp['save']), '[folders.save] Empty or invalid string.'
-    assert util.is_string(tmp['work'],False), '[folders.work] Invalid string.' 
+    assert util.is_string(tmp['work'],False), '[folders.work] Invalid string.'
 
 
 # Check existing output folder
 msg_warning = """WARNING:
     Another configuration was found in folder '%s', and it looks compatible with the current one.
-    Going through with this build might result in OVERWRITING existing results. 
+    Going through with this build might result in OVERWRITING existing results.
     The options in the current configuration are:\n%s
 
     The options in the existing configuration are:\n%s
@@ -96,14 +96,14 @@ def check_existing(cfg):
                 'Id mismatch with existing configuration "%s".' % (cfgfile)
             assert len(other['exec']['jobs']) == len(cfg['exec']['jobs']), \
                 'Number of jobs mismatch with existing configuration "%s".' % (cfgfile)
-            
+
             # format options as strings for comparison
             opt_new = json.dumps( cfg['exec']['options'], indent=4 )
             opt_old = json.dumps( other['exec']['options'], indent=4 )
 
             # Return true if the folder already exists
             return util.query_yes_no( msg_warning % ( folder, opt_new, opt_old ), "no" )
-    
+
     return True
 
 
@@ -135,7 +135,7 @@ tpl_submit = string.Template("""#!/bin/bash
 
 # remove info in all job subfolders
 for folder in job_*; do
-    [ -f $${folder}/info.json ] && rm -f $${folder}/info.json 
+    [ -f $${folder}/info.json ] && rm -f $${folder}/info.json
 done
 
 # submit map/reduce job to the cluster
@@ -198,14 +198,15 @@ def make_scripts( cfg, folder ):
         sname = os.path.join(folder,name)
         with open( sname, 'w' ) as f:
             f.write(text)
-        
+
         util.make_executable(sname)
-    
+
 
 # Success message
 msg_success = """
 Successful build (%d jobs across %d workers). To submit to the cluster, run:
-    %s
+    cd %s
+    ./submit
 """
 
 if __name__ == '__main__':
@@ -246,7 +247,7 @@ if __name__ == '__main__':
             os.makedirs( folder )
             print 'Created savedir "%s".' % (folder)
 
-        # Create config 
+        # Create config
         make_config( config, folder )
 
         # Create scripts
@@ -255,5 +256,4 @@ if __name__ == '__main__':
         # Success message
         njobs = len(config['exec']['jobs'])
         nworkers = len(config['exec']['workers'])
-        print msg_success % ( njobs, nworkers, os.path.join(folder,'submit') )
-
+        print msg_success % ( njobs, nworkers, folder )
