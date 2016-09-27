@@ -20,8 +20,14 @@ function [h,color_scale] = image( img, varargin )
     maxheight      = opt.get('maxheight',     50000 );
     maxsize        = [ maxheight, maxwidth ];
     
-    cmap_unsigned  = eval(sprintf('dk.ui.cmap.%s(128,false)', cmap_name));
-    cmap_signed    = eval(sprintf('dk.ui.cmap.%s(256,true)',  cmap_name));
+    if ischar(cmap_name)
+        cmap_unsigned = eval(sprintf('dk.ui.cmap.%s(128,false)', cmap_name));
+        cmap_signed   = eval(sprintf('dk.ui.cmap.%s(256,true)',  cmap_name));
+    else
+        cmap_raw      = cmap_name;
+        cmap_unsigned = [];
+        cmap_signed   = [];
+    end
     
     
     % quick aliases
@@ -101,10 +107,14 @@ function [h,color_scale] = image( img, varargin )
     color_scale = sort(color_scale);
     
     % set colormap
-    if abs(sum(color_scale)) / sum(abs(color_scale)) < 1e-3
-        colormap( gca, cmap_signed );
+    if ischar(cmap_name)
+        if abs(sum(color_scale)) / sum(abs(color_scale)) < 1e-3
+            colormap( gca, cmap_signed );
+        else
+            colormap( gca, cmap_unsigned );
+        end
     else
-        colormap( gca, cmap_unsigned );
+        colormap( gca, cmap_raw );
     end
     
     % adapt color-scale
