@@ -38,7 +38,8 @@ function output = array2string( values, format, varargin )
         
         rowNames = values.Properties.RowNames;
         colNames = values.Properties.VariableNames;
-        output   = jh.util.array2string( table2array(values), format, rowNames, colNames );
+        output   = dk.util.array2string( table2array(values), format, ...
+            'row', rowNames, 'col', colNames, 'num', numFmt );
         return;
         
     else
