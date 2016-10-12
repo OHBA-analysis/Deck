@@ -1,4 +1,10 @@
 function [h,l] = gridfit( nelem, lhratio )
+%
+% [h,l] = gridfit( nelem, lhratio=omega )
+%
+% Return optimal grid size to fit nelem elements with ratio lhratio (default: golden ratio).
+%
+% JH
 
     % use golden ratio by default
     if nargin < 2
