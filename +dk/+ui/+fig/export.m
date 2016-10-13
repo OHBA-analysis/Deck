@@ -12,8 +12,8 @@ function style = export( fig, fname, style )
     if ischar(style), style = hgexport('readstyle',style); end
 
     [~,~,ext] = fileparts(fname);
-    ext = dk.str.lstrip(ext,'.');
     if ~isempty(ext)
+        ext = dk.str.lstrip(ext,'.');
         style.Format = ext;
     end
     
