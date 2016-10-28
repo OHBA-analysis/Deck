@@ -1,8 +1,8 @@
 function dist = distplot( data, varargin )
 %
-% [dist,xtic] = distplot( data, Name, Value )
+% dist = distplot( data, Name, Value )
 %
-% Distribution plot (similar to boxplot, but using ksdensity).
+% Distribution plot (similar to boxplot, but using ksdensity to plot distributions vertically).
 % 
 % INPUT
 %
@@ -12,7 +12,7 @@ function dist = distplot( data, varargin )
 %
 %
 %    'Width'  Width of each distribution in the final plot, typically <1 (default: 0.7).
-%    'Theme'  For now only the theme 'orange is available'.
+%    'Theme'  For now only the theme 'orange' is available.
 %    'Range'  Support of the distribution as a 1x2 interval (default: []).
 %               By default, the interval is determined automatically by ksdensity.
 %   'NumPts'  Number of points to use for density estimation (default: 51).
