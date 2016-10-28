@@ -15,6 +15,7 @@ function dist = distplot( data, varargin )
 %    'Theme'  For now only the theme 'orange' is available.
 %    'Range'  Support of the distribution as a 1x2 interval (default: []).
 %               By default, the interval is determined automatically by ksdensity.
+%   'Kernel'  One of: 'normal', 'box', 'triangle', 'epanechnikov'
 %   'NumPts'  Number of points to use for density estimation (default: 51).
 %
 % OUTPUT
@@ -33,6 +34,7 @@ function dist = distplot( data, varargin )
     opt_width = opt.get('width',0.7);
     opt_theme = opt.get('theme','orange');
     opt_range = opt.get('range',[]);
+    opt_kern  = opt.get('kernel','normal');
     opt_supp  = opt.get('support',[]);
     opt_npts  = opt.get('numpts',51);
 
@@ -46,9 +48,9 @@ function dist = distplot( data, varargin )
     
     % process ksdensity options
     if isempty(opt_range)
-        ksarg = { [], 'NumPoints', opt_npts };
+        ksarg = { [], 'NumPoints', opt_npts, 'Kernel',opt_kern };
     else
-        ksarg = { linspace( opt_range(1), opt_range(2), opt_npts ) };
+        ksarg = { linspace( opt_range(1), opt_range(2), opt_npts ), 'Kernel', opt_kern };
     end
     if ~isempty(opt_supp)
         ksarg = [ ksarg, { 'Support', opt_supp } ];
