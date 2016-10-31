@@ -3,7 +3,7 @@ function dist = distplot( data, varargin )
 % dist = distplot( data, Name, Value )
 %
 % Distribution plot (similar to boxplot, but using ksdensity to plot distributions vertically).
-% 
+%
 % INPUT
 %
 %       data  Either a nxp matrix or a 1xp cell.
@@ -19,7 +19,7 @@ function dist = distplot( data, varargin )
 %   'NumPts'  Number of points to use for density estimation (default: 51).
 %
 % OUTPUT
-%   
+%
 %       dist  Structure with fields:
 %               .x  Support of the density estimate
 %               .y  Density estimate
@@ -29,7 +29,7 @@ function dist = distplot( data, varargin )
 % JH
 
     opt = dk.obj.kwArgs(varargin{:});
-    
+
     % parse options
     opt_width = opt.get('width',0.7);
     opt_theme = opt.get('theme','orange');
@@ -45,7 +45,7 @@ function dist = distplot( data, varargin )
             theme.med = hsv2rgb([30/360 1 0.1]); % black
             theme.avg = hsv2rgb([200/360 1 0.9]/100); % blue
     end
-    
+
     % process ksdensity options
     if isempty(opt_range)
         ksarg = { [], 'NumPoints', opt_npts, 'Kernel',opt_kern };
@@ -63,30 +63,30 @@ function dist = distplot( data, varargin )
         nd = size(data,2);
     end
     assert( nd > 0, 'Empty dataset in input.' );
-    
+
     % compute and draw distributions
     dist = cell(1,nd);
     xtic = ceil(opt_width) * (0.5 + (0:nd-1));
-    
+
     q99 = -Inf;
     q01 =  Inf;
-    
+
     for i = 1:nd
         [dist{i},v] = density_estimation( data, i, ksarg );
         plot_distribution( dist{i}, xtic(i), opt_width, theme );
-        
+
         q99 = max( q99, prctile(v,99) );
         q01 = min( q01, prctile(v,1) );
     end
-    
+
     % adjust y-axis limits
     q99 = 1.2*q99;
     q01 = 0.8*q01;
-    
+
     % prevent drawing over, and set tick labels
     hold off; ylim([q01 q99]);
     set(gca,'xtick',xtic,'xticklabel',dk.arrayfun(@num2str,1:nd,false));
-    
+
     % concatenate distributions as a struct array
     dist = [dist{:}];
 
@@ -99,11 +99,11 @@ function [dist,v] = density_estimation( dat, k, arg )
     else
         v = dat(:,k);
     end
-    
+
     [dist.y,dist.x] = ksdensity(v,arg{:});
     dist.m = median(v);
     dist.a = mean(v);
-    
+
 end
 
 function h = plot_distribution( dist, loc, wid, col )
@@ -111,13 +111,13 @@ function h = plot_distribution( dist, loc, wid, col )
     x = (wid/2) * dist.y / max(dist.y);
     x = [ loc + x, loc - fliplr(x) ];
     y = [ dist.x, fliplr(dist.x) ];
-    h.d = fill( x, y, col.box, 'EdgeColor', 'none' ); 
+    h.d = fill( x, y, col.box, 'EdgeColor', 'none' );
     hold on;
-    
+
     mw = interp1( dist.x, dist.y, dist.m );
     mw = (wid/2) * mw / max(dist.y);
     h.m = plot( loc+mw*[-1,1], dist.m*[1,1], '-', 'Color', col.med, 'LineWidth', 2 );
 
     %h.a = plot( loc, dist.a, '+', 'Color', col.avg, 'MarkerSize', 7 );
-    
+
 end
