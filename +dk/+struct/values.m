@@ -1,5 +1,6 @@
 function v = values( s )
-% v = STRUCTVALS( s )
+%
+% v = dk.struct.values( s )
 %
 % Returns a N x M cell-array where N is the size of the input struct-array and M is the number of fields.
 % Cell (i,j) contains the value of j^th field in the i^th structure.
@@ -10,7 +11,7 @@ function v = values( s )
     nstruct = numel(s);
     nfields = numel(f);
     v = cell( nstruct, nfields );
-    
+
     for i = 1:nstruct
     for j = 1:nfields
         v{i,j} = s(i).(f{j});

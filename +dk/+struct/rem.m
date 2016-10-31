@@ -1,7 +1,11 @@
 function s = rem( s, varargin )
 %
-% Remove a field value from a structure if the field exists.
-% If not, don't throw an error.
+% s = dk.struct.rem( s, varargin )
+%
+% Remove field(s) from structure or struct-array if the field exists.
+% Do not throw an error if (any of) the field(s) does not exist.
+%
+% JH
 
     if nargin == 2 && iscellstr(varargin{1})
         f = intersect( fieldnames(s), varargin{1} );

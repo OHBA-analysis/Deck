@@ -15,5 +15,5 @@ function s = repeat( fields, varargin )
     f(1:2:end) = fields;
 
     s = repmat( struct(f{:}), varargin{:} );
-    
+
 end

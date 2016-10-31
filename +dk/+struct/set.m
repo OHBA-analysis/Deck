@@ -1,20 +1,27 @@
-function s = set( s, fname, value )
+function s = set( s, field, value, overwrite )
 %
-% Set a field value in a structure if it is not set.
+% s = dk.struct.set( s, field, value, overwrite=false )
+%
+% Set a field value in a structure or struct-array.
+% If it is already set, this functionn will _not_ overwrite by default.
+%
+% JH
 
-    if ~isfield(s,fname)
+    if nargin < 4, overwrite=false; end
+
+    if ~isfield(s,field) || overwrite
         n = numel(s);
-        
+
         if isscalar(value)
-            for i = 1:n, s.(fname) = value; end
+            for i = 1:n, s(i).(field) = value; end
         elseif numel(value) == n
             if iscell(value)
-                for i = 1:n, s.(fname) = value{i}; end
+                for i = 1:n, s(i).(field) = value{i}; end
             else
-                for i = 1:n, s.(fname) = value(i); end
+                for i = 1:n, s(i).(field) = value(i); end
             end
         else
-            error('Dont know how to do this assignment.');
+            error('Number of value(s) does not match structure size.');
         end
     end
 
