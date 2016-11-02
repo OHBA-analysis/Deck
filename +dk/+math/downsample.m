@@ -6,7 +6,7 @@ function [y, ty]  = downsample( x, tx, fs, win )
 %
 % JH
 
-    FTOL = 2;
+    PREC = @(a,b) floor(log10(max(a,b))) - floor(log10(abs( a-b )));
     
     if nargin < 4, win = 'tukey'; end
     
@@ -20,6 +20,7 @@ function [y, ty]  = downsample( x, tx, fs, win )
     
     % check that fs is greater than current sampling rate
     newdt = 1/fs;
+    if abs(newdt-dt) < eps, y=x; ty=tx; return; end
     assert( newdt > dt, 'Requested sampling rate is higher than current one, use dk.math.upsample instead.' );
     
     % save last timepoint
@@ -31,7 +32,8 @@ function [y, ty]  = downsample( x, tx, fs, win )
     actual_fs = 1 / ( dt * ceil(newdt/dt) );
     
     % if too large, upsample to a suitable rate before downsampling
-    if abs(actual_fs - target_fs) > FTOL 
+    if PREC(actual_fs,target_fs) < 2 % the two MSD must be equal
+        dk.info('[dk.math.downsample] Upsampling before downsampling to correct for frequency discrepancy.');
         newdt  = newdt / ceil(newdt/dt);
         [x,tx] = dk.math.upsample( x, tx, 1/newdt );
     end
