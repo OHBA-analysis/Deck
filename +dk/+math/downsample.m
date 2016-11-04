@@ -40,7 +40,7 @@ function [y, ty]  = downsample( x, tx, fs, win )
     
     % compute sliding parameters
     wstep = ceil( 1/dt/fs );
-    wsize = 2*wstep;
+    wsize = ceil( wstep / 0.6 );
     nwin  = 1 + floor( (size(x,1) - wsize)/wstep );
     
     % prepare window
