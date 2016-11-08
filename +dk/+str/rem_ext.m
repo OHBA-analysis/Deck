@@ -1,12 +1,14 @@
-function [s,r] = rem_ext(s,n,dotc)
+function [s,r] = rem_ext( s, n, dotc )
 %
-% Remove the extension from string (assuming dot-separation).
+% [str,rem] = dk.str.rem_ext( str, n=inf, dotc='.' )
+%
+% Remove the extension from string.
 %
 % If n is an integer, it specifies how many extensions should be removed.
 % By default n=inf, which means everything after the first dot is removed.
 %
-% If n is a string, it specifies the extension to be removed, in which case 
-% the tail of the input string s will be matched against n and removed if 
+% If n is a string, it specifies the extension to be removed, in which case
+% the tail of the input string s will be matched against n and removed if
 % it matches.
 %
 % Example:
@@ -15,13 +17,13 @@ function [s,r] = rem_ext(s,n,dotc)
 % >> string.rem_ext(a,2)    % '.aaaaa.aaaa.'
 % >> string.rem_ext(a,3)    % '.aaaaa.aaaa'
 %
-% Contact: jhadida [at] fmrib.ox.ac.uk
-    
+% JH
+
     if nargin < 2, n=inf; end
     if nargin < 3, dotc='.'; end
-    
+
     r = '';
-    
+
     if isnumeric(n)
 
         dots = find(s == dotc);
@@ -32,16 +34,16 @@ function [s,r] = rem_ext(s,n,dotc)
             r = s(last:end);
             s = s(1:last-1);
         end
-        
+
     else
-        
+
         if n(1) ~= dotc, n = [dotc n]; end
-        
+
         l = numel(n);
         if strcmpi( s(end-l+1:end), n )
             r = n;
             s = s(1:end-l);
         end
-        
+
     end
 end
