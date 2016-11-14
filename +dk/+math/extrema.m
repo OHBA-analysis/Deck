@@ -1,4 +1,10 @@
 function [m,M] = extrema( X, dim )
+%
+% [m,M] = dk.math.extrema( X, dim )
+%
+% Compute extrema (min,max) on input data X along dimension dim.
+%
+% JH
 
     if nargin < 2, dim = 1; end
     
