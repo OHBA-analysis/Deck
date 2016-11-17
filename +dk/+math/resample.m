@@ -16,8 +16,16 @@ function [y, ty] = resample( x, tx, fs, method )
         m = mean(x,1);
         if isempty(fs)
             [y,ty] = resample( dk.bsx.sub(x,m), tx, method );
-        else
+        elseif isscalar(fs)
             [y,ty] = resample( dk.bsx.sub(x,m), tx, fs, method );
+        else
+            qt = fs(:); % interpret fs as query timepoints
+            dt = diff(qt); 
+            [y,ty] = resample( dk.bsx.sub(x,m), tx, 1/median(dt), method );
+            if numel(qt) ~= numel(ty) || any( abs(qt-ty) > eps )
+                y  = interp1( ty, y, qt, method );
+                ty = qt;
+            end
         end
         y = dk.bsx.add(y,m);
         
@@ -30,4 +38,9 @@ function [y, ty] = resample( x, tx, fs, method )
         
     end
 
+    % Matlab extrapolates apparently..
+    m  = ty <= tx(end);
+    ty = ty(m);
+    y  = y(m,:);
+    
 end
