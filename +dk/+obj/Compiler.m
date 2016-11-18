@@ -8,7 +8,7 @@ classdef Compiler < handle
 % Once you are done specifying the options of your compilation, run "build" in order to commit the internal state.
 % You can print the command to the console (for debuging/verbose) and compile using "print" and "compile".
 %
-% Contact: jhadida [at] fmrib.ox.ac.uk
+% JH
 
     properties (SetAccess = public)
         
@@ -57,10 +57,13 @@ classdef Compiler < handle
             self.optimize      = false;
             self.dry_run       = false;
             self.verbose       = false;
-            self.use_64b_size  = true;
             self.use_cpp0x     = false;
             self.silent        = false;
             self.debug         = false;
+            
+            % detect integer width
+            [~,maxArraySize]   = computer();
+            self.use_64b_size  = maxArraySize > pow2(31);
             
         end
         

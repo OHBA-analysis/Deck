@@ -14,11 +14,7 @@ function C = compiler( verbose, debug )
     C.debug    =  debug;
     C.verbose  = verbose;
     
-    % 64-bits sizes (corresp. to -largeArrayDims option)
-    C.use_64b_size = true;
-    %C.use_cpp0x    = true;
-    
-    % use our own mexopts.sh
+    % use custom mex options
     here = fileparts(mfilename('fullpath'));
     if myear >= 2016
         if ismac()

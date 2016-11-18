@@ -70,7 +70,7 @@ classdef List < handle
         
         % Remove duplicates
         function self = remove_duplicates(self)
-            self.list = unique(self.list);
+            self.list = unique(self.list,'stable');
         end
         
         % Find the first element that matches
