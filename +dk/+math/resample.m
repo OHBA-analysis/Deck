@@ -39,8 +39,10 @@ function [y, ty] = resample( x, tx, fs, method )
     end
 
     % Matlab extrapolates apparently..
-    m  = ty <= tx(end);
-    ty = ty(m);
-    y  = y(m,:);
+    if ty(end) > tx(end)
+        m  = ty <= tx(end);
+        ty = ty(m);
+        y  = y(m,:);
+    end
     
 end
