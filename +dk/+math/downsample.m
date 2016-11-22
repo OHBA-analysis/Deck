@@ -8,7 +8,7 @@ function [y, ty]  = downsample( x, tx, fs, win )
 
     PREC = @(a,b) floor(log10(max(a,b))) - floor(log10(abs( a-b )));
     
-    if nargin < 4, win = 'tukey'; end
+    if nargin < 4, win = 'hamming'; end
     
     [x,tx] = dk.util.format_ts(x,tx,'vertical');
     
@@ -55,6 +55,6 @@ function [y, ty]  = downsample( x, tx, fs, win )
     
     % interpolate to final precision
     ty = colon( tx(1), 1/fs, tx(end) )';
-    y  = interp1( t, y, ty, 'linear' );
+    y  = interp1( t, y, ty, 'pchip' );
     
 end
