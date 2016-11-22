@@ -32,9 +32,8 @@ function [y, ty] = resample( x, tx, fs, method )
     else
         
         % resample magnitude and angle separately for complex signals
-        [yabs,ty] = dk.math.resample( abs(x), tx, fs, method );
-        yphi = dk.math.resample( unwrap(angle(x),[],1), tx, fs, method );
-        y = yabs .* exp( 1i * yphi );
+        [y,ty] = dk.math.resample( abs(x), tx, fs, method );
+        y = y .* exp(1i*dk.math.resample( unwrap(angle(x),[],1), tx, fs, method ));
         
     end
 

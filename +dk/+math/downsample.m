@@ -35,7 +35,7 @@ function [y, ty]  = downsample( x, tx, fs, win )
     if PREC(actual_fs,target_fs) < 2 % the two MSD must be equal
         dk.info('[dk.math.downsample] Upsampling before downsampling to correct for frequency discrepancy.');
         newdt  = newdt / ceil(newdt/dt);
-        [x,tx] = dk.math.upsample( x, tx, 1/newdt );
+        [x,tx] = dk.math.upsample( x, tx, 1/newdt, 'linear' );
     end
     
     % compute sliding parameters
@@ -46,22 +46,15 @@ function [y, ty]  = downsample( x, tx, fs, win )
     % prepare window
     wy = dk.math.window( win, wsize );
     wy = wy(:)' / sum(wy);
-    wt = ones(1,wsize) / wsize;
     
-    % allocate output
-    t = zeros( nwin, 1 );
-    y = zeros( nwin, size(x,2) );
-    
-    for w = 1:nwin
-        b = 1 + (w-1)*wstep;
-        e = b + wsize-1;
-        
-        t(w)   = wt * tx(b:e);
-        y(w,:) = wy * x( b:e, : );
-    end
+    % sliding average
+    b = 1 + (0:nwin-1)*wstep;
+    e = b + wsize-1;
+    t = [tx(1); (tx(b) + tx(e))/2; tlast];
+    y = [x(1,:); nst.mex.sliding_dot( x, wy, wstep ); xlast];
     
     % interpolate to final precision
     ty = colon( tx(1), 1/fs, tx(end) )';
-    y  = interp1( [tx(1); t; tlast], [x(1,:); y; xlast], ty, 'pchip' );
+    y  = interp1( t, y, ty, 'linear' );
     
 end

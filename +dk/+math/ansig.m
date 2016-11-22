@@ -1,4 +1,4 @@
-function [env,phi,frq] = ansig( x, fs )
+function varargout = ansig( x, fs )
 %
 % [env,phi,frq] = dk.math.ansig( x, fs=1 )
 %
@@ -20,17 +20,22 @@ function [env,phi,frq] = ansig( x, fs )
     
     if nargin < 2, fs=1; end
 
-    % compute envelope and phase
     sig = hilbert(dk.bsx.sub( x, mean(x,1) ));
-    env = abs(sig);
-    phi = unwrap( angle(sig), [], 1 );
     
-    % estimate frequency only if required
-    if nargout >= 3
-        n = size(x,1);
-        t = (1:n)/fs;
-        
-        frq = dk.math.deriv_sample( t, phi ) / (2*pi);
+    switch nargout
+        case 1
+            varargout = {sig};
+        case 2
+            % compute envelope and phase
+            varargout = { abs(sig), unwrap( angle(sig), [], 1 ) };
+        case 3
+            % estimate frequency only if required
+            n = size(x,1);
+            t = (1:n)/fs;
+            
+            phi = unwrap( angle(sig), [], 1 );
+            frq = dk.math.deriv_sample( t, phi ) / (2*pi);
+            varargout = { abs(sig), phi, frq };
     end
 
 end
