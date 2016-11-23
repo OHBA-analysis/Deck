@@ -6,8 +6,8 @@ function [bsize,scale] = byte_size( b, unit_symbol )
 
     if nargin < 2, unit_symbol='B'; end
 
-    units = dk.cellfun( @(x) [x unit_symbol], {'','k','M','G','T'}, false );
-    scale = units{ 1+floor( log(b)/log(1024) ) };
+    units = dk.cellfun( @(x) [x unit_symbol], {'','k','M','G','T','P'}, false );
+    scale = units{min( numel(units), 1+floor( log(b)/log(1024) ) )};
     
     for i = 1:numel(units)
         u = units{i};
