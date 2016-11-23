@@ -17,7 +17,7 @@ function [h,l] = gridfit( nelem, lhratio )
     %   h*l >= nelem
     %
     h = ceil(sqrt(nelem/lhratio));
-    l = round(h*lhratio);
+    l = fix(h*lhratio);
 
     % should not happen, but just to be sure
     if h*l < nelem
