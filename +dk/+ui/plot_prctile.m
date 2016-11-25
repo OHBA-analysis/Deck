@@ -31,17 +31,16 @@ function [ph,fh] = plot_prctile( x, y, lo, hi, popts, fopts )
         fopts = {'LineWidth',1,'EdgeColor',color_red,'FaceAlpha',.7};
     end
     
-    assert( numel(x) == size(y,2), 'Input size mismatch.' );
+    [y,x] = dk.util.format_ts(y,x,'vert');
     assert( isscalar(lo) && isscalar(hi), 'Lower/higher percentiles should integers between 0 and 100.' );
     
-    n = size(y,1);
-    x = dk.to_row(x);
-    y_md = median(y,1);
+    n = size(y,2);
+    y_md = median(y,2);
     
     if n >= 3
-        y_lo = prctile( y, lo, 1 );
-        y_hi = prctile( y, hi, 1 );
-        fh = fill( horzcat(x,fliplr(x)), horzcat(y_hi,fliplr(y_lo)), color_red, fopts{:} ); hold on;
+        y_lo = prctile( y, lo, 2 );
+        y_hi = prctile( y, hi, 2 );
+        fh = fill( vertcat(x,flipud(x)), vertcat(y_hi,flipud(y_lo)), color_red, fopts{:} ); hold on;
     end
     ph = plot( x, y_md, popts{:} ); hold off;
 
