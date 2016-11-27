@@ -55,7 +55,8 @@ classdef Format < handle
             
             % process internal properties
             if opt.boolalpha
-                self.boolalpha = {'False','True'};
+                %self.boolalpha = {'False','True'};
+                self.boolalpha = {'false','true'};
             else
                 self.boolalpha = {'0','1'};
             end
