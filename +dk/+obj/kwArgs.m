@@ -104,6 +104,9 @@ classdef kwArgs < handle
             elseif isa(args,'dk.obj.kwArgs')
                 self.copy(args);
                 
+            elseif isempty(args) % empty input
+                return; 
+                
             else
                 error('Inputs should be either a cell of key-values or a structure.');
             end
