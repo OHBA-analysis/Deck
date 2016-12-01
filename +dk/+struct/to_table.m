@@ -1,6 +1,16 @@
 function T = to_table( s )
-% 
-% Convert struct-array to table
+%
+% T = dk.struct.to_table( s )
+%
+% Convert struct-array to table, with variable names corresponding to fieldnames.
+%
+% Example:
+%
+% s = dk.struct.array( ...
+%     'FirstName', {'Frank','Douglas','Edward','Zoey'}, ...
+%     'LastName', {'Underwood','Stamper','Meechum','Barnes'} ...
+% );
+% dk.struct.to_table(s)
 %
 % JH
 
@@ -8,7 +18,7 @@ function T = to_table( s )
     n = numel(f);
     m = numel(s);
     T = cell(1,n);
-    
+
     for i = 1:n
         T{i} = reshape( {s.(f{i})}, m, 1 );
     end
