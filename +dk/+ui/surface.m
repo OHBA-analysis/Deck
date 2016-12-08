@@ -19,6 +19,7 @@ function h = surface( x, y, z, varargin )
     in_zlabel = opt.pop( 'zlabel', 'z' );
     in_clabel = opt.pop( 'clabel', '' );
     in_clim   = opt.pop( 'clim', 'auto' );
+    in_cmap   = opt.pop( 'cmap', 'jet' );
     in_light  = opt.pop( 'light', '' );
     in_color  = opt.pop( 'color', z );
     in_subpos = opt.pop( 'subplot', {} );
@@ -40,6 +41,9 @@ function h = surface( x, y, z, varargin )
     if ~isempty(in_xlabel), xlabel(in_xlabel); end
     if ~isempty(in_ylabel), ylabel(in_ylabel); end
     if ~isempty(in_zlabel), zlabel(in_zlabel); end
+    
+    % colormap
+    colormap(gca,in_cmap);
     
     % colorbar
     cb = colorbar; caxis(in_clim); 
