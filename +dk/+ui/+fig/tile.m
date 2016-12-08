@@ -10,12 +10,12 @@ function tile( gsize, figures, screen )
     
     % figure numbers given as an input array
     if isnumeric(figures)
-        figures = arrayfun( @(k) figure(k), figures, 'UniformOutput', false );
+        figures = dk.arrayfun( @(k) figure(k), figures, false );
     end
     
     % array of figures given in input, make it a cell
     if ~iscell(figures)
-        figures = arrayfun( @(x) x, figures, 'UniformOutput', false );
+        figures = dk.arrayfun( @(x) x, figures, false );
     end
 
     % dimensions of the grid
@@ -46,9 +46,9 @@ function tile( gsize, figures, screen )
     spos = spos( screen, : );
     
     % convert normalised positions to pixel positions
-    bottom = bottom * spos(4) + spos(2);
+    bottom = bottom * spos(4) + spos(2)-1;
     height = height * spos(4);
-    left   = left   * spos(3) + spos(1);
+    left   = left   * spos(3) + spos(1)-1;
     width  = width  * spos(3);
     
     % apply positions
