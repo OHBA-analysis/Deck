@@ -1,4 +1,4 @@
-function y = squaremat( x )
+function y = squaremat( varargin )
 % square matrix
-    y = ismatrix(x) && diff(size(x))==0;
+    y = cellfun( @(x) ismatrix(x) && diff(size(x))==0, varargin, 'UniformOutput', true );
 end

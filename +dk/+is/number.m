@@ -1,3 +1,3 @@
-function y = number(x)
-    y = isnumeric(x) && isscalar(x);
+function y = number(varargin)
+    y = cellfun( @(x) isnumeric(x) && isscalar(x), varargin, 'UniformOutput', true );
 end

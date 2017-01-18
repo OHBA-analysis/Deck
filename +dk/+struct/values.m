@@ -6,6 +6,7 @@ function v = values( s, order )
 % Cell (i,j) contains the value of j^th field in the i^th structure.
 %
 % If order is specified as a cell-string of fieldnames, then the order of output columns is set accordingly.
+% Non-existing fields are ignored SILENTLY (please check that you have the right number of fields in output).
 %
 % JH
 
