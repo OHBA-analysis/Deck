@@ -53,22 +53,15 @@ function [h,color_scale] = image( img, varargin )
     if iscell(img)
         
         % x and y axes are given
-        x = img{1}; nx = numel(x);
-        y = img{2}; ny = numel(y);
-        
-        % transpose image if needed
-        img = img{3};
-        assert( nx*ny == numel(img), 'Size mismatch between x-y axis and image.' );
-        if size(img,1) ~= ny && size(img,2) == ny
-            img = img';
-        end
+        [x,y,img] = dk.math.imresample( img{1}, img{2}, img{3}, 'cubic' );
         
         % resize image if needed
         img = check_size(img,maxsize);
         
         % if image was resized, adapt x and y
-        if size(img,1) ~= ny, y = interp1( linspace(0,1,ny), y, linspace(0,1,size(img,1)) ); end
-        if size(img,2) ~= nx, x = interp1( linspace(0,1,nx), x, linspace(0,1,size(img,2)) ); end
+        [nr,nc] = size(img);
+        ny = numel(y); if nr ~= ny, y = interp1( linspace(0,1,ny), y, linspace(0,1,nr) ); end
+        nx = numel(x); if nc ~= nx, x = interp1( linspace(0,1,nx), x, linspace(0,1,nc) ); end
         
         % draw image
         h = imagesc(x,y,img); set(gca,'YDir','normal');
@@ -128,7 +121,7 @@ function [h,color_scale] = image( img, varargin )
     
 end
 
-function img = check_size(img,maxsize)
+function [img,x,y] = check_size(img,maxsize)
 
     imgsize = size(img);
     maxsize = min( imgsize, maxsize );
