@@ -1,4 +1,11 @@
 function x = swap( x, i, j )
+%
+% x = dk.util.swap( x, i, j )
+%
+% Swap to elements in x.
+% If x is a structure (or struct-array) then i and j should be fieldnames to swap.
+%
+% JH
 
     if iscell(x)
         tmp  = x{j};
