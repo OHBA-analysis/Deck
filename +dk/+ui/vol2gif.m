@@ -1,39 +1,46 @@
-function vol2gif( filename, volume, delay, imsize )
+function vol2gif( filename, volume, delay, resize )
 %
-% VOL2GIF( filename, volume, delay )
+% VOL2GIF( filename, volume, delay=100ms, resize=[] )
 %
 % Create animated GIF from 3D matrix and save as given filename.
 % Default delay is 0.1 sec.
 % 
 % JH
 
-    if nargin < 3, delay = 0.1; end
+    dk.assert( dk.require('convert'), [ ...
+        'This utility requires imagemagick to be installed on the host system.\n' ...
+        'It is available on OSX through homebrew, and on Linux through package managers.' ...
+    ] );
+
+    if nargin < 3, delay = 100; end
+    if nargin < 4, resize = []; end
     
     % make sure it has the correct extension
     filename = dk.str.set_ext(filename,'gif');
     
-    % convert to 256 graylevels
-    volume  = round(256*mat2gray(volume));
-    nslices = size(volume,3);
+    % convert delay to suitable unit
+    delay = delay/10;
     
-    % first slice overwrites the file if any
-    if nargin > 3
-        slice = imresize( volume(:,:,1), imsize, 'nearest' );
-    else
-        slice = volume(:,:,1);
+    % load slices
+    if ischar(volume)
+        volume = dk.ui.load_slices( volume );
     end
-    imwrite( slice, filename, 'gif', 'WriteMode', 'overwrite', 'DelayTime', delay, 'LoopCount', inf );
-
-    % write other slices to file
-    for i = 2:nslices
-        
-        if nargin > 3
-            slice = imresize( volume(:,:,i), imsize, 'nearest' );
-        else
-            slice = volume(:,:,i);
+    volume = dk.ui.vol2slices( volume ); % make sure it is a cell
+    nslices = numel(volume);
+    
+    % resize if required
+    if ~isempty(resize)
+        for i = 1:nslices
+            volume{i} = imresize( volume{i}, resize, 'bilinear' );
         end
-        
-        imwrite( slice, filename, 'gif', 'WriteMode', 'append', 'DelayTime', delay );
     end
-
+    
+    % export to temporary folder
+    folder  = fullfile( '/tmp', dk.fs.tempname );
+    pattern = sprintf('img_%%0%dd.png',1 + floor(log10(nslices)));
+    dk.ui.save_slices( volume, folder, pattern );
+    
+    [s,m] = system(sprintf( 'convert -delay %d -loop 0 %s %s', delay, fullfile(folder,'img_*.png'), filename ));
+    dk.reject( s, 'Could not run convert command:\n%s.', m );
+    
 end
