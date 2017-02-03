@@ -2,19 +2,17 @@ function style = export( fig, fname, style )
 % 
 % Export a figure "fig" to an image named "fname" using the export style (string or struct) "style".
 % If the style is specified as a string, then the style is loaded from Matlab and this might throw 
-% an error if it doesn't exist. The default style is used if nothing is specified.
+% an error if it doesn't exist. 
 %
-% Note that the Format field fo the style will is overriden if the input filename contains an extension.
+% NOTE: Format field in the style is overriden if filename specifies the extension.
 % 
 % Contact: jhadida [at] fmrib.ox.ac.uk
 
-    if nargin < 3,    style = 'default'; end
     if ischar(style), style = hgexport('readstyle',style); end
 
     [~,~,ext] = fileparts(fname);
     if ~isempty(ext)
-        ext = dk.str.lstrip(ext,'.');
-        style.Format = ext;
+        style.Format = dk.str.lstrip(ext,'.');
     end
     
     hgexport( fig, fname, style );
