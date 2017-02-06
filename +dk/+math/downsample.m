@@ -1,6 +1,6 @@
 function [y, ty]  = downsample( x, tx, fs, win )
 %
-% [y, ty] = dk.math.downsample( x, tx, fs, method=pchip )
+% [y, ty] = dk.math.downsample( x, tx, fs, win=hamming )
 %
 % Downsample a time-series using sliding-window.
 %
