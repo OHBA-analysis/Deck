@@ -30,11 +30,8 @@ function varargout = ansig( x, fs )
             varargout = { abs(sig), unwrap( angle(sig), [], 1 ) };
         case 3
             % estimate frequency only if required
-            n = size(x,1);
-            t = (1:n)/fs;
-            
             phi = unwrap( angle(sig), [], 1 );
-            frq = dk.math.deriv_sample( t, phi ) / (2*pi);
+            frq = dk.math.diff( phi, 1/fs ) / (2*pi);
             varargout = { abs(sig), phi, frq };
     end
 
