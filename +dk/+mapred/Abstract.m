@@ -230,7 +230,7 @@ classdef Abstract < handle
                     workerdata = load( workerfile );
                     output( config.exec.workers{i} ) = workerdata.output;
                     dk.println('Worker %d/%d merged, timeleft %s...',i,nworkers,timer.timeleft_str(i/nworkers));
-                    % delete( worderfile );
+                    % delete( workerfile );
                 catch
                     dk.println('Worker %d/%d... FAILED',i,nworkers);
                 end

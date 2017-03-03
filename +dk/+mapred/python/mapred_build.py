@@ -130,7 +130,9 @@ def make_config( cfg, folder ):
 
 # Template scripts
 tpl_map = string.Template("""matlab -singleCompThread -nodisplay -r "cd '${startdir}'; startup; cd '${workdir}'; obj = ${classname}(); obj.run_worker('${savedir}',${workerid}); exit(0);" """)
-tpl_reduce = string.Template("""matlab -singleCompThread -nodisplay -r "cd '${startdir}'; startup; cd '${workdir}'; obj = ${classname}(); obj.run_reduce('${savedir}'); exit(0);" """)
+tpl_reduce = string.Template("""#!/bin/bash
+
+matlab -singleCompThread -nodisplay -r "cd '${startdir}'; startup; cd '${workdir}'; obj = ${classname}(); obj.run_reduce('${savedir}'); exit(0);" """)
 tpl_submit = string.Template("""#!/bin/bash
 
 # remove info in all job subfolders
@@ -140,7 +142,7 @@ done
 
 # submit map/reduce job to the cluster
 mid=$$(fsl_sub -q ${queue}.q -M ${email} -m ${mailopt} -N ${jobname} -l "${logdir}" -t "${mapscript}")
-rid=$$(fsl_sub -j $${mid} -q ${queue}.q -M ${email} -m ${mailopt} -N ${jobname} -l "${logdir}" "${redscript}")
+rid=$$(fsl_sub -j $${mid} -q ${queue}.q -M ${email} -m ${mailopt} -N ${jobname} -l "${logdir}" ./"${redscript}")
 
 # Show IDs
 echo "Submitted map with ID $${mid} and reduce with ID $${rid}. Use qstat and mapred_status to monitor the progress."
