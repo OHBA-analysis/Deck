@@ -1,28 +1,30 @@
 classdef Abstract < handle
-    
+
     properties (Abstract,Constant)
         name
         id
     end
-    
+
     methods (Abstract)
-        
-        % Should return a struct-array the same length as the unrolled loop with named parameters.
+
+        % This method gets called to retrieve the parameters of a single job, or an array
+        % of parameters for all jobs if called without index.
         %
-        % If index is specified, then output should correspond to the structure at that index in the array output.
+        % Return a struct-array with named parameters the same length as the unrolled loop.
+        % If index is specified, then output only the structure at that index.
         %
         inputs = get_inputs(self,index);
-        
-        % First arg should be a structure with named parameters (typically as returned by get_inputs(k)).
+
+        % This method gets called to execute a single job.
         %
-        % Second arg should be a path to the folder in which the routine may save data as needed.
-        %
-        % Additional inputs should be options that can be parsed by dk.obj.kwArgs (eg named options, or struct).
+        % inputs: structure similar to that returned by get_inputs(k) for some index k.
+        % folder: path to the folder in which data will be saved (if any).
+        % varargin: options that can be parsed by dk.obj.kwArgs (eg key/value pairs, or struct).
         %
         output = process(self,inputs,folder,varargin);
-        
+
     end
-    
+
     methods
 
         function cfg = load_config(self)
@@ -37,7 +39,7 @@ classdef Abstract < handle
             njobs   = numel(inputs);
             workers = split_jobs( njobs, nworkers );
             options = dk.obj.kwArgs(varargin{:});
-            
+
             % edit the exec field
             cfg.exec.class   = self.name;
             cfg.exec.jobs    = inputs;
@@ -49,38 +51,38 @@ classdef Abstract < handle
             dk.json.write(self.config_file,cfg);
 
         end
-        
+
         function cfg = set_folders(self,start,work,save)
-            
+
             cfg = self.load_config();
             cfg.folders.start = start;
             cfg.folders.work  = work;
             cfg.folders.save  = save;
-            
+
             % save edited config
             dk.println('[MapReduce] Configuration edited in "%s".',self.config_file);
             dk.json.write(self.config_file,cfg);
-            
+
         end
-        
+
         function cfg = set_cluster(self,jobname,queue,email,mailopt)
-            
+
             cfg = self.load_config();
             cfg.cluster.jobname = jobname;
             cfg.cluster.queue   = queue;
             cfg.folders.email   = email;
             cfg.folders.mailopt = mailopt;
-            
+
             % save edited config
             dk.println('[MapReduce] Configuration edited in "%s".',self.config_file);
             dk.json.write(self.config_file,cfg);
-            
+
         end
-        
+
     end
-    
+
     methods (Hidden)
-        
+
         function f = config_file(self)
             f = [dk.mapred.name2relpath(self.name) '.mapred.json'];
         end
@@ -92,8 +94,8 @@ classdef Abstract < handle
             %config = fix_config(config);
 
             % make sure the ID is correct
-            assert( strcmp(config.id,self.id), 'ID mismatch between class and running config.' );
-            
+            dk.assert( strcmp(config.id,self.id), 'ID mismatch between this class (%s) and running config (%s).', self.id, config.id );
+
             % save the folder from where the config was loaded
             % this allows to move the folder around without affecting the processing
             config.folder = folder;
@@ -101,16 +103,16 @@ classdef Abstract < handle
         end
 
         function [output,failed] = run_job( self, workerid, jobid, config )
-            
+
             % not failed if the processing runs without error
             failed = true;
-            
+
             % create folder for storage if it doesn't already exist
             jobfolder = fullfile( config.folders.save, sprintf('job_%d',jobid) );
             if ~dk.fs.is_dir( jobfolder )
                 dk.assert( mkdir(jobfolder), 'Could not create folder "%s".', jobfolder );
             end
-            
+
             % parse options and make sure it's a struct
             options = config.exec.options;
             if isempty(options)
@@ -127,7 +129,7 @@ classdef Abstract < handle
             info.stop    = '';
             info.errmsg  = '';
             dk.json.write( fullfile(jobfolder,'info.json'), info );
-            
+
             % processing
             try
                 output = self.process( info.inputs, jobfolder, info.options );
@@ -138,15 +140,15 @@ classdef Abstract < handle
                 info.status = 'failed';
                 info.errmsg = ME.message;
             end
-            
+
             % update info
             info.stop = get_timestamp();
             dk.json.write( fullfile(jobfolder,'info.json'), info );
-            
+
         end
-        
+
         function output = run_worker( self, folder, workerid )
-            
+
             % load config (contains options)
             config = self.load_running_config(folder);
 
@@ -154,43 +156,43 @@ classdef Abstract < handle
             if nargin < 3
                 workerid = get_task_id();
             end
-            
+
             % get all jobs to run
             jobids = config.exec.workers{workerid};
             njobs  = numel(jobids);
-            
+
             dk.println('[MapReduce.START] Worker #%d',workerid);
             dk.println('         folder : %s',pwd);
             dk.println('           host : %s',dk.env.hostname);
             dk.println('           date : %s',get_timestamp);
             dk.println('          njobs : %d',njobs);
             dk.println('-----------------\n');
-                        
+
             timer  = dk.time.Timer();
             output = cell(1,njobs);
-            
+
             for i = 1:njobs
                 jobid = jobids(i);
                 try
-                    [output{i},failed] = self.run_job( workerid, jobid, config ); 
+                    [output{i},failed] = self.run_job( workerid, jobid, config );
                     assert(~failed); % force exception to issue FAIL message
                     dk.println('Job #%d (%d/%d, timeleft %s)...',jobid,i,njobs,timer.timeleft_str(i/njobs));
                 catch
                     dk.println('Job #%d (%d/%d)... FAILED',jobid,i,njobs);
                 end
             end
-            
+
             % save output file
             outfile = fullfile( folder, sprintf( config.files.worker, workerid ) );
             dk.println('\n\t Saving output file to "%s" (%s)...',outfile,get_timestamp);
             save( outfile, '-v7.3', 'output' );
-            
+
             fprintf('\n\n');
             dk.println('[MapReduce.STOP] Worker #%d',workerid);
             dk.println('          date : %s',get_timestamp);
             dk.println('        output : %s',outfile);
             dk.println('----------------\n');
-            
+
         end
 
         function output = run_reduce( self, folder )
@@ -224,7 +226,7 @@ classdef Abstract < handle
             for i = 1:nworkers
 
                 workerfile = fullfile( folder, sprintf( config.files.worker, i ) );
-                try 
+                try
                     workerdata = load( workerfile );
                     output( config.exec.workers{i} ) = workerdata.output;
                     dk.println('Worker %d/%d merged, timeleft %s...',i,nworkers,timer.timeleft_str(i/nworkers));
@@ -245,27 +247,29 @@ classdef Abstract < handle
             dk.println('----------------\n');
 
         end
-        
+
     end
-    
+
 end
 
 function t = get_timestamp()
 
     % return a nice timestamp with date and time
     t = datestr(now,'dd-mmm-yyyy HH:MM:SS');
-    
+
 end
 
 function id = get_task_id()
-    
-    % detect grid environment (for now, only SGE)
-    id = str2num(getenv('SGE_TASK_ID'));
+
+    % get current task ID from computing environment variables (for now, only SGE)
+    id = str2num(getenv('SGE_TASK_ID')); %#ok
 
 end
 
 function jobids = split_jobs( njobs, nworkers )
 
+    % split a given number of jobs equally across a given number of workers
+    % output is a 1xNworkers cell, each containing a list of job IDs
     assert( nworkers>0 && njobs>0, 'Inputs should be positive.' );
 
     njobs_per_worker  = ceil( njobs / nworkers );
@@ -274,7 +278,7 @@ function jobids = split_jobs( njobs, nworkers )
     for i = 1:nworkers
         jobids{i} = (1+jobstrides(i)):jobstrides(i+1);
     end
-    
+
 end
 
 % apply corrections because of crap JSON parsing
@@ -282,7 +286,7 @@ function config = fix_config(config)
 
     % make sure the workers are stored in a cell
     assert( iscell(config.exec.workers) || ismatrix(config.exec.workers), 'Unexpected worker type.' );
-    
+
     if ~iscell(config.exec.workers)
         n = size(config.exec.workers,1);
         config.exec.workers = dk.arrayfun( @(k) config.exec.workers(k,:), 1:n, false );
