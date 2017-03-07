@@ -1,8 +1,11 @@
 function [coef,rsq] = polyreg( x, y, n, doplot )
 %
+% [coef,rsq] = dk.math.polyreg( x, y, n, doplot )
+%
 % Fits polynomial of degree n to input data.
 % Returns n+1 coefficients sorted from the highest power down. 
 % Second output is the adjusted r-squared.
+% If no output is assigned, the fit is plotted.
 %
 % JH
 
@@ -26,7 +29,7 @@ function [coef,rsq] = polyreg( x, y, n, doplot )
         scatter( x, y, 'bo' ); hold on;
         t = linspace(x(1),x(end),300);
         plot( t, polyval( coef, t ), 'r-', 'LineWidth', 3 ); hold off;
-        title(sprintf( 'Polynomial regression (degree %d)', n ));
+        title(sprintf( 'Polynomial regression (degree %d, r^2= %g)', n, rsq ));
         legend( 'Original data', 'Regression' );
         
     end
