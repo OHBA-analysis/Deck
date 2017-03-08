@@ -1,8 +1,9 @@
-function T = to_table( s )
+function T = to_table( s, r )
 %
-% T = dk.struct.to_table( s )
+% T = dk.struct.to_table( s, r=[] )
 %
 % Convert struct-array to table, with variable names corresponding to fieldnames.
+% Structure fields correspond to columns. Optionally specify row names.
 %
 % Example:
 %
@@ -23,6 +24,9 @@ function T = to_table( s )
         T{i} = reshape( {s.(f{i})}, m, 1 );
     end
     T = [T,{'VariableNames',f}];
+    if nargin > 1
+        T = [T,{'RowNames',r}];
+    end
     T = table(T{:});
 
 end
