@@ -21,7 +21,7 @@ function [y, ty] = resample( x, tx, fs, method )
         else
             qt = fs(:); % interpret fs as query timepoints
             dt = diff(qt); 
-            [y,ty] = resample( dk.bsx.sub(x,m), tx, 1/median(dt), method );
+            [y,ty] = resample( dk.bsx.sub(x,m), tx, 1/prctile(dt,10), method );
             if numel(qt) ~= numel(ty) || any( abs(qt-ty) > eps )
                 y  = interp1( ty, y, qt, method );
                 ty = qt;
