@@ -6,7 +6,6 @@ import mapred_utils as util
 from datetime import datetime as date
 from datetime import timedelta
 from dateutil import parser as dateparser
-from termcolor import colored
 
 # Read job information
 def read_info( folder, jobid ):
@@ -46,10 +45,11 @@ def worker_progress( folder, workerid, jobids ):
     head = 'Worker #%d [ %d %%, timeleft: %s ]' % \
         ( workerid, 100.0 * (pgr['done']+pgr['failed'])/pgr['total'], remaining )
 
+    cprint = util.ColorPrinter()
     if pgr['failed'] > 0:
-        print colored(head,'white','on_red',attrs=['bold'])
+        print cprint.cfg('w','r','b').out(head)
     elif pgr['done'] == pgr['total']:
-        print colored(head,'green',attrs=['bold'])
+        print cprint.cfg('g').out(head)
     else:
         print head
 
@@ -59,12 +59,7 @@ def worker_progress( folder, workerid, jobids ):
      + failed : %d
     """ % ( pgr['total'], pgr['done'], pgr['failed'] )
 
-
-if __name__ == '__main__':
-
-    parser = argparse.ArgumentParser( prog='mapres_status' )
-    parser.add_argument('--config', default='', help='Configuration file (search for it if omitted)')
-    args = parser.parse_args()
+def main(args):
 
     # Get config file and read it
     cfgfile = args.config
@@ -79,3 +74,12 @@ if __name__ == '__main__':
     nworkers = len(workers)
     for w in xrange(nworkers):
         worker_progress( folder, w+1, workers[w] )
+
+
+if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser( prog='mapres_status' )
+    parser.add_argument('--config', default='', help='Configuration file (search for it if omitted)')
+    main(parser.parse_args())
+
+    

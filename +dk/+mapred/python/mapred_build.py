@@ -6,63 +6,44 @@ import string
 import json
 import mapred_utils as util
 
-# Check configuration contains all the required fields
-def check_validity( cfg ):
+# Template scripts
+TPL_MAP = string.Template("""matlab -singleCompThread -nodisplay -r "cd '${startdir}'; startup; cd '${workdir}'; obj = ${classname}(); obj.run_worker('${savedir}',${workerid}); exit(0);" """)
 
-    # Check that all fields are there
-    assert { 'id', 'cluster', 'exec', 'files', 'folders' } <= set(cfg), '[root] Missing field(s).'
+TPL_REDUCE = string.Template("""#!/bin/bash
 
-    # Check id
-    tmp = cfg['id']
-    assert util.is_string(tmp), '[id] Empty or invalid string.'
+matlab -singleCompThread -nodisplay -r "cd '${startdir}'; startup; cd '${workdir}'; obj = ${classname}(); obj.run_reduce('${savedir}'); exit(0);" """)
 
-    # Check cluster
-    tmp = cfg['cluster']
-    valid_queues = ['veryshort', 'short', 'long', 'verylong', 'bigmem', 'cuda']
-    valid_mailopts = ['b','e','a','s','n']
-    assert { 'jobname', 'queue', 'email', 'mailopt' } <= set(tmp), '[cluster] Missing field(s).'
-    assert util.is_string(tmp['jobname']), '[cluster.jobname] Empty or invalid string.'
-    assert util.is_string(tmp['email']), '[cluster.email] Empty or invalid string.'
-    assert tmp['queue'] in valid_queues, '[cluster.queue] Invalid queue.'
-    assert tmp['mailopt'] in valid_mailopts, '[cluster.mailopt] Invalid mailopt.'
-    if tmp['threads']:
-        assert isinstance(tmp['threads'],int), '[cluster.threads] Should be an int'
+TPL_SUBMIT = string.Template("""#!/bin/bash
 
-    # Check exec
-    tmp = cfg['exec']
-    assert { 'class', 'jobs', 'workers', 'options' } <= set(tmp), '[exec] Missing field(s).'
-    assert util.is_string(tmp['class']), '[exec.class] Empty or invalid string.'
-    assert isinstance(tmp['jobs'],list) and tmp['jobs'], '[exec.jobs] Empty or invalid list.'
-    assert isinstance(tmp['workers'],list) and tmp['workers'], '[exec.workers] Empty or invalid list.'
-    assert isinstance(tmp['options'],dict), '[exec.options] Invalid options.'
+# remove info in all job subfolders
+for folder in job_*; do
+    [ -f $${folder}/info.json ] && rm -f $${folder}/info.json
+done
 
-    # # Because of bad Matlab JSON lib, workers can be a list of ints instead of a list of lists
-    # if not isinstance( tmp['workers'][0], list ):
-    #     cfg['exec']['workers'] = [ [x] for x in cfg['exec']['workers'] ]
-    #     tmp =  cfg['exec']
+# submit map/reduce job to the cluster
+mid=$$(fsl_sub -q ${queue}.q -M ${email} -m ${mailopt} ${threads} -N ${jobname} -l "${logdir}" -t "${mapscript}")
+rid=$$(fsl_sub -j $${mid} -q ${queue}.q -M ${email} -m ${mailopt} -N ${jobname} -l "${logdir}" ./"${redscript}")
 
-    assert sum(map( len, tmp['workers'] )) == len(tmp['jobs']), '[exec] Jobs/workers size mismatch.'
+# Show IDs
+echo "Submitted map with ID $${mid} and reduce with ID $${rid}. Use qstat and mapred_status to monitor the progress."
+""")
 
-    # Check files
-    tmp = cfg['files']
-    assert { 'reduced', 'worker' } <= set(tmp), '[files] Missing field(s).'
-    assert util.is_string(tmp['reduced']), '[files.reduced] Empty or invalid string.'
-    assert util.is_string(tmp['worker']), '[files.worker] Empty or invalid string.'
-    try:
-        tpl = tmp['worker'] % (1)
-    except:
-        raise "[files.worker] Worker filename cannot be formatted."
+TPL_RUNWORKER = string.Template("""#!/bin/bash
 
-    # Check folders
-    tmp = cfg['folders']
-    assert { 'start', 'work', 'save' } <= set(tmp), '[folders] Missing field(s).'
-    assert util.is_string(tmp['start']), '[folders.start] Empty or invalid string.'
-    assert util.is_string(tmp['save']), '[folders.save] Empty or invalid string.'
-    assert util.is_string(tmp['work'],False), '[folders.work] Invalid string.'
+if [ $$# -lt 1 ]; then
+    echo "Usage: runworker <WorkerID>"
+fi
 
+nohup nice \\
+    matlab -singleCompThread -nodisplay \\
+    -r "cd '${startdir}'; startup; cd '${workdir}'; obj = ${classname}(); obj.run_worker('${savedir}',$$1); exit;" \\
+    >| "${logdir}/runworker_$${1}.log" 2>&1 &
+
+echo "Running with pid $$!."
+""")
 
 # Check existing output folder
-msg_warning = """WARNING:
+MSG_WARN = """WARNING:
     Another configuration was found in folder '%s', and it looks compatible with the current one.
     Going through with this build might result in OVERWRITING existing results.
     The options in the current configuration are:\n%s
@@ -104,16 +85,13 @@ def check_existing(cfg):
             opt_old = json.dumps( other['exec']['options'], indent=4 )
 
             # Return true if the folder already exists
-            return util.query_yes_no( msg_warning % ( folder, opt_new, opt_old ), "no" )
+            return util.query_yes_no( MSG_WARN % ( folder, opt_new, opt_old ), "no" )
 
     return True
 
 
 # Write new config to save folder
 def make_config( cfg, folder ):
-
-    # copy the whole config
-    other = dict(cfg)
 
     # creat config folder if it doesnt exist
     cfg_folder = os.path.join( folder, 'config' )
@@ -126,42 +104,9 @@ def make_config( cfg, folder ):
     link_file = os.path.join( cfg_folder, 'config.json' )
     cfg_file  = os.path.join( cfg_folder, cfg_name )
 
-    util.write_json( cfg_file, other )
+    util.write_json( cfg_file, cfg )
     util.relink( link_file, cfg_name )
 
-
-# Template scripts
-tpl_map = string.Template("""matlab -singleCompThread -nodisplay -r "cd '${startdir}'; startup; cd '${workdir}'; obj = ${classname}(); obj.run_worker('${savedir}',${workerid}); exit(0);" """)
-tpl_reduce = string.Template("""#!/bin/bash
-
-matlab -singleCompThread -nodisplay -r "cd '${startdir}'; startup; cd '${workdir}'; obj = ${classname}(); obj.run_reduce('${savedir}'); exit(0);" """)
-tpl_submit = string.Template("""#!/bin/bash
-
-# remove info in all job subfolders
-for folder in job_*; do
-    [ -f $${folder}/info.json ] && rm -f $${folder}/info.json
-done
-
-# submit map/reduce job to the cluster
-mid=$$(fsl_sub -q ${queue}.q -M ${email} -m ${mailopt} ${threads} -N ${jobname} -l "${logdir}" -t "${mapscript}")
-rid=$$(fsl_sub -j $${mid} -q ${queue}.q -M ${email} -m ${mailopt} -N ${jobname} -l "${logdir}" ./"${redscript}")
-
-# Show IDs
-echo "Submitted map with ID $${mid} and reduce with ID $${rid}. Use qstat and mapred_status to monitor the progress."
-""")
-tpl_runworker = string.Template("""#!/bin/bash
-
-if [ $$# -lt 1 ]; then
-    echo "Usage: runworker <WorkerID>"
-fi
-
-nohup nice \\
-    matlab -singleCompThread -nodisplay \\
-    -r "cd '${startdir}'; startup; cd '${workdir}'; obj = ${classname}(); obj.run_worker('${savedir}',$$1); exit;" \\
-    >| "${logdir}/runworker_$${1}.log" 2>&1 &
-
-echo "Running with pid $$!."
-""")
 
 # Write scripts according to current config
 def make_scripts( cfg, folder ):
@@ -192,10 +137,10 @@ def make_scripts( cfg, folder ):
     # put the scripts together
     nworkers = len(cfg['exec']['workers'])
     scripts = {
-           'map.sh': "\n".join([ tpl_map.substitute(sub,workerid=(i+1)) for i in xrange(nworkers) ]) + "\n",
-        'reduce.sh': tpl_reduce.substitute(sub) + "\n",
-        'runworker': tpl_runworker.substitute(sub),
-           'submit': tpl_submit.substitute(sub)
+           'map.sh': "\n".join([ TPL_MAP.substitute(sub,workerid=(i+1)) for i in xrange(nworkers) ]) + "\n",
+        'reduce.sh': TPL_REDUCE.substitute(sub) + "\n",
+        'runworker': TPL_RUNWORKER.substitute(sub),
+           'submit': TPL_SUBMIT.substitute(sub)
     }
 
     # create log folder
@@ -219,12 +164,7 @@ Successful build (%d jobs across %d workers). To submit to the cluster, run:
     ./submit
 """
 
-if __name__ == '__main__':
-
-    parser = argparse.ArgumentParser( prog='mapres_build' )
-    parser.add_argument('config', help='Configuration file to be built')
-    parser.add_argument('--savedir', default='', help='Override save folder in config')
-    args = parser.parse_args()
+def main(args):
 
     # Try different extensions in case it's missing
     config = args.config
@@ -238,8 +178,7 @@ if __name__ == '__main__':
         assert os.path.isfile(config), 'File "%s" not found.' % (config)
 
     # Load config and validate it
-    config = util.read_json(config)
-    check_validity(config)
+    config = util.parse_config(config)
 
     # Save folder
     folder = args.savedir
@@ -257,13 +196,19 @@ if __name__ == '__main__':
             os.makedirs( folder )
             print 'Created savedir "%s".' % (folder)
 
-        # Create config
+        # Create config and scripts
         make_config( config, folder )
-
-        # Create scripts
         make_scripts( config, folder )
 
         # Success message
         njobs = len(config['exec']['jobs'])
         nworkers = len(config['exec']['workers'])
         print msg_success % ( njobs, nworkers, folder )
+
+
+if __name__ == '__main__':
+
+    parser = argparse.ArgumentParser( prog='mapres_build' )
+    parser.add_argument('config', help='Configuration file to be built')
+    parser.add_argument('--savedir', default='', help='Override save folder in config')
+    main(parser.parse_args())
