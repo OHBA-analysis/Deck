@@ -124,8 +124,8 @@ def make_scripts( cfg, folder ):
           'workdir': workdir,
         'classname': cfg['exec']['class'],
            'logdir': 'logs',
-        'mapscript': 'map.sh',
-        'redscript': 'reduce.sh'
+        'mapscript': 'map.task',
+        'redscript': 'reduce'
     })
 
     # multithreading

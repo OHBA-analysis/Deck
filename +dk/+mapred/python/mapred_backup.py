@@ -41,6 +41,14 @@ if __name__ == '__main__':
             wmove.append(wname)
             os.rename( wfile, os.path.join(backupFolder,wname) )
 
+    # Move log folder (should match substitution in mapred_build)
+    try:
+        logFolder = os.path.join(saveFolder,'logs')
+        shutil.move( logFolder, backupFolder )
+        os.makedirs( logFolder ) # make a new one
+    except:
+        print "Could not find or move logs folder: " + logFolder
+
     # Compress job folders
     jmove = []
     if args.jobs:
