@@ -25,6 +25,8 @@ def check_validity( cfg ):
     assert util.is_string(tmp['email']), '[cluster.email] Empty or invalid string.'
     assert tmp['queue'] in valid_queues, '[cluster.queue] Invalid queue.'
     assert tmp['mailopt'] in valid_mailopts, '[cluster.mailopt] Invalid mailopt.'
+    if tmp['threads']:
+        assert isinstance(tmp['threads'],int), '[cluster.threads] Should be an int'
 
     # Check exec
     tmp = cfg['exec']
@@ -141,7 +143,7 @@ for folder in job_*; do
 done
 
 # submit map/reduce job to the cluster
-mid=$$(fsl_sub -q ${queue}.q -M ${email} -m ${mailopt} -N ${jobname} -l "${logdir}" -t "${mapscript}")
+mid=$$(fsl_sub -q ${queue}.q -M ${email} -m ${mailopt} ${threads} -N ${jobname} -l "${logdir}" -t "${mapscript}")
 rid=$$(fsl_sub -j $${mid} -q ${queue}.q -M ${email} -m ${mailopt} -N ${jobname} -l "${logdir}" ./"${redscript}")
 
 # Show IDs
@@ -180,6 +182,12 @@ def make_scripts( cfg, folder ):
         'mapscript': 'map.sh',
         'redscript': 'reduce.sh'
     })
+
+    # multithreading
+    if cfg['cluster']['threads']:
+        sub['threads'] = '-s openmp,%d' % (cfg['cluster']['threads'])
+    else:
+        sub['threads'] = ''
 
     # put the scripts together
     nworkers = len(cfg['exec']['workers'])
