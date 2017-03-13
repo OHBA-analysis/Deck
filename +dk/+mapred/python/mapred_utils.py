@@ -137,10 +137,10 @@ def parse_config(filename):
     cfg = {k: cfg[k] for k in ('id', 'cluster', 'exec', 'files', 'folders')} # filter required
 
     assert is_string(cfg['id']), '[id] Empty or invalid string.'
-    _parse_cluster(cfg)
-    _parse_exec(cfg)
-    _parse_files(cfg)
-    _parse_folders(cfg)
+    _parse_cluster(cfg['cluster'])
+    _parse_exec(cfg['exec'])
+    _parse_files(cfg['files'])
+    _parse_folders(cfg['folders'])
 
     return cfg
 
