@@ -137,8 +137,8 @@ def make_scripts( cfg, folder ):
     # put the scripts together
     nworkers = len(cfg['exec']['workers'])
     scripts = {
-           'map.sh': "\n".join([ TPL_MAP.substitute(sub,workerid=(i+1)) for i in xrange(nworkers) ]) + "\n",
-        'reduce.sh': TPL_REDUCE.substitute(sub) + "\n",
+         'map.task': "\n".join([ TPL_MAP.substitute(sub,workerid=(i+1)) for i in xrange(nworkers) ]) + "\n",
+           'reduce': TPL_REDUCE.substitute(sub) + "\n",
         'runworker': TPL_RUNWORKER.substitute(sub),
            'submit': TPL_SUBMIT.substitute(sub)
     }
