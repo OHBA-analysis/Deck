@@ -129,7 +129,7 @@ def make_scripts( cfg, folder ):
     })
 
     # multithreading
-    if cfg['cluster']['threads']:
+    if 'threads' in cfg['cluster']:
         sub['threads'] = '-s openmp,%d' % (cfg['cluster']['threads'])
     else:
         sub['threads'] = ''
