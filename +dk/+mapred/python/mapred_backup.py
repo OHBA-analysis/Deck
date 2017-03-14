@@ -58,7 +58,7 @@ if __name__ == '__main__':
             for job in jobFolders:
                 jobName = os.path.basename(job)
                 jmove.append( jobName )
-                tar.append( job, arcname=jobName )
+                tar.add( job, arcname=jobName )
 
     # Write summary
     print 'Backed up to folder "%s" (%d output(s), %d folder(s))' % (backupFolder,len(wmove),len(jmove))
