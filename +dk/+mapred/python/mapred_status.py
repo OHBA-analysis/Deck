@@ -38,7 +38,7 @@ def worker_progress( folder, workerid, jobids ):
     # Estimate remaining time
     info = read_info(folder,jobids[0])
     if not info:
-        remaining = '<undefined>'
+        remaining = '<null>'
     else:
         remaining = str(time_remaining( info['start'], pgr['done']/max(0.5,pgr['total']-pgr['failed']) ))
 
@@ -53,11 +53,8 @@ def worker_progress( folder, workerid, jobids ):
     else:
         print head
 
-    print """
-     + total  : %d
-     + done   : %d
-     + failed : %d
-    """ % ( pgr['total'], pgr['done'], pgr['failed'] )
+    print "\t (%s total), (%s done). (%s failed)" % \
+        ( cprint.fg('c').fmt(pgr['total']), cprint.fg('g').fmt(pgr['done']), cprint.fg('r').fmt(pgr['failed']) )
 
 def main(args):
 

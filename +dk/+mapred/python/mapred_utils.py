@@ -64,8 +64,10 @@ def read_json( filename ):
     with open(filename,'r') as f:
         return json.load(f)
 
-# ----------------------------------------
-# ----------------------------------------
+
+# ==================== *** *** ====================
+# ==================== *** *** ====================
+
 
 # Search for config file in current directory
 def find_config():
@@ -144,8 +146,9 @@ def parse_config(filename):
 
     return cfg
 
-# ----------------------------------------
-# ----------------------------------------
+
+# ==================== *** *** ====================
+# ==================== *** *** ====================
 
 
 class ColorPrinter:
@@ -243,4 +246,3 @@ class ColorPrinter:
 
     def out(self,*args):
         print self.fmt(*args)
-
