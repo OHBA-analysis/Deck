@@ -53,7 +53,7 @@ def worker_progress( folder, workerid, jobids ):
     else:
         print head
 
-    print "\t (%s total), (%s done). (%s failed)" % \
+    print "\t (%s total), (%s done), (%s failed)" % \
         ( cprint.fg('c').fmt(pgr['total']), cprint.fg('g').fmt(pgr['done']), cprint.fg('r').fmt(pgr['failed']) )
 
 def main(args):
