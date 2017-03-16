@@ -29,7 +29,7 @@ def time_remaining( startstamp, fraction ):
 def worker_progress( folder, workerid, jobids ):
 
     # Analyse status for each job in worker
-    pgr = { 'running': 0.0, 'done': 0.0, 'failed': 0.0, 'total': len(jobids) }
+    pgr = { 'running': 0, 'done': 0, 'failed': 0, 'total': len(jobids) }
     for job in jobids:
         info = read_info(folder,job)
         if info:
@@ -40,10 +40,10 @@ def worker_progress( folder, workerid, jobids ):
     if not info:
         remaining = '<null>'
     else:
-        remaining = str(time_remaining( info['start'], pgr['done']/max(0.5,pgr['total']-pgr['failed']) ))
+        remaining = str(time_remaining( info['start'], float(pgr['done'])/max(0.5,pgr['total']-pgr['failed']) ))
 
     head = 'Worker #%d [ %d %%, timeleft: %s ]' % \
-        ( workerid, 100.0 * (pgr['done']+pgr['failed'])/pgr['total'], remaining )
+        ( workerid, 100 * float(pgr['done']+pgr['failed'])/pgr['total'], remaining )
 
     cprint = util.ColorPrinter()
     if pgr['failed'] > 0:
