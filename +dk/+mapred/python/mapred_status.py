@@ -47,9 +47,9 @@ def worker_progress( folder, workerid, jobids ):
 
     cprint = util.ColorPrinter()
     if pgr['failed'] > 0:
-        print cprint.cfg('w','r','b').out(head)
+        cprint.cfg('w','r','b').out(head)
     elif pgr['done'] == pgr['total']:
-        print cprint.cfg('g').out(head)
+        cprint.cfg('g').out(head)
     else:
         print head
 
