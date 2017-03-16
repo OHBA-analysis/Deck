@@ -12,7 +12,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--folder', default=os.getcwd(), help='The "save folder" of the map/reduce task being backed up')
     parser.add_argument('--name', default=util.sortable_timestamp(), help='Name of the subfolder to create in the data directory')
-    parser.add_argument('--nojob', action='store_false', help='Exclude jobs from backup')
+    parser.add_argument('--nojob', action='store_true', help='Exclude jobs from backup')
     args = parser.parse_args()
 
     # Make sure save folder exists
