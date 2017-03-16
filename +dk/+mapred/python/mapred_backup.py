@@ -55,6 +55,7 @@ if __name__ == '__main__':
     if not args.nojob:
         jobFolders = glob.glob(os.path.join( saveFolder, 'job_*' ))
         jobArchive = os.path.join( backupFolder, 'jobs.tar.bz2' )
+        print "Compressing %d jobs outputs to archive %s (please wait)..." % ( len(jobFolders), jobArchive )
         with tarfile.open( jobArchive, 'w:bz2' ) as tar:
             for job in jobFolders:
                 jobName = os.path.basename(job)
