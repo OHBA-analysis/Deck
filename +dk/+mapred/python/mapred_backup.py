@@ -10,18 +10,19 @@ import mapred_utils as util
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('name', help='Name of the subfolder to create in the data directory')
-    parser.add_argument('--jobs', action='store_true', help='Compress and bacup job folders')
-    parser.add_argument('--config', default='', help='Configuration file (will be searched if omitted)')
+    parser.add_argument('--folder', default=os.getcwd(), help='The "save folder" of the map/reduce task being backed up')
+    parser.add_argument('--name', default=util.sortable_timestamp(), help='Name of the subfolder to create in the data directory')
+    parser.add_argument('--nojob', action='store_false', help='Exclude jobs from backup')
     args = parser.parse_args()
 
-    # Find config file
-    cfgFile = args.config
-    if not cfgFile:
-        cfgFile = util.find_config()
+    # Make sure save folder exists
+    saveFolder = args.folder
+    assert os.path.isdir(saveFolder), 'Folder not found: ' + saveFolder
 
+    # Find config file
+    cfgFile = os.path.join( saveFolder, 'config', 'config.json' )
+    assert os.path.isfile(cfgFile), 'Could not find config file: ' + cfgFile
     config = util.read_json(cfgFile)
-    saveFolder = config['folders']['save']
 
     # Create backup folder
     backupFolder = os.path.join( saveFolder, 'data', args.name )
@@ -51,7 +52,7 @@ if __name__ == '__main__':
 
     # Compress job folders
     jmove = []
-    if args.jobs:
+    if not args.nojob:
         jobFolders = glob.glob(os.path.join( saveFolder, 'job_*' ))
         jobArchive = os.path.join( backupFolder, 'jobs.tar.bz2' )
         with tarfile.open( jobArchive, 'w:bz2' ) as tar:
