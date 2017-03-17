@@ -87,6 +87,14 @@ def find_config():
 def parse_config(filename):
 
     def _parse_cluster(cfg):
+        """
+        For the mail option m:
+            ‘b’     Mail is sent at the beginning of the job.
+            ‘e’     Mail is sent at the end of the job.
+            ‘a’     Mail is sent when the job is aborted or rescheduled.
+            ‘s’     Mail is sent when the job is suspended.
+            ‘n’     No mail is sent.
+        """
         
         valid_queues = ['veryshort', 'short', 'long', 'verylong', 'bigmem', 'cuda']
         valid_mailopts = ['b','e','a','s','n']

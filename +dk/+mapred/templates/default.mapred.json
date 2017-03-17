@@ -5,7 +5,7 @@
         "jobname": "mapred",
         "queue": "long",
         "email": "",
-        "mailopt": "n"
+        "mailopt": "a"
     },
 
     "exec" : {

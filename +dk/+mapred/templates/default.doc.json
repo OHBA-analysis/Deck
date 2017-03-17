@@ -19,7 +19,7 @@
         // E-mail to which notifications should be sent 
         "email": "",
         // Mail option flags - [b]egin, [e]nd, [a]bort, [s]uspend, [n]o mail
-        "mailopt": "n"
+        "mailopt": "a"
     },
 
     /**
