@@ -1,6 +1,6 @@
 function s = wstd( x, w, dim )
 %
-% s = wstd( x, w, dim=1 )
+% s = dk.math.wstd( x, w, dim=1 )
 %
 % Compute weighted std of input sample along specified dimension.
 %
@@ -9,8 +9,7 @@ function s = wstd( x, w, dim )
 % JH
     
     if nargin < 3
-        [~,dim] = shiftdim(x); 
-        dim = dim+1;
+        dim = dk.util.nsdim(x);
     end
 
     D = ndims(x);

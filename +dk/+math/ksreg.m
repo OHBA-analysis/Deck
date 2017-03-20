@@ -1,6 +1,6 @@
 function r = ksreg( x, y, n, b, kerf, doplot )
 %
-% r = ksreg( x, y, n=100, b=(optimal), kerf=rat2, doplot=(nargout==0) )
+% r = dk.math.ksreg( x, y, n=100, b=(optimal), kerf=rat2, doplot=(nargout==0) )
 %
 % Kernel Smoothing Regression.
 %

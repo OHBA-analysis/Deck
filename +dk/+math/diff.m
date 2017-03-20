@@ -1,6 +1,6 @@
 function [dx,ck] = diff( x, h, dim, horizon, tangency )
 %
-% [dx,ck] = diff( x, h, dim, horizon=4, tangency=4 )
+% [dx,ck] = dk.math.diff( x, h, dim, horizon=4, tangency=4 )
 %
 % Numerical differentiation of sampled sequence.
 %
@@ -11,7 +11,7 @@ function [dx,ck] = diff( x, h, dim, horizon, tangency )
 %     y = dk.math.diff( x, h );
 %     plot(t,x,t,y);
 %
-% See: 
+% Reference: 
 % http://www.holoborodko.com/pavel/numerical-methods/numerical-derivative/smooth-low-noise-differentiators/
 %
 % JH
