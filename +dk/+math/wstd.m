@@ -2,7 +2,9 @@ function s = wstd( x, w, dim )
 %
 % s = wstd( x, w, dim=1 )
 %
-% Compute weighted std of input sample along specified dimension. 
+% Compute weighted std of input sample along specified dimension.
+%
+% Reference: http://stats.stackexchange.com/a/6536/44129
 %
 % JH
     
