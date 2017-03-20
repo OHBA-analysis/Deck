@@ -1,4 +1,5 @@
 function [ph,fh] = plot_prctile( x, y, lo, hi, popts, fopts )
+%
 % [ph,fh] = plot_prctile( x, y, lo, hi, popts, fopts )
 %
 % Percentile plot.
@@ -18,7 +19,7 @@ function [ph,fh] = plot_prctile( x, y, lo, hi, popts, fopts )
 %   y  = bsxfun( @plus, sin(x), randn(42,100) ); 
 %   dk.ui.plot_prctile(x,y,23,66);
 %
-% Contact: jhadida [at] fmrib.ox.ac.uk
+% JH
 
 
     color_blue = lab2rgb([60 -5 -30]);

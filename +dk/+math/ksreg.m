@@ -1,9 +1,36 @@
 function r = ksreg( x, y, n, b, kerf, doplot )
 %
-% Kernel Smoothing Regression
+% r = ksreg( x, y, n=100, b=(optimal), kerf=rat2, doplot=(nargout==0) )
+%
+% Kernel Smoothing Regression.
+%
+% INPUTS:
+%
+%        x  Coordinates (not necessarily in order)
+%        y  Associated (scalar) values
+%        n  Number of desired output points (default: 100)
+%        b  Kernel bandwidth for regression (default: optimal bandwidth from litterature)
+%     kerf  Kernel function (default: second-order rational)
+%   doplot  Plot results in current figure (default: true if no output)
+%
+% KERNEL FUNCTIONS:
+%
+%     exp1  @(t) exp( -abs(t) )
+%     exp2  @(t) exp( -t.*t )
+%     rat1  @(t) 1./(1+abs(t))
+%     rat2  @(t) 1./(1+t.*t)
+%
+% OUTPUT:
+%
+%   Structure with fields {x,y,s} where x is a vector of linearly smapled coordinates 
+%   in the input range, y the vector of associated values, and s the vector of associated 
+%   pointwise weighted std.
+% 
 %
 % Inspired by:
 % http://uk.mathworks.com/matlabcentral/fileexchange/19195-kernel-smoothing-regression
+%
+% JH
 
     % sort input data
     [x,o] = sort(x(:));
@@ -45,10 +72,12 @@ function r = ksreg( x, y, n, b, kerf, doplot )
     assert( kerf(1) == kerf(-1), 'ker should be a scalar symmetric function.' );
 
     r.x = linspace(x(1),x(end),n);
-    r.f = zeros(1,n);
+    r.y = zeros(1,n);
+    r.s = zeros(1,n);
     for i = 1:n
         w = kerf( (x - r.x(i))/b );
-        r.f(i) = sum(w.*y) / sum(w);
+        r.s(i) = dk.math.wstd( y, w );
+        r.y(i) = sum(w.*y) / sum(w);
     end
 
     % plot
@@ -56,7 +85,7 @@ function r = ksreg( x, y, n, b, kerf, doplot )
     if doplot
         
         scatter( x, y, 'bo' ); hold on;
-        plot( r.x, r.f, 'r-', 'LineWidth', 3 ); hold off;
+        plot( r.x, r.y, 'r-', 'LineWidth', 3 ); hold off;
         title(sprintf( 'Kernel smoothing regression (bw = %g)', b ));
         legend( 'Original data', 'Regression' );
         
