@@ -74,8 +74,10 @@ function r = ksreg( x, y, n, b, kerf, doplot )
     r.x = linspace(x(1),x(end),n);
     r.y = zeros(1,n);
     r.s = zeros(1,n);
+    r.w = zeros(1,n);
     for i = 1:n
         w = kerf( (x - r.x(i))/b );
+        r.w(i) = sum(w);
         r.s(i) = dk.math.wstd( y, w );
         r.y(i) = sum(w.*y) / sum(w);
     end

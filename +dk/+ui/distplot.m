@@ -12,6 +12,8 @@ function dist = distplot( data, varargin )
 %
 %
 %    'Width'  Width of each distribution in the final plot, typically <1 (default: 0.7).
+%    'Label'  Cell-string array of label for each column (default: column numbers).
+%             Numeric inputs are converted to string.
 %    'Theme'  For now only the theme 'orange' is available.
 %    'Range'  Support of the distribution as a 1x2 interval (default: []).
 %               By default, the interval is determined automatically by ksdensity.
@@ -29,15 +31,31 @@ function dist = distplot( data, varargin )
 % JH
 
     opt = dk.obj.kwArgs(varargin{:});
+    
+    % number of columns
+    if iscell(data)
+        nd = numel(data);
+    else
+        nd = size(data,2);
+    end
+    assert( nd > 0, 'Empty dataset in input.' );
 
     % parse options
     opt_width = opt.get('width',0.7);
+    opt_label = opt.get('label',1:nd);
     opt_theme = opt.get('theme','orange');
     opt_range = opt.get('range',[]);
     opt_kern  = opt.get('kernel','normal');
     opt_supp  = opt.get('support',[]);
     opt_npts  = opt.get('numpts',51);
 
+    % convert label to string
+    if isnumeric(opt_label)
+        opt_label = dk.arrayfun( @num2str, opt_label, false );
+    end
+    assert( iscellstr(opt_label), 'Labels should either be numeric or a cellstring.' );
+    assert( numel(opt_label) == nd, 'There should be one label per column.' );
+    
     % colors used for drawing
     switch lower(opt_theme)
         case 'orange'
@@ -55,14 +73,6 @@ function dist = distplot( data, varargin )
     if ~isempty(opt_supp)
         ksarg = [ ksarg, { 'Support', opt_supp } ];
     end
-
-    % number of columns
-    if iscell(data)
-        nd = numel(data);
-    else
-        nd = size(data,2);
-    end
-    assert( nd > 0, 'Empty dataset in input.' );
 
     % compute and draw distributions
     dist = cell(1,nd);
@@ -85,7 +95,10 @@ function dist = distplot( data, varargin )
 
     % prevent drawing over, and set tick labels
     hold off; ylim([q01 q99]);
-    set(gca,'xtick',xtic,'xticklabel',dk.arrayfun(@num2str,1:nd,false));
+    set(gca,'xtick',xtic,'xticklabel',opt_label);
+    if mean(cellfun( @length, opt_label )) > 5
+        set(gca,'xticklabelrotation',55);
+    end
 
     % concatenate distributions as a struct array
     dist = [dist{:}];
