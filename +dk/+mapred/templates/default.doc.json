@@ -42,7 +42,7 @@
      */
     "files" : {
         // Name of the reduced file
-        "reduced": "reduced.mat",
+        "reduce": "reduced.mat",
         // Formatted output name for each worker
         "worker": "worker_%d_output.mat"
     },

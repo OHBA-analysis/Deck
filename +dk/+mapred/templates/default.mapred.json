@@ -16,7 +16,7 @@
     },
 
     "files" : {
-        "reduced": "reduced.mat",
+        "reduce": "reduced.mat",
         "worker": "worker_%d_output.mat"
     },
 
