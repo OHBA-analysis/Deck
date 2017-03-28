@@ -128,8 +128,8 @@ def parse_config(filename):
 
     def _parse_files(cfg):
 
-        assert {'reduced', 'worker'} <= set(cfg), '[files] Missing field(s).'
-        assert is_string(cfg['reduced']), '[files.reduced] Empty or invalid string.'
+        assert {'reduce', 'worker'} <= set(cfg), '[files] Missing field(s).'
+        assert is_string(cfg['reduce']), '[files.reduce] Empty or invalid string.'
         assert is_string(cfg['worker']), '[files.worker] Empty or invalid string.'
         try:
             cfg['worker'] % (1)

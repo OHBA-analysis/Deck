@@ -59,9 +59,9 @@ def check_existing(cfg):
     if os.path.isdir(folder):
 
         # If the reduced file already exists
-        redfile = os.path.join( folder, cfg['files']['reduced'] )
+        redfile = os.path.join( folder, cfg['files']['reduce'] )
         assert not os.path.isfile(redfile), \
-            'Reduced file "%s" already exists, either back it up or change "files.reduced" field.' % (redfile)
+            'Reduced file "%s" already exists, either back it up or change "files.reduce" field.' % (redfile)
 
         # If any of the workers outputs already exists
         nworkers = len(cfg['exec']['workers'])
