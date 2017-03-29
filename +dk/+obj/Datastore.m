@@ -40,9 +40,14 @@ classdef Datastore < handle
             f = dk.str.set_ext( self.file(varargin{:}), 'mat' );
         end
         
+        function y = exists(self,varargin)
+            y = dk.fs.is_file( self.file(varargin{:}) );
+        end
+        
         function f = save(self,name,varargin)
             
             f = self.matfile(name);
+            dk.wreject( dk.fs.is_file(f), 'File "%s" will be overwritten.', f );
             
             if nargin == 3 && isstruct(varargin{1})
                 data = varargin{1};

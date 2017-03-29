@@ -1,5 +1,7 @@
 function S = symindex( n, strict )
 %
+% S = dk.mtx.symindex( n, strict=false )
+%
 % nxn symmetric matrix like
 %
 %  1  2  3  4  5
@@ -14,7 +16,7 @@ function S = symindex( n, strict )
         M = tril( true(n), -1 );
         S = zeros(n);
         S(M) = 1:( n*(n-1)/2 );
-        S = S + S'; % warning, you can't use these indices directly, Matlab will complain about diagonal 0s
+        S = S + S'; % WARNING: you can't use these indices directly, Matlab will complain about diagonal 0s
     else
         M = tril( true(n), 0 );
         S = zeros(n);

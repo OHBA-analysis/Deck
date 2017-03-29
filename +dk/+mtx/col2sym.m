@@ -1,5 +1,7 @@
 function S = col2sym( C, strict )
 %
+% S = dk.mtx.col2sym( C, strict=false )
+%
 % This is the inverse function of dk.mtx.sym2col.
 
     assert( ismatrix(C), 'Expected a matrix in input.' );
