@@ -46,6 +46,12 @@ if __name__ == '__main__':
             wmove.append(wname)
             os.rename( wfile, os.path.join(backupFolder,wname) )
 
+    # Move reduced output
+    rname = config['files']['reduce']
+    rfile = os.path.join( saveFolder, rname )
+    if os.path.isfile(rfile):
+        os.rename( rfile, os.path.join(backupFolder,rname) )
+
     # Move log folder (should match substitution in mapred_build)
     try:
         logFolder = os.path.join(saveFolder,'logs')
