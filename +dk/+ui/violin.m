@@ -1,8 +1,8 @@
-function dist = distplot( data, varargin )
+function dist = violin( data, varargin )
 %
-% dist = distplot( data, Name, Value )
+% dist = dk.ui.violin( data, Name, Value )
 %
-% Distribution plot (similar to boxplot, but using ksdensity to plot distributions vertically).
+% Violin plot (similar to boxplot, but using ksdensity to plot distributions vertically).
 %
 % INPUT
 %

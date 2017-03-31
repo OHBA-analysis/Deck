@@ -7,6 +7,14 @@ function [hi,ht] = colorbar( range, label, varargin )
 % Open a new figure with a colorbar in specified range and label.
 % Outputs handles to the axes containing the colorbar and text label.
 %
+% Example:
+%   dk.ui.colorbar( [-3 7], 'This is a label', ...
+%       'orient', 'h', 'reverse', true, 'txtopt', {'FontSize',25}, 'cmap', dk.ui.cmap.wjet );
+%
+% INPUTS:
+%     range  1x2 vector specifying the extents of the colorbar.
+%     label  The text label to be placed near the colorbar.
+%
 % OPTIONS:
 %
 %    orient  Orientation of the colorbar: 'horiz' or 'vert' (default: 'vert').
@@ -27,6 +35,10 @@ function [hi,ht] = colorbar( range, label, varargin )
         len = opt.get( 'length', 128 );
         txtopt = opt.get( 'txtopt', {} );
         
+    % these guys control how close/far the text label is from the colorbar
+    tlo = 0.2;
+    thi = 0.5;
+        
     % open new figure
     figure('units','normalized'); colormap(cmap);
     
@@ -42,7 +54,7 @@ function [hi,ht] = colorbar( range, label, varargin )
                 ht = axes( 'Position', [ 0.03 0.03 0.17 0.94 ], 'Visible', 'off' );
                 
                 imagesc( hi, x, y, (1:len)' );
-                text( ht, 0.5, 0.5, label, 'Rotation', +90, 'HorizontalAlignment', 'center', txtopt{:} );
+                text( ht, thi, 0.5, label, 'Rotation', +90, 'HorizontalAlignment', 'center', txtopt{:} );
                 hi.YAxisLocation = 'right';
                 
             else
@@ -50,7 +62,7 @@ function [hi,ht] = colorbar( range, label, varargin )
                 ht = axes( 'Position', [ 0.80 0.03 0.17 0.94 ], 'Visible', 'off' );
                 
                 imagesc( hi, x, y, (1:len)' );
-                text( ht, 0.2, 0.5, label, 'Rotation', -90, 'HorizontalAlignment', 'center', txtopt{:} );
+                text( ht, tlo, 0.5, label, 'Rotation', -90, 'HorizontalAlignment', 'center', txtopt{:} );
                 
             end
             hi.XTick = [];
@@ -66,7 +78,7 @@ function [hi,ht] = colorbar( range, label, varargin )
                 ht = axes( 'Position', [ 0.03 0.03 0.94 0.22 ], 'Visible', 'off' );
                 
                 imagesc( hi, x, y, (1:len) );
-                text( ht, 0.5, 0.5, label, 'HorizontalAlignment', 'center', txtopt{:} );
+                text( ht, 0.5, thi, label, 'HorizontalAlignment', 'center', txtopt{:} );
                 hi.XAxisLocation = 'top';
                 
             else
@@ -74,7 +86,7 @@ function [hi,ht] = colorbar( range, label, varargin )
                 ht = axes( 'Position', [ 0.03 0.75 0.94 0.22 ], 'Visible', 'off' );
                 
                 imagesc( hi, x, y, (1:len) );
-                text( ht, 0.5, 0.2, label, 'HorizontalAlignment', 'center', txtopt{:} );
+                text( ht, 0.5, tlo, label, 'HorizontalAlignment', 'center', txtopt{:} );
                 
             end
             hi.YTick = [];

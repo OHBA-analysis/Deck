@@ -1,4 +1,10 @@
 function c = matlab(n)
+% 
+% c = matlab( n=7 )
+%
+% Default Matlab colors in 2016+
+%
+% JH
 
     c = [ ... Default Matlab palette
              0    0.4470    0.7410 ; ...
