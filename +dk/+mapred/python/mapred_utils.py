@@ -105,7 +105,8 @@ def parse_config(filename):
         assert is_string(cfg['email']), '[cluster.email] Empty or invalid string.'
         assert cfg['queue'] in valid_queues, '[cluster.queue] Invalid queue.'
         assert cfg['mailopt'] in valid_mailopts, '[cluster.mailopt] Invalid mailopt.'
-        if cfg.has_key('threads'):
+        
+        if 'threads' in cfg:
             assert isinstance(cfg['threads'],int), '[cluster.threads] Should be an int'
 
     def _parse_exec(cfg):

@@ -65,13 +65,32 @@ classdef Abstract < handle
 
         end
 
-        function cfg = set_cluster(self,jobname,queue,email,mailopt)
+        function cfg = set_cluster(self,queue,email,threads,jobname,mailopt)
+        %
+        % Mailopt option:
+        %     ‘b’     Mail is sent at the beginning of the job.
+        %     ‘e’     Mail is sent at the end of the job.
+        %     ‘a’     Mail is sent when the job is aborted or rescheduled.
+        %     ‘s’     Mail is sent when the job is suspended.
+        %     ‘n’     No mail is sent.
+        %
+        % By default, mailopt is 'a'.
+        %
+            
+            if nargin < 4, threads=1; end
+            if nargin < 5, jobname='dk.mapred'; end
+            if nargin < 6, mailopt='a'; end
 
             cfg = self.load_config();
-            cfg.cluster.jobname = jobname;
             cfg.cluster.queue   = queue;
-            cfg.folders.email   = email;
-            cfg.folders.mailopt = mailopt;
+            cfg.cluster.email   = email;
+            cfg.cluster.jobname = jobname;
+            cfg.cluster.mailopt = mailopt;
+            
+            % only set threads if there are more than 1
+            if threads > 1
+                cfg.cluster.threads = threads;
+            end
 
             % save edited config
             dk.println('[MapReduce] Configuration edited in "%s".',self.config_file);
