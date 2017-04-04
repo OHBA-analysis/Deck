@@ -19,6 +19,7 @@ function dist = violin( data, varargin )
 %               By default, the interval is determined automatically by ksdensity.
 %   'Kernel'  One of: 'normal', 'box', 'triangle', 'epanechnikov'
 %   'NumPts'  Number of points to use for density estimation (default: 51).
+%  'Weights'  nxp matrix or 1xp cell with weights for each point.
 %
 % OUTPUT
 %
@@ -48,6 +49,7 @@ function dist = violin( data, varargin )
     opt_kern  = opt.get('kernel','normal');
     opt_supp  = opt.get('support',[]);
     opt_npts  = opt.get('numpts',51);
+    opt_wght  = opt.get('weights',[]);
 
     % convert label to string
     if isnumeric(opt_label)
@@ -71,7 +73,7 @@ function dist = violin( data, varargin )
         ksarg = { linspace( opt_range(1), opt_range(2), opt_npts ), 'Kernel', opt_kern };
     end
     if ~isempty(opt_supp)
-        ksarg = [ ksarg, { 'Support', opt_supp } ];
+        ksarg = [ ksarg, {'Support', opt_supp} ];
     end
 
     % compute and draw distributions
@@ -82,7 +84,14 @@ function dist = violin( data, varargin )
     q01 =  Inf;
 
     for i = 1:nd
-        [dist{i},v] = density_estimation( data, i, ksarg );
+        
+        if ~isempty(opt_wght)
+            w = getcol(opt_wght,i);
+            %w = w / min(nonzeros(w));
+            [dist{i},v] = density_estimation( getcol(data,i), [ ksarg, {'Weights', w} ] );
+        else
+            [dist{i},v] = density_estimation( getcol(data,i), ksarg );
+        end
         plot_distribution( dist{i}, xtic(i), opt_width, theme );
 
         q99 = max( q99, prctile(v,99) );
@@ -105,13 +114,15 @@ function dist = violin( data, varargin )
 
 end
 
-function [dist,v] = density_estimation( dat, k, arg )
-
-    if iscell(dat)
-        v = dat{k}(:);
+function c=getcol(x,k)
+    if iscell(x)
+        c = x{k}(:);
     else
-        v = dat(:,k);
+        c = x(:,k);
     end
+end
+
+function [dist,v] = density_estimation( v, arg )
 
     [dist.y,dist.x] = ksdensity(v,arg{:});
     dist.m = median(v);
