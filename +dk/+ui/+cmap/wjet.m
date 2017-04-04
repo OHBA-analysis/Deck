@@ -1,17 +1,20 @@
-function x = wjet( n )
+function x = wjet( n, f )
 %
-% x = wjet( n=64 )
+% x = dk.ui.cmap.wjet( n=128, f=0 )
 %
-% Matlab jet colormap with whitened middle range.
+% Weighted jet colormap based on Matlab jet function.
+% n controls the number of colors, and f the brightness at the centre of the color range.
+% f should be between 0 (no downweighting) and 1 (centre is black).
 %
 % JH
 
-    if nargin < 1, n=64; end
+    if nargin < 1, n=128; end
+    if nargin < 2, f=0; end
     
     x = jet(n);
     w = (1:n)/n - 0.5;
-    w = 4*w;
-    w = 1 - 0.7*exp( - w.^2 );
-    x = bsxfun( @power, x, w(:) );
+    w = exp( - 45 * w(:).^2 );
+    x = bsxfun( @power, x, 1-0.7*w );
+    x = bsxfun( @times, x, 1-f*w );
     
 end

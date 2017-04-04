@@ -1,4 +1,10 @@
 function [h,color_scale] = image( img, varargin )
+%
+% [h,color_scale] = dk.ui.image( img, varargin )
+%
+% TODO: document this function
+%
+% JH
 
     % parse inputs
     opt = dk.obj.kwArgs( varargin );
@@ -121,7 +127,7 @@ function [h,color_scale] = image( img, varargin )
     
 end
 
-function [img,x,y] = check_size(img,maxsize)
+function img = check_size(img,maxsize)
 
     imgsize = size(img);
     maxsize = min( imgsize, maxsize );
