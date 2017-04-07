@@ -1,13 +1,21 @@
-function vals = clamp( vals, bvals, cvals )
+function vals = clamp( vals, varargin )
 %
-% vals = clamp( vals, bvals, cvals =bvals )
+% vals = dk.math.clamp( vals, [lo,hi] )
+% vals = dk.math.clamp( vals, lo, hi )
 %
 % Clamp input values in the range bvals to values cvals.
 %
-% Contact: jhadida [at] fmrib.ox.ac.uk
+% JH
 
-    if nargin < 3, cvals = bvals; end
+    if nargin == 3
+        lo = varargin{1};
+        hi = varargin{2};
+    else
+        lo = varargin{1}(1);
+        hi = varargin{1}(2);
+    end
 
-    vals( vals < bvals(1) ) = cvals(1);
-    vals( vals > bvals(2) ) = cvals(2);
+    vals = max( vals, lo );
+    vals = min( vals, hi );
+    
 end
