@@ -1,6 +1,6 @@
 function h = ring( Rin, Rout, C, npts, col, varargin )
 %
-% h = ring( inner, outer, centre=[0 0], npts=51, col='w', varargin )
+% h = dk.ui.ring( inner, outer, centre=[0 0], npts=51, col='k', varargin )
 %
 % Draw a ring with specified inner and outer radii, at the centre provided.
 % Additional arguments are forwarded to patch, and the output is a handle to the patch.
