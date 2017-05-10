@@ -16,6 +16,11 @@ function varargout = ansig( x, fs )
 %   frq    Instantaneous frequency for each signal 
 %          Computed only if required, in cycles/unit unless fs is defined.
 %
+% If only one output is set, then the complex analytic signal is returned. That is:
+%
+%   [env,~] = dk.math.ansig(x); % real-valued envelope returned 
+%   as = dk.math.ansig(x); % complex-valued analytic signal returned
+%
 % JH
     
     if nargin < 2, fs=1; end

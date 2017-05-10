@@ -19,6 +19,7 @@ function [dx,ck] = diff( x, h, dim, horizon, tangency )
     if nargin < 5, tangency=4; end
     if nargin < 4, horizon=4; end
     if nargin < 3 || isempty(dim)
+        % first non-singleton dimension
         [~,shift] = shiftdim(x); 
         dim = shift+1;
     else
@@ -72,14 +73,15 @@ function [dx,ck] = diff( x, h, dim, horizon, tangency )
         
     end
     
+    % temporary new size to work only along dimension dim
     a = size(x,dim);
     b = numel(x)/a;
     S = circshift( size(x), [0,shift] );
     
-    ck = [-fliplr(ck),0,ck]/h;
-    dx = reshape(shiftdim(x,shift),[a,b]);
+    ck = [-fliplr(ck),0,ck]/h; % weights of derivation filter
+    dx = reshape(shiftdim(x,shift),[a,b]); % reshape input data as a matrix with dim as first dimension
     %dx = conv2( padarray(dx,[M,0],'replicate'), flipud(ck(:)), 'valid' );
-    dx = conv2( wextend('ar','sp1',dx,M), flipud(ck(:)), 'valid' );
-    dx = shiftdim(reshape(dx,S),-shift);
+    dx = conv2( wextend('ar','sp1',dx,M), flipud(ck(:)), 'valid' ); % wextend padds x smoothly before filtering
+    dx = shiftdim(reshape(dx,S),-shift); % reshape data as it was passed
 
 end
