@@ -20,10 +20,7 @@ function [dx,ck] = diff( x, h, dim, horizon, tangency )
     if nargin < 4, horizon=4; end
     if nargin < 3 || isempty(dim)
         % first non-singleton dimension
-        [~,shift] = shiftdim(x); 
-        dim = shift+1;
-    else
-        shift = dim-1;
+        dim = dk.util.nsdim(x);
     end
     if nargin < 2, h=1; end
 
@@ -73,15 +70,17 @@ function [dx,ck] = diff( x, h, dim, horizon, tangency )
         
     end
     
-    % temporary new size to work only along dimension dim
-    a = size(x,dim);
-    b = numel(x)/a;
-    S = circshift( size(x), [0,shift] );
+    % weights of derivation filter
+    ck = [-fliplr(ck),0,ck]/h; 
     
-    ck = [-fliplr(ck),0,ck]/h; % weights of derivation filter
-    dx = reshape(shiftdim(x,shift),[a,b]); % reshape input data as a matrix with dim as first dimension
+    % reshape input data as a matrix with dim as first dimension
+    [dx,rev] = dk.mtx.squash( x, dim ); 
+    
+    % wextend padds smoothly before filtering
     %dx = conv2( padarray(dx,[M,0],'replicate'), flipud(ck(:)), 'valid' );
-    dx = conv2( wextend('ar','sp1',dx,M), flipud(ck(:)), 'valid' ); % wextend padds x smoothly before filtering
-    dx = shiftdim(reshape(dx,S),-shift); % reshape data as it was passed
+    dx = conv2( wextend('ar','sp1',dx,M), flipud(ck(:)), 'valid' ); 
+    
+    % reshape data to the original size
+    dx = dk.mtx.unsquash(dx,rev); 
 
 end
