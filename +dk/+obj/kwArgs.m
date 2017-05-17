@@ -3,7 +3,7 @@ classdef kwArgs < handle
 % A very basic name/value pair parser for function inputs.
 % For more formal control over function inputs (including validation), checkout Matlab's inputParser.
 %
-% Contact: jhadida [at] fmrib.ox.ac.uk
+% JH
 
     properties
         CaseSensitive;
@@ -33,19 +33,19 @@ classdef kwArgs < handle
             end
         end
         
-        function clear(self)
+        function self = clear(self)
             self.parsed        = struct();
             self.accessed      = {};
             self.CaseSensitive = false;
         end
         
-        function copy(self,other)
+        function self = copy(self,other)
             self.CaseSensitive = other.CaseSensitive;
             self.parsed        = other.parsed;
         end
         
         % report of which fields were set vs which were accessed 
-        function reset_accessed(self)
+        function self = reset_accessed(self)
             self.accessed = {};
         end
         function [ok,not_accessed] = access_report(self)
@@ -73,7 +73,7 @@ classdef kwArgs < handle
             args = dk.struct.to_cell(self.parsed);
         end
         
-        function parse(self,varargin)
+        function self = parse(self,varargin)
             
             self.parsed = struct();
             self.reset_accessed();
@@ -112,7 +112,7 @@ classdef kwArgs < handle
             end
         end
         
-        function merge(self,varargin)
+        function self = merge(self,varargin)
             
             p = self.parsed;
             self.parse(varargin{:});
@@ -130,21 +130,21 @@ classdef kwArgs < handle
         end
         
         % sanitisation methods
-        function sanitise(self,name,sanitise_fun)
+        function self = sanitise(self,name,sanitise_fun)
             name = self.field(name);
             self.parsed.(name) = sanitise_fun(self.parsed.(name));
         end
-        function sanitise_opt(self,name,sanitise_fun)
+        function self = sanitise_opt(self,name,sanitise_fun)
             if self.has(name)
                 self.sanitise(name,sanitise_fun);
             end
         end
         
         % validation methods
-        function validate(self,name,validate_fun)
+        function self = validate(self,name,validate_fun)
             validate_fun( self.parsed.(self.field(name)) );
         end
-        function validate_opt(self,name,validate_fun)
+        function self = validate_opt(self,name,validate_fun)
             if self.has(name)
                 self.validate(name,validate_fun);
             end
