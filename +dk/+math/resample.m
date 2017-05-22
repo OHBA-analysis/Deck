@@ -14,18 +14,31 @@ function [y, ty] = resample( x, tx, fs, method )
     if isreal(x)
 
         m = mean(x,1);
+        x = dk.bsx.sub(x,m);
+        
         if isempty(fs)
-            [y,ty] = resample( dk.bsx.sub(x,m), tx, method );
+            
+            % resample at equally-spaced points
+            [y,ty] = resample( x, tx, method );
+            
         elseif isscalar(fs)
-            [y,ty] = resample( dk.bsx.sub(x,m), tx, fs, method );
+            
+            % resample at given sampling rate
+            [y,ty] = resample( x, tx, fs, method );
+            
         else
-            qt = fs(:); % interpret fs as query timepoints
-            dt = diff(qt); 
-            [y,ty] = resample( dk.bsx.sub(x,m), tx, 1/prctile(dt,10), method );
+            
+            % interpret fs as query timepoints
+            qt = fs(:); 
+            dt = prctile( diff(qt), 10 ); % smaller steps bring the rate up
+            [y,ty] = resample( x, tx, 1/dt, method );
+            
+            % Matlab didn't care about requested timepoints, interpolate manually
             if numel(qt) ~= numel(ty) || any( abs(qt-ty) > eps )
                 y  = interp1( ty, y, qt, method );
                 ty = qt;
             end
+            
         end
         y = dk.bsx.add(y,m);
         
