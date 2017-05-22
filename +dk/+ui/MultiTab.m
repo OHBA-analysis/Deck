@@ -95,10 +95,10 @@ classdef MultiTab < handle
         end
         
         % add/remove tabs
-        function n = add(self,name,data)
+        function [n,h] = add(self,name,data)
             
             n = self.ntabs + 1;
-            if nargin < 3, data=[]; end
+            if nargin < 3, data=struct(); end
             if nargin < 2, name=sprintf('Tab %d',n); end
             
             % add tab panel if open
@@ -187,6 +187,11 @@ classdef MultiTab < handle
             else
                 data = self.tab(n).data;
             end
+        end
+        
+        % get data of all tabs
+        function data = all_data(self)
+            data = dk.arrayfun( @(x) x.data, self.tab, false );
         end
         
         % tab width (all equal)
