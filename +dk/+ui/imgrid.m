@@ -1,6 +1,6 @@
-function fig = imgrid( slices, names, varargin )
+function fig = imgrid( slices, names, samerange, varargin )
 %
-% fig = dk.ui.imgrid( slices, names, varargin )
+% fig = dk.ui.imgrid( slices, names, samerange=false, varargin )
 %
 % Opens a new figure and draw each slice of input 3D matrix in a separate subplot.
 % The size of the subplot grid is computed using dk.util.gridfit.
@@ -41,10 +41,28 @@ function fig = imgrid( slices, names, varargin )
         names = dk.arrayfun( @(k) sprintf('Slice %d',k), 1:n, false );
     end
     
+    % value range
+    if nargin < 3 || isempty(samerange)
+        samerange = false; 
+    end
+    if samerange
+        r = dk.cellfun( @(x) [min(x(:)), max(x(:))], slices, false );
+        r = vertcat(r{:});
+        r = [min(r(:,1)), max(r(:,2))];
+    else
+        r = [];
+    end
+    
     % draw figure
     fig = figure;
     for i = 1:n
-        dk.ui.image( slices{i}, 'subplot', {h,l,i}, 'title', names{i}, varargin{:} );
+        dk.ui.image( slices{i}, 'subplot', {h,l,i}, 'title', names{i}, 'crange', r, varargin{:} );
     end
+    
+    % save user data
+    fig.UserData.slices = slices;
+    fig.UserData.names  = names;
+    fig.UserData.range  = r;
+    fig.UserData.grid   = [h,l];
 
 end

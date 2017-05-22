@@ -1,53 +1,37 @@
-function [h,color_scale] = image( img, varargin )
+function [h,crange] = image( img, varargin )
 %
-% [h,color_scale] = dk.ui.image( img, varargin )
+% [h,crange] = dk.ui.image( img, varargin )
 %
 % TODO: document this function
 %
 % JH
-
+    
     % parse inputs
-    opt = dk.obj.kwArgs( varargin );
+    opt = dk.obj.kwArgs( varargin{:} );
     
-    color_scale    = opt.get('color_scale',    [] );
-    adapt_scale    = opt.get('adapt_scale',    isempty(color_scale) );
+    crange     = opt.get('crange',     [] );
+    ctype      = opt.get('ctype',      'auto' );
     
-    title_str      = opt.get('title',          '' );
-    label_x        = opt.get('xlabel',         '' );
-    label_y        = opt.get('ylabel',         '' );
-    label_c        = opt.get('clabel',         '' );
-    remove_ticks   = opt.get('remove_ticks',   isempty(label_x) && isempty(label_y) );
+    title_str  = opt.get('title',      '' );
+    label_x    = opt.get('xlabel',     '' );
+    label_y    = opt.get('ylabel',     '' );
+    label_c    = opt.get('clabel',     '' );
+    rm_ticks   = opt.get('rmticks',    isempty(label_x) && isempty(label_y) );
+    rm_bar     = opt.get('rmbar',      false );
     
-    scale_func     = opt.get('scale_func',     @(x) max(abs(dk.math.trunc(x(:),2))) );
-    cmap_name      = opt.get('cmap',          'bgr' );
-    subpos         = opt.get('subplot',       {} );
+    cmap_raw   = opt.get('cmap',       'bgr' );
+    subpos     = opt.get('subplot',    {} );
     
-    maxwidth       = opt.get('maxwidth',      50000 );
-    maxheight      = opt.get('maxheight',     50000 );
-    maxsize        = [ maxheight, maxwidth ];
+    maxwidth   = opt.get('maxwidth',   50000 );
+    maxheight  = opt.get('maxheight',  50000 );
+    maxsize    = [ maxheight, maxwidth ];
     
-    if ischar(cmap_name)
-        cmap_unsigned = eval(sprintf('dk.ui.cmap.%s(128,false)', cmap_name));
-        cmap_signed   = eval(sprintf('dk.ui.cmap.%s(256,true)',  cmap_name));
+    if ischar(cmap_raw)
+        cmap_unsigned = eval(sprintf('dk.ui.cmap.%s(128,false)', cmap_raw));
+        cmap_signed   = eval(sprintf('dk.ui.cmap.%s(256,true)',  cmap_raw));
     else
-        cmap_raw      = cmap_name;
         cmap_unsigned = [];
         cmap_signed   = [];
-    end
-    
-    
-    % quick aliases
-    if opt.get('positive',false)
-        color_scale = [0,1];
-        adapt_scale = true;
-    end
-    if opt.get('negative',false)
-        color_scale = [-1,0];
-        adapt_scale = true;
-    end
-    if opt.get('signed',false)
-        color_scale = [-1,1];
-        adapt_scale = true;
     end
     
     % subplot if asked
@@ -84,46 +68,84 @@ function [h,color_scale] = image( img, varargin )
     end
     
     % remove ticks
-    if remove_ticks
+    if rm_ticks
         set(gca,'xtick',[],'ytick',[]);
     else
         xlabel(label_x);
         ylabel(label_y);
     end
     
-    % set color-scale
-    if isempty(color_scale)
-    [p1,p99] = dk.util.deal_vector(prctile( img(:), [1 99] ));
-    if (p1 < -eps) && (p99 > eps)
-        color_scale = [-1 1];
-    elseif p1 < -eps
-        color_scale   = [-1 0];
-        cmap_unsigned = flipud(cmap_unsigned); % reverse colormap
-    else
-        color_scale = [0 1];
+    % color range
+    if isempty(crange)
+        crange = prctile( img(:), [1 99] );
     end
-    end
-    color_scale = sort(color_scale);
     
-    % set colormap
-    if ischar(cmap_name)
-        if abs(sum(color_scale)) / sum(abs(color_scale)) < 1e-3
-            colormap( gca, cmap_signed );
-        else
-            colormap( gca, cmap_unsigned );
+    % truncate to 2 significant digits
+    crange = dk.math.trunc(sort(crange), 2); 
+    
+    % characterise range
+    lo = crange(1);
+    hi = crange(2);
+    mg = max(abs(crange));
+    if (lo < -eps) && (hi > eps)
+        rtype = 0; % range crosses 0
+    elseif hi < eps
+        rtype = -1; % both negative
+    else
+        rtype = 1;
+    end
+    
+    % automatic type deduction
+    if strcmpi( ctype, 'auto' )
+        switch rtype
+            case 0
+                ctype = 'bisym';
+            case 1
+                ctype = 'pos';
+            case -1
+                ctype = 'neg';
         end
+    end
+    
+    % set color-scale
+    switch lower(ctype)
+        case 'none'
+            cmap = cmap_unsigned;
+        case 'pos'
+            crange = crange .* [0 1]; % force lo to 0
+            cmap = cmap_unsigned;
+        case 'neg'
+            crange = crange .* [1 0]; % force hi to 0
+            cmap = flipud(cmap_unsigned);
+        case 'revneg'
+            crange = crange .* [1 0]; % force hi to 0
+            cmap = cmap_unsigned;
+        case 'bisym'
+            crange = mg .* [-1 1]; % symmetric
+            cmap = cmap_signed;
+        case 'sym'
+            crange = mg .* [-1 1]; % symmetric
+            cmap = cmap_unsigned;
+        case 'revsym'
+            crange = mg .* [-1 1]; % symmetric
+            cmap = flipud(cmap_unsigned);
+    end
+    
+    % override colormap if specified manually
+    if ischar(cmap_raw)
+        colormap( gca, cmap );
     else
         colormap( gca, cmap_raw );
     end
     
-    % adapt color-scale
-    if adapt_scale
-        color_scale = scale_func(img) * color_scale;
-    end
-    
     % remaining options
-    cb = colorbar(gca); caxis( color_scale ); title(title_str);
-    if ~isempty(label_c), cb.Label.String = label_c; end;
+    if ~rm_bar
+        cb = colorbar(gca); caxis( crange ); 
+        if ~isempty(label_c)
+            cb.Label.String = label_c; 
+        end
+    end
+    title(title_str);
     
 end
 
