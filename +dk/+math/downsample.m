@@ -33,7 +33,7 @@ function [y, ty]  = downsample( x, tx, fs, win )
     
     % if too large, upsample to a suitable rate before downsampling
     if PREC(actual_fs,target_fs) < 2 % the two MSD must be equal
-        dk.info('[dk.math.downsample] Upsampling before downsampling to correct for frequency discrepancy.');
+        dk.debug('[dk.math.downsample] Upsampling before downsampling to correct for frequency discrepancy.');
         newdt  = newdt / ceil(newdt/dt);
         [x,tx] = dk.math.upsample( x, tx, 1/newdt, 'linear' );
     end
