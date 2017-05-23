@@ -47,7 +47,11 @@ if __name__ == '__main__':
             os.rename( wfile, os.path.join(backupFolder,wname) )
 
     # Move reduced output
-    rname = config['files']['reduce']
+    if 'reduced' in config['files']:
+        rname = config['files']['reduced'] # compatibility issue
+    else:
+        rname = config['files']['reduce']
+
     rfile = os.path.join( saveFolder, rname )
     if os.path.isfile(rfile):
         os.rename( rfile, os.path.join(backupFolder,rname) )
