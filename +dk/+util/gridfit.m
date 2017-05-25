@@ -6,9 +6,9 @@ function [h,l] = gridfit( nelem, lhratio )
 %
 % JH
 
-    % use golden ratio by default
+    % use 16:9 by default
     if nargin < 2
-        lhratio = (1+sqrt(5))/2;
+        lhratio = 16/9;
     end
     
     % solve system

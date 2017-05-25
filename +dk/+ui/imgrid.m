@@ -1,4 +1,4 @@
-function fig = imgrid( slices, names, samerange, varargin )
+function fig = imgrid( slices, names, samerng, varargin )
 %
 % fig = dk.ui.imgrid( slices, names, samerange=false, varargin )
 %
@@ -12,7 +12,10 @@ function fig = imgrid( slices, names, samerange, varargin )
 %             will be shown in a different subplot.
 %
 %      names  Cell-string with title associated with each subplot.
-%             If empty, the default title 'Slice %d'.
+%             Default title is 'Slice %d'.
+%
+%    samerng  Display all matrices in the same color-range.
+%             Default is false.
 %
 %   varargin  Additional inputs are forwarded to dk.ui.image.
 %
@@ -42,10 +45,10 @@ function fig = imgrid( slices, names, samerange, varargin )
     end
     
     % value range
-    if nargin < 3 || isempty(samerange)
-        samerange = false; 
+    if nargin < 3 || isempty(samerng)
+        samerng = false; 
     end
-    if samerange
+    if samerng
         r = dk.cellfun( @(x) [min(x(:)), max(x(:))], slices, false );
         r = vertcat(r{:});
         r = [min(r(:,1)), max(r(:,2))];
@@ -56,7 +59,8 @@ function fig = imgrid( slices, names, samerange, varargin )
     % draw figure
     fig = figure;
     for i = 1:n
-        dk.ui.image( slices{i}, 'subplot', {h,l,i}, 'title', names{i}, 'crange', r, varargin{:} );
+        dk.ui.image( slices{i}, 'subplot', {h,l,i}, 'title', names{i}, 'crange', r, ...
+            'rmbar', samerng && mod(i,l), varargin{:} );
     end
     
     % save user data

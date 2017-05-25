@@ -137,13 +137,15 @@ function [h,crange] = image( img, varargin )
     else
         colormap( gca, cmap_raw );
     end
+    caxis( crange ); 
     
     % remaining options
-    if ~rm_bar
-        cb = colorbar(gca); caxis( crange ); 
-        if ~isempty(label_c)
-            cb.Label.String = label_c; 
-        end
+    cb = colorbar(gca); 
+    if ~isempty(label_c)
+        cb.Label.String = label_c; 
+    end
+    if rm_bar
+        cb.Visible = 'off'; 
     end
     title(title_str);
     
