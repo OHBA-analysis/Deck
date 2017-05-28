@@ -98,13 +98,18 @@ def parse_config(filename):
         """
         
         valid_queues = ['veryshort', 'short', 'long', 'verylong', 'bigmem', 'cuda']
+        valid_queues_q = [ queue + '.q' for queue in valid_queues ]
         valid_mailopts = ['b','e','a','s','n']
 
         assert {'jobname', 'queue', 'email', 'mailopt'} <= set(cfg), '[cluster] Missing field(s).'
         assert is_string(cfg['jobname']), '[cluster.jobname] Empty or invalid string.'
         assert is_string(cfg['email']), '[cluster.email] Empty or invalid string.'
-        assert cfg['queue'] in valid_queues, '[cluster.queue] Invalid queue.'
         assert cfg['mailopt'] in valid_mailopts, '[cluster.mailopt] Invalid mailopt.'
+
+        if cfg['queue'] in valid_queues:
+            cfg['queue'] += '.q'
+
+        assert cfg['queue'] in valid_queues_q, '[cluster.queue] Invalid queue.'
         
         if 'threads' in cfg:
             assert isinstance(cfg['threads'],int), '[cluster.threads] Should be an int'

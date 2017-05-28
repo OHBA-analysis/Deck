@@ -22,8 +22,8 @@ for folder in job_*; do
 done
 
 # submit map/reduce job to the cluster
-mid=$$(fsl_sub -q ${queue}.q -M ${email} -m ${mailopt} ${threads} -N ${jobname} -l "${logdir}" -t "${mapscript}")
-rid=$$(fsl_sub -j $${mid} -q ${queue}.q -M ${email} -m ${mailopt} -N ${jobname} -l "${logdir}" ./"${redscript}")
+mid=$$(fsl_sub -q ${queue} -M ${email} -m ${mailopt} ${threads} -N ${jobname} -l "${logdir}" -t "${mapscript}")
+rid=$$(fsl_sub -j $${mid} -q ${queue} -M ${email} -m ${mailopt} -N ${jobname} -l "${logdir}" ./"${redscript}")
 
 # Show IDs
 echo "Submitted map with ID $${mid} and reduce with ID $${rid}. Use qstat and mapred_status to monitor the progress."
@@ -209,7 +209,7 @@ def main(args):
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser( prog='mapres_build' )
+    parser = argparse.ArgumentParser( prog='mapred_build' )
     parser.add_argument('config', help='Configuration file to be built')
     parser.add_argument('--savedir', default='', help='Override save folder in config')
     main(parser.parse_args())
