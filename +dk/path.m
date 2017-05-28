@@ -1,3 +1,3 @@
-function d = path()
-    d = fileparts(mfilename('fullpath'));
+function d = path(varargin)
+    d = fileparts(mfilename('fullpath'),varargin{:});
 end
