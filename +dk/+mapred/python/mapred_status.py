@@ -27,35 +27,51 @@ def time_remaining( startstamp, fraction ):
         return None
 
 # Worker progress report
-def worker_progress( folder, workerid, jobids ):
+def worker_progress( folder, workerid, jobids, more=False ):
 
-    # Analyse status for each job in worker
-    pgr = { 'running': 0, 'done': 0, 'failed': 0, 'total': len(jobids) }
+    # Group jobs by status
+    pgr = { 'running': [], 'done': [], 'failed': [] }
     for job in jobids:
         info = read_info(folder,job)
         if info:
-            pgr[ info['status'].lower() ] += 1
+            pgr[ info['status'].lower() ].append(job)
+
+    # Jobs remaining to be executed
+    pgr['remaining'] = list(set(jobids) - set( pgr['running'] + pgr['done'] + pgr['failed'] ))
+
+    # List counts
+    cpgr = { key:len(value) for key,value in pgr.iteritems() }
+    cpgr['total'] = len(jobids)
 
     # Estimate remaining time
     info = read_info(folder,jobids[0])
     if not info:
         remaining = '<null>'
     else:
-        remaining = str(time_remaining( info['start'], float(pgr['done'])/max(0.5,pgr['total']-pgr['failed']) ))
+        remaining = str(time_remaining( info['start'], float(cpgr['done'])/max(0.5,cpgr['total']-cpgr['failed']) ))
 
     head = 'Worker #%d [ %d %%, timeleft: %s ]' % \
-        ( workerid, 100 * float(pgr['done']+pgr['failed'])/pgr['total'], remaining )
+        ( workerid, 100 * float(cpgr['done']+cpgr['failed'])/pgr['total'], remaining )
 
     cprint = util.ColorPrinter()
-    if pgr['failed'] > 0:
+    if cpgr['failed'] > 0:
         cprint.cfg('w','r','b').out(head)
-    elif pgr['done'] == pgr['total']:
+    elif cpgr['done'] == cpgr['total']:
         cprint.cfg('g').out(head)
     else:
         print head
 
+    # Print lists
+    if more:
+        print '\t    Failed: ' + ','.join(pgr['failed'])
+        if cpgr['remaining'] > 0.75*cpgr['total']:
+            print '\t      Done: ' + ','.join(pgr['done'])
+        else:
+            print '\t Remaining: ' + ','.join(pgr['remaining'])
+
+    # Summary
     print "\t (%s total), (%s done), (%s failed)" % \
-        ( cprint.fg('c').fmt(pgr['total']), cprint.fg('g').fmt(pgr['done']), cprint.fg('r').fmt(pgr['failed']) )
+        ( cprint.fg('c').fmt(cpgr['total']), cprint.fg('g').fmt(cpgr['done']), cprint.fg('r').fmt(cpgr['failed']) )
 
 def main(args):
 
@@ -71,13 +87,14 @@ def main(args):
     workers  = config['exec']['workers']
     nworkers = len(workers)
     for w in xrange(nworkers):
-        worker_progress( folder, w+1, workers[w] )
+        worker_progress( folder, w+1, workers[w], args.more )
 
 
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser( prog='mapres_status' )
     parser.add_argument('--config', default='', help='Configuration file (search for it if omitted)')
+    parser.add_argument('--more', action='store_true', help='More information')
     main(parser.parse_args())
 
     
