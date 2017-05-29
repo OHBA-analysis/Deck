@@ -51,7 +51,7 @@ def worker_progress( folder, workerid, jobids, more=False ):
         remaining = str(time_remaining( info['start'], float(cpgr['done'])/max(0.5,cpgr['total']-cpgr['failed']) ))
 
     head = 'Worker #%d [ %d %%, timeleft: %s ]' % \
-        ( workerid, 100 * float(cpgr['done']+cpgr['failed'])/pgr['total'], remaining )
+        ( workerid, 100 * float(cpgr['done']+cpgr['failed'])/cpgr['total'], remaining )
 
     cprint = util.ColorPrinter()
     if cpgr['failed'] > 0:
@@ -63,11 +63,12 @@ def worker_progress( folder, workerid, jobids, more=False ):
 
     # Print lists
     if more:
-        print '\t    Failed: ' + ','.join(pgr['failed'])
+        if cpgr['failed'] > 0:
+            print '\t    Failed: ' + ','.join(map(str,pgr['failed']))
         if cpgr['remaining'] > 0.75*cpgr['total']:
-            print '\t      Done: ' + ','.join(pgr['done'])
+            print '\t      Done: ' + ','.join(map(str,pgr['done']))
         else:
-            print '\t Remaining: ' + ','.join(pgr['remaining'])
+            print '\t Remaining: ' + ','.join(map(str,pgr['remaining']))
 
     # Summary
     print "\t (%s total), (%s done), (%s failed)" % \
