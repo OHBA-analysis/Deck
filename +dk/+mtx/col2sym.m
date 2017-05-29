@@ -24,7 +24,7 @@ function S = col2sym( C, strict )
     for i = 1:s
         M = C(:,i);
         M = M(I);
-        if strict, M = M - diag(diag(M)); end
+        if strict, M = dk.mtx.setdiag(M,0); end
         S(:,:,i) = M;
     end
     
