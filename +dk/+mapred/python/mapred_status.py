@@ -8,6 +8,7 @@ from datetime import datetime as date
 from datetime import timedelta
 from dateutil import parser as dateparser
 
+
 # Read job information
 def read_info( folder, jobid ):
     infofile = os.path.join( folder, 'job_' + str(jobid), 'info.json' )
@@ -19,12 +20,17 @@ def time_remaining( startstamp, fraction ):
 
     # estimate remaining time in seconds
     if fraction > 0:
+
         remaining = date.now() - dateparser.parse(startstamp)
         remaining = remaining.total_seconds()
         remaining = remaining/float(fraction) - remaining
+
         return timedelta( seconds=remaining )
+
     else:
         return None
+
+
 
 # Worker progress report
 def worker_progress( folder, workerid, jobids, more=False ):
@@ -32,9 +38,11 @@ def worker_progress( folder, workerid, jobids, more=False ):
     # Group jobs by status
     pgr = { 'running': [], 'done': [], 'failed': [] }
     for job in jobids:
+
         info = read_info(folder,job)
         if info:
             pgr[ info['status'].lower() ].append(job)
+
 
     # Jobs remaining to be executed
     pgr['remaining'] = list(set(jobids) - set( pgr['running'] + pgr['done'] + pgr['failed'] ))
@@ -43,6 +51,7 @@ def worker_progress( folder, workerid, jobids, more=False ):
     cpgr = { key:len(value) for key,value in pgr.iteritems() }
     cpgr['total'] = len(jobids)
 
+
     # Estimate remaining time
     info = read_info(folder,jobids[0])
     if not info:
@@ -50,6 +59,8 @@ def worker_progress( folder, workerid, jobids, more=False ):
     else:
         remaining = str(time_remaining( info['start'], float(cpgr['done'])/max(0.5,cpgr['total']-cpgr['failed']) ))
 
+
+    # Print information about worker and timeleft
     head = 'Worker #%d [ %d %%, timeleft: %s ]' % \
         ( workerid, 100 * float(cpgr['done']+cpgr['failed'])/cpgr['total'], remaining )
 
@@ -61,7 +72,8 @@ def worker_progress( folder, workerid, jobids, more=False ):
     else:
         print head
 
-    # Print lists
+
+    # Print job lists
     if more:
         if cpgr['failed'] > 0:
             print '\t    Failed: ' + ','.join(map(str,pgr['failed']))
@@ -70,9 +82,12 @@ def worker_progress( folder, workerid, jobids, more=False ):
         else:
             print '\t Remaining: ' + ','.join(map(str,pgr['remaining']))
 
+
     # Summary
     print "\t (%s total), (%s done), (%s failed)" % \
         ( cprint.fg('c').fmt(cpgr['total']), cprint.fg('g').fmt(cpgr['done']), cprint.fg('r').fmt(cpgr['failed']) )
+
+
 
 def main(args):
 
@@ -87,6 +102,7 @@ def main(args):
     # Analyse workers progress
     workers  = config['exec']['workers']
     nworkers = len(workers)
+
     for w in xrange(nworkers):
         worker_progress( folder, w+1, workers[w], args.more )
 
