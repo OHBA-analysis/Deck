@@ -1,4 +1,4 @@
-function c = matlab(n)
+function [c,o] = matlab(n)
 % 
 % c = matlab( n=7 )
 %
@@ -15,6 +15,9 @@ function c = matlab(n)
         0.3010    0.7450    0.9330 ; ...
         0.6350    0.0780    0.1840   ...
     ];
+
+    % reordering from purple/blue to orange/red
+    o = [7 2 3 5 6 1 4];
 
     if nargin > 0
         c = interp1( (1:7)', c, linspace(1,7,n)' );

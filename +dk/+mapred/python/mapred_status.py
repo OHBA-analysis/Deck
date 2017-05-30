@@ -79,8 +79,10 @@ def worker_progress( folder, workerid, jobids, more=False ):
             print '\t    Failed: ' + ','.join(map(str,pgr['failed']))
         if cpgr['remaining'] > 0.75*cpgr['total']:
             print '\t      Done: ' + ','.join(map(str,pgr['done']))
-        else:
+        elif cpgr['remaining'] > 0:
             print '\t Remaining: ' + ','.join(map(str,pgr['remaining']))
+        elif cpgr['running'] > 0:
+            print '\t   Running: ' + ','.join(map(str,pgr['running']))
 
 
     # Summary
