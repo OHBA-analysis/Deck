@@ -1,9 +1,10 @@
-function reject( varargin )
+function val = reject( varargin )
 %
-% dk.reject( condition, fmt, varargin )
-% dk.reject( channel, condition, fmt, varargin )
+% val = dk.reject( condition, fmt, varargin )
+% val = dk.reject( channel, condition, fmt, varargin )
 %
 % Default channel is 'error'.
+% Returns true if the rejection passes, false otherwise.
 %
 % JH
 
@@ -23,7 +24,8 @@ function reject( varargin )
         args = varargin(2:end);
     end
 
-    if any(logical(cond))
+    val = ~any(logical(cond));
+    if ~val
         switch chan
             case validE
                 error( args{:} );

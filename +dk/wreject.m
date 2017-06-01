@@ -1,3 +1,3 @@
-function wreject( varargin )
-    dk.reject( 'w', varargin{:} );
+function v=wreject( varargin )
+    v=dk.reject( 'w', varargin{:} );
 end

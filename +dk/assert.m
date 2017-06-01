@@ -1,9 +1,10 @@
-function assert( varargin )
+function val = assert( varargin )
 %
-% dk.assert( condition, fmt, varargin )
-% dk.assert( channel, condition, fmt, varargin )
+% val = dk.assert( condition, fmt, varargin )
+% val = dk.assert( channel, condition, fmt, varargin )
 %
 % Default channel is 'error'.
+% Returns true if the assertion passes, false otherwise.
 %
 % JH
 
@@ -23,7 +24,8 @@ function assert( varargin )
         args = varargin(2:end);
     end
 
-    if ~all(logical(cond))
+    val = all(logical(cond));
+    if ~val
         switch chan
             case validE
                 error( args{:} );
