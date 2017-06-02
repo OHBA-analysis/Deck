@@ -47,7 +47,7 @@ classdef Compiler < handle
             self.reset();
         end
         
-        function default_settings(self)
+        function self=default_settings(self)
             
             self.out_dir       = pwd;
             self.out_name      = '';
@@ -67,7 +67,7 @@ classdef Compiler < handle
             
         end
         
-        function reset(self)
+        function self=reset(self)
             
             self.default_settings();
 
@@ -82,7 +82,7 @@ classdef Compiler < handle
             
         end
         
-        function build(self)
+        function self=build(self)
             
             self.command.clear();
             
@@ -171,12 +171,12 @@ classdef Compiler < handle
             
         end
         
-        function print(self)
+        function self=print(self)
             self.build();
             disp(['mex ' strjoin(self.command.list)]);
         end
         
-        function compile(self)
+        function self=compile(self)
             self.build();
             mex( self.command.list{:} );
         end
@@ -186,54 +186,54 @@ classdef Compiler < handle
     methods
         
         % Add/remove files to compile
-        function add_file(self,f)
+        function self=add_file(self,f)
             self.files.append(f);
         end
-        function rem_file(self,f)
+        function self=rem_file(self,f)
             self.files.remove_all(f);
         end
-        function rem_files(self)
+        function self=rem_files(self)
             self.files.clear();
         end
         
         % Add compiler flag
-        function flag(self,f)
+        function self=flag(self,f)
             self.flags.append(f);
         end
         
         % Add/remove defines
-        function define(self,name,val)
+        function self=define(self,name,val)
             if nargin<3, val=''; end
             assert( ischar(name) && ischar(val), ...
                 'name and value should be strings.' );
             
             self.def.(name) = val;
         end
-        function undefine(self,name)
+        function self=undefine(self,name)
            self.undef.append( name ); 
         end
         
         % Add/remove library paths
-        function add_lib_path(self,lp)
+        function self=add_lib_path(self,lp)
             self.lpath.append(lp);
         end
-        function rem_lib_path(self,lp)
+        function self=rem_lib_path(self,lp)
             self.lpath.remove_all(lp);
         end
         
         % Add/remove libraries
-        function add_lib(self,l)
+        function self=add_lib(self,l)
             self.lib.append(l);
         end
-        function rem_lib(self,l)
+        function self=rem_lib(self,l)
             self.lib.remove_all(l);
         end
         
         % Add/remove includes
-        function add_inc(self,ip)
+        function self=add_inc(self,ip)
             self.ipath.append(ip);
         end
-        function rem_inc(self,ip)
+        function self=rem_inc(self,ip)
             self.ipath.remove_all(ip);
         end
         
