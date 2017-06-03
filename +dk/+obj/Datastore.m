@@ -42,6 +42,10 @@ classdef Datastore < handle
             y = dk.fs.is_file( self.file(varargin{:}) );
         end
         
+        function f = find(self,varargin)
+            f = dir(fullfile( self.folder, varargin{:} ));
+        end
+        
         function f = save(self,name,varargin)
             
             dk.reject( isempty(self.folder), '[dk.Datastore] Folder is not set.' );
