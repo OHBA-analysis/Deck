@@ -16,10 +16,10 @@ function [num,pos] = numbers( str, varargin )
 %
 %
 % Example:
-% [pos,num] = dk.str.numbers('Example -234.0 with 01. multiple 10.7E-3 numbers.')
-% [pos,num] = dk.str.numbers('Example -234.0 with 01. multiple 10.7E-3 numbers.','int')
-% [pos,num] = dk.str.numbers('Example -234.0 with 01. multiple 10.7E-3 numbers.','uint')
-% [pos,num] = dk.str.numbers('Example -234.0 with 01. multiple 10.7E-3 numbers.','int','once')
+% [num,pos] = dk.str.numbers('Example -234.0 with 01. multiple 10.7E-3 numbers.')
+% [num,pos] = dk.str.numbers('Example -234.0 with 01. multiple 10.7E-3 numbers.','int')
+% [num,pos] = dk.str.numbers('Example -234.0 with 01. multiple 10.7E-3 numbers.','uint')
+% [num,pos] = dk.str.numbers('Example -234.0 with 01. multiple 10.7E-3 numbers.','int','once')
 %
 % JH
 
