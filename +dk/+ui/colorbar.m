@@ -1,11 +1,11 @@
-function [hi,ht] = colorbar( range, label, varargin )
+function h = colorbar( range, label, varargin )
 %
-% [hi,ht] = dk.ui.colorbar( range, label, varargin )
+% h = dk.ui.colorbar( range, label, varargin )
 %
 % THIS IS NOT A REPLACEMENT FOR MATLAB'S colorbar FUNCTION!
 %
 % Open a new figure with a colorbar in specified range and label.
-% Outputs handles to the axes containing the colorbar and text label.
+% Outputs handles to colorbar image and text label (structure).
 %
 % Example:
 %   dk.ui.colorbar( [-3 7], 'This is a label', ...
@@ -40,7 +40,7 @@ function [hi,ht] = colorbar( range, label, varargin )
     thi = 0.5;
         
     % open new figure
-    figure('units','normalized'); colormap(cmap);
+    fig=figure('units','normalized'); colormap(cmap);
     
     % work out the position of things
     switch lower(orient)
@@ -53,16 +53,16 @@ function [hi,ht] = colorbar( range, label, varargin )
                 hi = axes( 'Position', [ 0.25 0.03 0.50 0.94 ] );
                 ht = axes( 'Position', [ 0.03 0.03 0.17 0.94 ], 'Visible', 'off' );
                 
-                imagesc( hi, x, y, (1:len)' );
-                text( ht, thi, 0.5, label, 'Rotation', +90, 'HorizontalAlignment', 'center', txtopt{:} );
+                oi=imagesc( hi, x, y, (1:len)' );
+                ot=text( ht, thi, 0.5, label, 'Rotation', +90, 'HorizontalAlignment', 'center', txtopt{:} );
                 hi.YAxisLocation = 'right';
                 
             else
                 hi = axes( 'Position', [ 0.25 0.03 0.50 0.94 ] );
                 ht = axes( 'Position', [ 0.80 0.03 0.17 0.94 ], 'Visible', 'off' );
                 
-                imagesc( hi, x, y, (1:len)' );
-                text( ht, tlo, 0.5, label, 'Rotation', -90, 'HorizontalAlignment', 'center', txtopt{:} );
+                oi=imagesc( hi, x, y, (1:len)' );
+                ot=text( ht, tlo, 0.5, label, 'Rotation', -90, 'HorizontalAlignment', 'center', txtopt{:} );
                 
             end
             hi.XTick = [];
@@ -77,16 +77,16 @@ function [hi,ht] = colorbar( range, label, varargin )
                 hi = axes( 'Position', [ 0.07 0.30 0.90 0.50 ] );
                 ht = axes( 'Position', [ 0.03 0.03 0.94 0.22 ], 'Visible', 'off' );
                 
-                imagesc( hi, x, y, (1:len) );
-                text( ht, 0.5, thi, label, 'HorizontalAlignment', 'center', txtopt{:} );
+                oi=imagesc( hi, x, y, (1:len) );
+                ot=text( ht, 0.5, thi, label, 'HorizontalAlignment', 'center', txtopt{:} );
                 hi.XAxisLocation = 'top';
                 
             else
                 hi = axes( 'Position', [ 0.07 0.20 0.90 0.50 ] );
                 ht = axes( 'Position', [ 0.03 0.75 0.94 0.22 ], 'Visible', 'off' );
                 
-                imagesc( hi, x, y, (1:len) );
-                text( ht, 0.5, tlo, label, 'HorizontalAlignment', 'center', txtopt{:} );
+                oi=imagesc( hi, x, y, (1:len) );
+                ot=text( ht, 0.5, tlo, label, 'HorizontalAlignment', 'center', txtopt{:} );
                 
             end
             hi.YTick = [];
@@ -96,5 +96,12 @@ function [hi,ht] = colorbar( range, label, varargin )
             error('Unknown orientation: %s',orient);
         
     end
+    
+    % save handles in figure UserData
+    h.text.axis = ht;
+    h.text.handle = ot;
+    h.image.axis = hi;
+    h.image.handle = oi;
+    fig.UserData = h;
 
 end
