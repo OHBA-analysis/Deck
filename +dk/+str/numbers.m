@@ -1,6 +1,6 @@
-function [pos,num] = numbers( str, varargin )
+function [num,pos] = numbers( str, varargin )
 %
-% [pos,num] = dk.str.numbers( str, Option1, Option2 ... )
+% [num,pos] = dk.str.numbers( str, Option1, Option2 ... )
 %
 % Extract numbers from string.
 % Options are specified as strings:
@@ -9,10 +9,11 @@ function [pos,num] = numbers( str, varargin )
 %   'uint'  Unsigned integers only
 %   'once'  Stop searching after the first number found
 %
-% The first output pos is a Nx2 array where N is the number of matches (=1 with option 'once'),
+% The first output is an array containing the matches in double type.
+%
+% The second output pos is a Nx2 array where N is the number of matches (=1 with option 'once'),
 % and where the columns denote respectively the first and last character index of each match.
 %
-% The second output is an array containing the matches themselves in double type.
 %
 % Example:
 % [pos,num] = dk.str.numbers('Example -234.0 with 01. multiple 10.7E-3 numbers.')
