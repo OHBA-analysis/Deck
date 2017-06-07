@@ -1,6 +1,6 @@
 function h = menu_ginput( callback, parent, label, surf )
 %
-% h = dk.ui.widget.menu_ginput( callback, parent=gcf, label=Select, surf=false, snap=[] )
+% h = dk.widget.menu_ginput( callback, parent=gcf, label=Select, surf=false, snap=[] )
 %
 % Adds a menu entry to a figure which triggers ginput (mouse selection tool).
 %

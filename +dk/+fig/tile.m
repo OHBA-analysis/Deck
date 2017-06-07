@@ -38,7 +38,7 @@ function tile( gsize, figures, screen )
     if nargin < 3
         screen = zeros( 1, nfigs );
         for i = 1:nfigs
-            [~,~,screen(i)] = dk.ui.fig.position(figures{i});
+            [~,~,screen(i)] = dk.fig.position(figures{i});
         end
         screen = mode(screen);
     end

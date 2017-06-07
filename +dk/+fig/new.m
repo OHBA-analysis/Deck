@@ -13,10 +13,10 @@ function f = new( name, figsize, screen, varargin )
 
     f = figure( 'name', name, varargin{:} );
     if nargin > 2 && ~isempty(screen)
-        dk.ui.fig.movetoscreen(f,screen);
+        dk.fig.movetoscreen(f,screen);
     end
     if nargin > 1 && ~isempty(figsize)
-        dk.ui.fig.resize( f, figsize );
+        dk.fig.resize( f, figsize );
     end
 
 end

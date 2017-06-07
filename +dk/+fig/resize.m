@@ -9,8 +9,8 @@ function resize( f, height, width )
         height = height(1);
     end
     
-    [~,hw,sn] = dk.ui.fig.position(f);
-    si = dk.ui.screen.info(sn);
+    [~,hw,sn] = dk.fig.position(f);
+    si = dk.screen.info(sn);
     
     if isempty(height)
         if width > 1

@@ -9,7 +9,7 @@ function h = colorbar( range, label, varargin )
 %
 % Example:
 %   dk.ui.colorbar( [-3 7], 'This is a label', ...
-%       'orient', 'h', 'reverse', true, 'txtopt', {'FontSize',25}, 'cmap', dk.ui.cmap.wjet );
+%       'orient', 'h', 'reverse', true, 'txtopt', {'FontSize',25}, 'cmap', dk.cmap.wjet );
 %
 % INPUTS:
 %     range  1x2 vector specifying the extents of the colorbar.

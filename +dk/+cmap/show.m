@@ -1,6 +1,6 @@
 function show( cmap, sz )
 %
-% dk.ui.cmap.show( cmap, sz=[600 100] )
+% dk.cmap.show( cmap, sz=[600 100] )
 %
 
     if nargin < 2, sz=[600 100]; end

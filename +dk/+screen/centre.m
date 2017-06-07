@@ -4,7 +4,7 @@ function c = centre(varargin)
 %
 % JH
 
-    c = dk.ui.screen.info(varargin{:});
+    c = dk.screen.info(varargin{:});
     c = vertcat( c.centre );
 
 end

@@ -1,4 +1,14 @@
 function y = is_in_range( val, lo, hi, bc )
+%
+% y = dk.math.is_in_range( val, lo, hi, bc='[]' )
+%
+% Checks whether input value is in specified range, with optional boundary condition.
+% Valid conditions are:
+%   open, ()
+%   closed, []
+%   [), (]
+%
+% JH
     
     if nargin < 4, bc = '[]'; end
     

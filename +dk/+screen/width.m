@@ -4,7 +4,7 @@ function w = width(varargin)
 %
 % Contact: jhadida [at] fmrib.ox.ac.uk
 
-    w = dk.ui.screen.size(varargin{:});
+    w = dk.screen.size(varargin{:});
     w = w(:,2);
     
 end

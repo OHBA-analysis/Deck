@@ -1,0 +1,29 @@
+function p = palette( c )
+%
+% p = palette( c )
+% 
+% Create palette from input color.
+% See: https://www.viget.com/articles/tints-tones-shades
+%
+% JH
+    
+    if isscalar(c), c=hsv2rgb([c 1 1]); end
+    if ischar(c), c=dk.clr.hex2rgb(c); end
+    assert( dk.is.rgb(c), 'Expected RGB color or hue in input.' );
+    
+    p.darkest = dk.clr.shade(c,0.2);
+    p.darker = dk.clr.tone(c,0.2);
+    p.normal = c;
+    p.lighter = dk.clr.tint(c,0.2);
+    p.lightest = dk.clr.tint(c,0.8);
+    
+    
+    if nargout == 0
+        figure;
+        im = ones(75,100);
+        f = fieldnames(p);
+        im = dk.cellfun( @(ff) dk.bsx.mul(reshape(p.(ff),[1,1,3]),im), f, false );
+        imshow(vertcat(im{:}));
+    end
+
+end

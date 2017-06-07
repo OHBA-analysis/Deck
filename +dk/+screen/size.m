@@ -4,7 +4,7 @@ function s = size( varargin )
 %
 % JH
 
-    s = dk.ui.screen.info(varargin{:});
+    s = dk.screen.info(varargin{:});
     s = vertcat( s.size );
     
 end

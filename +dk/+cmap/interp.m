@@ -1,6 +1,6 @@
 function col = interp( cmap, val, range, method )
 %
-% col = dk.ui.cmap.interp( cmap, val, range=[min(val),max(val)], method=linear );
+% col = dk.cmap.interp( cmap, val, range=[min(val),max(val)], method=linear );
 %
 % Interpolate color for each value in val according to specified range using colormap cmap.
 % By default, the range is set to the extremal values in val, and the interpolation is linear.

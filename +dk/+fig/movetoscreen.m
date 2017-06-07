@@ -1,7 +1,7 @@
 function sc = movetoscreen( f, num )
 
-    [~,hw] = dk.ui.fig.position(f);
-    sc = dk.ui.screen.centre(num);
+    [~,hw] = dk.fig.position(f);
+    sc = dk.screen.centre(num);
     wh = fliplr(hw);
     
     u = get(f,'units'); set(f,'units','pixels');

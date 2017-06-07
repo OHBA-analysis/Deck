@@ -4,7 +4,7 @@ function h = height(varargin)
 %
 % Contact: jhadida [at] fmrib.ox.ac.uk
 
-    h = dk.ui.screen.size(varargin{:});
+    h = dk.screen.size(varargin{:});
     h = h(:,1);
     
 end

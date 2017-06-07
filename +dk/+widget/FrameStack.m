@@ -5,7 +5,7 @@ classdef FrameStack < handle
 % Example usage:
 %
 % frames = rand(100,100,35); 
-% fstack = dk.ui.widget.FrameStack( figure ).set_frames(frames).select_frame(13);
+% fstack = dk.widget.FrameStack( figure ).set_frames(frames).select_frame(13);
 % fstack.framerate = 10; % in Hz
 %
 % JH

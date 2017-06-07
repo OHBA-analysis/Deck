@@ -5,7 +5,7 @@ function maximise( f )
 % JH
 
     u = get(f,'units'); set(f,'units','pixels');
-    [~,~,sn] = dk.ui.fig.position(f);
+    [~,~,sn] = dk.fig.position(f);
     s = get( 0, 'MonitorPositions' );
     set( f, 'outerposition', s(sn,:) );
     set(f,'units',u);

@@ -27,8 +27,8 @@ function [h,crange] = image( img, varargin )
     maxsize    = [ maxheight, maxwidth ];
     
     if ischar(cmap_raw)
-        cmap_unsigned = eval(sprintf('dk.ui.cmap.%s(128,false)', cmap_raw));
-        cmap_signed   = eval(sprintf('dk.ui.cmap.%s(256,true)',  cmap_raw));
+        cmap_unsigned = eval(sprintf('dk.cmap.%s(128,false)', cmap_raw));
+        cmap_signed   = eval(sprintf('dk.cmap.%s(256,true)',  cmap_raw));
     else
         cmap_unsigned = [];
         cmap_signed   = [];

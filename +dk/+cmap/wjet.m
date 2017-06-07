@@ -1,6 +1,6 @@
 function x = wjet( n, f )
 %
-% x = dk.ui.cmap.wjet( n=128, f=0 )
+% x = dk.cmap.wjet( n=128, f=0 )
 %
 % Weighted jet colormap based on Matlab jet function.
 % n controls the number of colors, and f the brightness at the centre of the color range.
