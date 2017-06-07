@@ -33,7 +33,7 @@ function fig = imgrid( slices, names, samerng, varargin )
     end
 
     assert( iscell(slices), 'Input slices should be a cell.' );
-    assert( all(cellfun( @ismatrix, slices )), 'Cell elements should be matrices.' );
+    assert( all(cellfun( @(x) ~isvector(x), slices )), 'Cell elements should be matrices.' );
     
     % compute grid size
     n = numel(slices);
