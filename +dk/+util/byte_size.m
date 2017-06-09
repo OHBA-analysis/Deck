@@ -5,7 +5,7 @@ function [bsize,scale] = byte_size( b, unit_symbol )
 % if it is a bitsize, not a bytesize, you can set the unit symbol to 'b' instead
 
     if nargin < 2, unit_symbol='B'; end
-
+    
     units = dk.cellfun( @(x) [x unit_symbol], {'','k','M','G','T','P'}, false );
     scale = units{min( numel(units), 1+floor( log(b)/log(1024) ) )};
     
