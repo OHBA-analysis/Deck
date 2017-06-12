@@ -1,38 +1,42 @@
-function c = rwb(n,twosided)
-	% twosided is equivalant to signed i.e. caxis is symmetric & centered at 0
+function c = rwb2( n, signed )
+%
+% c = bgr( n=64, signed=false )
+%
+%   
 
-	if nargin < 2 || isempty(twosided)
-		twosided = true; % two sided by default
-	end
+    if nargin < 1, n = 64; end
+    if nargin < 2, signed = false; end
+    
+    method = 'linear';
+    r = dk.clr.palette(0);
+    b = dk.clr.palette(0.6);
+    g = 0.9*[1 1 1];
 
-	if nargin < 1 || isempty(n)
-		n = 101;
-	end
-	
-	if twosided
-		% n should be odd so that zero is in the middle, if twosided
-		if mod(n,2) == 0, n=n+1; end
-		saturation = linspace(1,0,floor(n/2)+1);
-		saturation = saturation(1:end-1); % Remove the zero-saturation and have the correct length
-	else
-		saturation = linspace(1,0,n);
-	end
-
-	red = rgb2hsv([1 0 0]);
-	red = repmat(red,length(saturation),1);
-	red(:,2) = saturation;
-
-    if ~twosided
-        c = hsv2rgb(red);
-        return
+    if signed
+        if mod(n,2)==0, n=n+1; end
+        C = [ ...
+            -1.00, b.darkest; ...
+            -0.80, b.normal; ...
+            -0.45, b.lighter; ...
+            -0.10, b.lightest; ...
+            -0.00, g; ...
+            +0.10, r.lightest; ...
+            +0.45, r.lighter; ...
+            +0.80, r.normal; ...
+            +1.00, r.darkest ...
+        ];
+        x = linspace(-1,1,n)';
+    else
+        C = [ ...
+            -0.00, g; ...
+            +0.10, r.lightest; ...
+            +0.45, r.lighter; ...
+            +0.80, r.normal; ...
+            +1.00, r.darkest  ...
+        ];
+        x = linspace(0,1,n)';
     end
 
-    blue = rgb2hsv([0 0 1]);
-	blue = repmat(blue,length(saturation),1);
-	blue(end:-1:1,2) = saturation;
+    c = interp1( C(:,1), C(:,2:4), x, method );
 
-	c = [hsv2rgb(red); 1 1 1; hsv2rgb(blue)];
-	c = c(end:-1:1,:);
-    
 end
-

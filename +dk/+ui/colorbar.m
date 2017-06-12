@@ -1,11 +1,11 @@
-function h = colorbar( range, label, varargin )
+function [fig,h] = colorbar( range, label, varargin )
 %
-% h = dk.ui.colorbar( range, label, varargin )
+% [fig,h] = dk.ui.colorbar( range, label, varargin )
 %
 % THIS IS NOT A REPLACEMENT FOR MATLAB'S colorbar FUNCTION!
 %
 % Open a new figure with a colorbar in specified range and label.
-% Outputs handles to colorbar image and text label (structure).
+% Outputs handles to figure, and a structure with handles to colorbar image and text label.
 %
 % Example:
 %   dk.ui.colorbar( [-3 7], 'This is a label', ...
@@ -17,7 +17,7 @@ function h = colorbar( range, label, varargin )
 %
 % OPTIONS:
 %
-%    orient  Orientation of the colorbar: 'horiz' or 'vert' (default: 'vert').
+%    orient  Orientation of the colorbar: 'horz' or 'vert' (default: 'vert').
 %   reverse  Change the relative position of label and colorbar (default: false).
 %      cmap  Colormap, either string or nx3 array of RGB colors (default: 'jet').
 %    length  Number of points in the colorbar (default: 128).
@@ -37,7 +37,13 @@ function h = colorbar( range, label, varargin )
         cmap = opt.get( 'cmap', 'jet' );
         len = opt.get( 'length', 128 );
         txtopt = opt.get( 'txtopt', {} );
-        d = opt.get( 'dims', [20 45 5 3]/100 );
+        if isempty(label)
+            default_d = [0 35 15 3]/100;
+        else
+            default_d = [25 30 5 3]/100;
+        end
+        d = opt.get( 'dims', default_d );
+        s = opt.get( 'size', [] );
         
     % these guys control how close/far the text label is from the colorbar
     tsz = d(1);
@@ -87,6 +93,9 @@ function h = colorbar( range, label, varargin )
             hi.YDir = 'normal';
             box(hi,'off');
             
+            % default figure size
+            if isempty(s), s = [700 200]; end
+            
         case {'horizontal','horz','h'}
             
             x = linspace(range(1),range(2),len);
@@ -117,6 +126,9 @@ function h = colorbar( range, label, varargin )
             hi.YTick = [];
             box(hi,'off');
             
+            % default figure size
+            if isempty(s), s = [200 700]; end
+            
         otherwise
             error('Unknown orientation: %s',orient);
         
@@ -133,5 +145,6 @@ function h = colorbar( range, label, varargin )
     h.image.axis = hi;
     h.image.handle = oi;
     fig.UserData = h;
+    dk.fig.resize(fig,s);
 
 end
