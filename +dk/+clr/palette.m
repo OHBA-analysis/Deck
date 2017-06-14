@@ -1,6 +1,6 @@
-function p = palette( c )
+function p = palette( c, w )
 %
-% p = palette( c )
+% p = palette( c, w=[0.2,0.2,0.2,0.8] )
 % 
 % Create palette from input color.
 % See: https://www.viget.com/articles/tints-tones-shades
@@ -11,11 +11,13 @@ function p = palette( c )
     if ischar(c), c=dk.clr.hex2rgb(c); end
     assert( dk.is.rgb(c), 'Expected RGB color or hue in input.' );
     
-    p.darkest = dk.clr.shade(c,0.2);
-    p.darker = dk.clr.tone(c,0.2);
+    if nargin < 2, w=[0.2,0.2,0.2,0.8]; end
+    
+    p.darkest = dk.clr.shade(c,w(1));
+    p.darker = dk.clr.tone(c,w(2));
     p.normal = c;
-    p.lighter = dk.clr.tint(c,0.2);
-    p.lightest = dk.clr.tint(c,0.8);
+    p.lighter = dk.clr.tint(c,w(3));
+    p.lightest = dk.clr.tint(c,w(4));
     
     
     if nargout == 0
