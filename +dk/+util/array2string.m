@@ -27,12 +27,12 @@ function output = array2string( values, format, varargin )
     if isnumeric(values) || islogical(values)
         
         assert( ismatrix(values), 'Sorry, multidimensional arrays are not supported.' );
-        V = arrayfun( @(x) dk.to_string(x,numFmt), values, 'UniformOutput', false );
+        V = dk.arrayfun( @(x) dk.to_string(x,numFmt), values, false );
         
     elseif iscell(values)
         
         assert( ismatrix(values), 'Sorry, multidimensional arrays are not supported.' );
-        V = cellfun( @(x) dk.to_string(x,numFmt), values, 'UniformOutput', false );
+        V = dk.cellfun( @(x) dk.to_string(x,numFmt), values, false );
         
     elseif istable(values)
         
@@ -125,5 +125,8 @@ function output = array2string( values, format, varargin )
             output(1,1) = '[';
             output(end,end-2) = ']';
     end
+    
+    % print to console if no output
+    if nargout == 0, disp(output); end
 
 end
