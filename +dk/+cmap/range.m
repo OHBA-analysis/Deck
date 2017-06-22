@@ -17,7 +17,10 @@ function [crange,ctype] = range( x, ctype, crange )
     
     % truncate to 2 significant digits
     crange = dk.math.trunc(sort(crange), 2);
-    dk.assert( diff(crange) > 0, 'Empty color range (might be too narrow).' );
+    if diff(crange) <= 0
+        warning( 'Empty color range (might be too narrow).' );
+        crange = [0 1];
+    end
     
     % characterise range
     lo = crange(1);
