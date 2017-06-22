@@ -41,7 +41,7 @@ classdef GeoData_NNS < handle
             
         end
         
-        function idx = find(self,x,tol)
+        function [idx,dst] = find(self,x,tol)
         %
         % Index of closest point if its distance is within tolerance, otherwise 0.
         %
