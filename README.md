@@ -1,3 +1,6 @@
+
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://tldrlegal.com/license/gnu-affero-general-public-license-v3-(agpl-3.0))
+
 ## Deck
 
 A general-purpose Matlab (2015+) toolbox that doesn't get in your way.
