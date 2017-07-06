@@ -15,7 +15,7 @@ If not, follow [these instructions](https://git-scm.com/book/en/v2/Getting-Start
 
 Then go to the folder in which you'd like to install Deck and type:
 ```
-git clone https://github.com/Sheljohn/Deck.git <folder_name|default:"deck">
+git clone https://github.com/sheljohn/deck.git <folder_name|default:"deck">
 ```
 
 To use Deck in Matlab, simply add the source folder to your path (do **NOT** use `genpath`), and run `dk_startup`. 

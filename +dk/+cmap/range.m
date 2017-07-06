@@ -6,6 +6,12 @@ function [crange,ctype] = range( x, ctype, crange )
 %
 % JH
 
+    if islogical(x)
+        crange = [0,1];
+        ctype  = 'bool';
+        return;
+    end
+
     assert( isnumeric(x), '[dk.cmap.range] Input data should be numeric.' );
     if nargin < 2, ctype='auto'; end
     if nargin < 3, crange=[]; end

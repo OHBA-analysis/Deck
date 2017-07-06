@@ -64,7 +64,8 @@ function [h,crange] = image( img, varargin )
         %set( gca, 'yticklabel', arrayfun(@num2str,y,'UniformOutput',false) );
         
     else
-        h = imagesc(check_size( img, maxsize )); 
+        img = check_size( img, maxsize );
+        h = imagesc(img); 
     end
     
     % remove ticks
@@ -82,8 +83,10 @@ function [h,crange] = image( img, varargin )
     switch lower(ctype)
         case {'neg','revsym'}
             cmap = flipud(cmap_unsigned);
-        case {'bisym'}
+        case 'bisym'
             cmap = cmap_signed;
+        case 'bool'
+            cmap = gray(64);
         otherwise
             cmap = cmap_unsigned;
     end
@@ -101,7 +104,7 @@ function [h,crange] = image( img, varargin )
     if ~isempty(label_c)
         cb.Label.String = label_c; 
     end
-    if rm_bar
+    if rm_bar || islogical(img)
         cb.Visible = 'off'; 
     end
     title(title_str);
