@@ -49,7 +49,7 @@ classdef GeoData_NNS < handle
             if nargin < 3, tol=1e-12; end
             
             [idx,dst] = self.nns.knnsearch(x,'K',1);
-            idx = idx * (dst <= tol);
+            idx = idx .* (dst <= tol);
             
         end
         
@@ -61,7 +61,7 @@ classdef GeoData_NNS < handle
             if nargin < 3, tol=1e-12; end
         
             idx = self.find(x,tol);
-            assert( idx > 0, 'Nearest neighbour distance above limit threshold.' );
+            assert( all(idx > 0), 'Nearest neighbour distance above limit threshold.' );
             
             self.access(idx) = true;
             y = dk.getelem(self.data, idx);
