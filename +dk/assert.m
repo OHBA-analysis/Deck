@@ -28,7 +28,9 @@ function val = assert( varargin )
     if ~val
         switch chan
             case validE
-                error( args{:} );
+                s.message = sprintf(args{:});
+                s.stack   = dbstack(1);
+                error(s);
             case validW
                 dk.warn( args{:} );
             case validI
