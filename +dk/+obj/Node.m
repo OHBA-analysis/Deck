@@ -87,7 +87,6 @@ classdef Node < handle
         end
         
         function self=remap(self,old2new)
-            %self.depth = dp(self.depth);
             self.parent = old2new(self.parent);
             self.children = old2new(self.children);
             assert( all([self.parent,self.children]), 'Error during remap (null index found).' );

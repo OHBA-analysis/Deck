@@ -110,7 +110,7 @@ classdef Tree < handle
             if nargin < 3, cur=1; end
             assert( isscalar(cur), 'Expected a single node.' );
             curnode = self.node(cur);
-            callback(cur,curnode);
+            callback(cur, curnode);
             next = curnode.children;
             for i = 1:length(next)
                 self.dfs( callback, next(i) );
@@ -135,6 +135,8 @@ classdef Tree < handle
         %
         % Options:
         %
+        %        Name  Figure name
+        %        Link  Link options (see line options)
         %    NodeSize  Alias for MarkerSize
         %    NodeEdge  Alias for MarkerEdgeColor
         %   NodeColor  Nx3 array of colours for each node
@@ -153,6 +155,7 @@ classdef Tree < handle
             height = width(1) ./ log10(9+(1:D));
             
             % parse options
+            linkopt = opt.get('Link', {} );
             nodeopt = {'MarkerSize',opt.get('NodeSize',8),'MarkerEdgeColor',opt.get('NodeEdge','k')};
             nodecol = opt.get('NodeColor',dk.cmap.interp( hsv(max(D,5)), depth ));
             
@@ -188,6 +191,7 @@ classdef Tree < handle
                     % draw the children in order
                     x0 = offset(pi); % offset of the parent
                     ci = self.node(pi).children;
+                    di = 1+self.node(pi).depth;
                     nc = numel(ci);
                     for j = 1:nc
                         k = ci(j); 
@@ -200,8 +204,8 @@ classdef Tree < handle
                         x0 = x0 + width(k);
 
                         % draw node and link to parent
-                        glink = draw_link( coord(k), y, coord(pi), height(h) );
-                        gnode = draw_node( coord(k), y, nodecol(k,:), nodeopt );
+                        glink = draw_link( coord(k), y, coord(pi), height(h), linkopt );
+                        gnode = draw_node( coord(k), y, nodecol(di,:), nodeopt );
 
                         % save handles
                         gobj.node(k) = gnode;
@@ -266,8 +270,8 @@ function h = draw_node(x,y,c,opt)
     h = plot(x,y,'o',opt{:});
 end
 
-function h = draw_link(x,y,xx,yy)
-    h = plot([x,xx],[y,yy],'k-');
+function h = draw_link(x,y,xx,yy,opt)
+    h = plot([x,xx],[y,yy],'k-',opt{:});
 end
 
 function txt = datatip(~,evt)
