@@ -137,6 +137,8 @@ classdef Tree < handle
         %
         %        Name  Figure name
         %        Link  Link options (see line options)
+        %      Sepfun  Function of the depth adding width to separate branches
+        %     Balance  Balancing flag (children reordering)
         %    NodeSize  Alias for MarkerSize
         %    NodeEdge  Alias for MarkerEdgeColor
         %   NodeColor  Nx3 array of colours for each node
@@ -144,6 +146,7 @@ classdef Tree < handle
         %
             
             opt = dk.obj.kwArgs(varargin{:});
+            balance = opt.get('Balance',true);
             
             % properties
             depth = [self.node.depth];
@@ -151,7 +154,8 @@ classdef Tree < handle
             N = self.n_nodes;
             
             % width and height
-            width = self.compute_widths();
+            sepfun = opt.get( 'Sepfun', @(x)x );
+            width = self.compute_widths(sepfun);
             height = width(1) ./ log10(9+(1:D));
             
             % parse options
@@ -187,32 +191,38 @@ classdef Tree < handle
                     % skip if there are no children
                     pi = p(i);
                     if self.node(pi).is_leaf, continue; end
-
-                    % draw the children in order
-                    x0 = offset(pi); % offset of the parent
+                    
+                    % reorder children to balance the tree
                     ci = self.node(pi).children;
                     di = 1+self.node(pi).depth;
                     nc = numel(ci);
+                    if balance
+                        ci = reorder_children( ci, width(ci) );
+                    end
+
+                    % draw the children in order
+                    x0 = offset(pi); % offset of the parent
+                    x0 = x0 + (width(pi) - sum(width(ci)))/2; % add separation increment
                     for j = 1:nc
-                        k = ci(j); 
+                        cij = ci(j); 
 
                         % save position of current node
-                        offset(k) = x0;
-                        coord(k) = x0 + width(k)/2;
+                        offset(cij) = x0;
+                        coord(cij) = x0 + width(cij)/2;
 
                         % update offset for siblings
-                        x0 = x0 + width(k);
+                        x0 = x0 + width(cij);
 
                         % draw node and link to parent
-                        glink = draw_link( coord(k), y, coord(pi), height(h), linkopt );
-                        gnode = draw_node( coord(k), y, nodecol(di,:), nodeopt );
+                        glink = draw_link( coord(cij), y, coord(pi), height(h), linkopt );
+                        gnode = draw_node( coord(cij), y, nodecol(di,:), nodeopt );
 
                         % save handles
-                        gobj.node(k) = gnode;
-                        gobj.link(k) = glink;
+                        gobj.node(cij) = gnode;
+                        gobj.link(cij) = glink;
 
                         % set datatip
-                        gnode.UserData.id = k;
+                        gnode.UserData.id = cij;
                         glink.UserData.id = pi;
                     end
                 end
@@ -231,7 +241,7 @@ classdef Tree < handle
     
     methods (Hidden)
         
-        function w = compute_widths(self)
+        function w = compute_widths(self,sepfun)
         %
         % Compute the width required for displaying each node and its children.
         % The leaf nodes have a width of 1, which is equivalent to right and left margins of 1/2.
@@ -242,6 +252,7 @@ classdef Tree < handle
 
             depth = [self.node.depth];
             maxdepth = max(depth);
+            inc = sepfun(fliplr(0:maxdepth-1));
 
             % initialise width
             w = zeros(size(self.node));
@@ -254,6 +265,7 @@ classdef Tree < handle
                 n = numel(k);
 
                 for i = 1:n
+                    w(k(i)) = w(k(i)) + inc(h);
                     w(p(i)) = w(p(i)) + w(k(i));
                 end
             end
@@ -281,4 +293,28 @@ function txt = datatip(~,evt)
     catch
         txt = 'Undefined';
     end
+end
+
+function c = reorder_children( c, w )
+%
+% Simple balancing technique which distributes weights in decreasing order, 
+% starting at the centre and alternating right and left.
+%
+
+    n = numel(c);
+    if n == 1, return; end
+    
+    [~,o] = sort(w,'descend');
+    r = zeros(1,n);
+    p = ceil(n/2);
+
+    for i = 1:n
+        if mod(i,2) == 1 % odd
+            r( p - (i-1)/2 ) = c(o(i));
+        else
+            r( p + i/2 ) = c(o(i));
+        end
+    end
+    c = r;
+    
 end
