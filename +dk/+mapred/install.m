@@ -1,8 +1,8 @@
 function install( bindir )
 
-    % default to $HOME/local/bin
+    % default to $HOME/.local/bin
     if nargin < 1
-        bindir = fullfile(dk.env.home,'local/bin');
+        bindir = fullfile(dk.env.home,'.local/bin');
         warning( 'No target directory selected, selecting "%s" by default.', bindir );
     end
     if ~dk.fs.is_dir(bindir)

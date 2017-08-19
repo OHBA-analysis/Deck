@@ -2,7 +2,7 @@
 
 # Create bin dir
 if [ $# -lt 1 ]; then
-    bindir="${HOME}/local/bin"
+    bindir="${HOME}/.local/bin"
 else
     bindir="$1"
 fi
