@@ -45,8 +45,15 @@ classdef Node < handle
                     arg = varargin{1};
                     if iscellstr(arg)
                         out = dk.cellfun( @(f)self.userdat.(f), arg, false );
-                    else
+                    elseif iscell(arg)
+                        out = self.data(arg{:});
+                    elseif dk.is.struct(arg)
+                        self.userdat = arg;
+                        out = self;
+                    elseif ischar(arg)
                         out = self.userdat.(arg);
+                    else
+                        error('Unknown input type.');
                     end
                 otherwise
                     arg = struct(varargin{:});
