@@ -1,7 +1,7 @@
 classdef Node < handle
     
     properties (SetAccess = protected)
-        userdat
+        data
         parent
         children
         depth
@@ -20,7 +20,7 @@ classdef Node < handle
             y=isempty(self.children);
         end
         function f=get.fields(self)
-            f=fieldnames(self.userdat);
+            f=fieldnames(self.data);
         end
         function y=get.is_empty(self)
             y=(numel(self.fields) > 0);
@@ -35,41 +35,6 @@ classdef Node < handle
     
     methods
         
-        function out=data(self,varargin)
-        %
-        % value = data( 'field' )
-        % {value1, value2 ... } = data( {'field1', 'field2' ... } )
-        % self = data( 'field1', value1, 'field2', value2 ... );
-        %
-        
-            switch nargin
-                case 1
-                    out = self.userdat;
-                case 2
-                    arg = varargin{1};
-                    if iscellstr(arg)
-                        out = dk.cellfun( @(f)self.userdat.(f), arg, false );
-                    elseif iscell(arg)
-                        out = self.data(arg{:});
-                    elseif dk.is.struct(arg)
-                        self.userdat = arg;
-                        out = self;
-                    elseif ischar(arg)
-                        out = self.userdat.(arg);
-                    else
-                        error('Unknown input type.');
-                    end
-                otherwise
-                    arg = struct(varargin{:});
-                    self.userdat = dk.struct.merge(self.userdat,arg);
-                    out = self;
-            end
-        end
-        
-    end
-    
-    methods (Hidden)
-        
         function self = Node(varargin)
             self.clear();
             self.assign(varargin{:});
@@ -79,14 +44,18 @@ classdef Node < handle
             self.depth = 0;
             self.parent = [];
             self.children = [];
-            self.userdat = struct();
+            self.data = struct();
         end
         
         function self=assign(self,depth,parent,varargin)
             self.depth = depth;
             self.parent = parent;
             if nargin > 3
-                self.data(varargin{:});
+                if isstruct(varargin{1})
+                    self.data = varargin{1};
+                else
+                    self.data = struct(varargin{:});
+                end
             end
         end
         
