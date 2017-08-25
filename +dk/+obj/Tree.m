@@ -5,7 +5,7 @@ classdef Tree < handle
     end
 
     properties (Transient,Dependent)
-        n_nodes, n_leaves;
+        n_nodes, n_leaves, n_splits;
     end
     
     methods
@@ -14,6 +14,9 @@ classdef Tree < handle
         end
         function n=get.n_leaves(self)
             n=sum([self.node.is_leaf]);
+        end
+        function n=get.n_splits(self)
+            n=self.n_nodes - self.n_leaves;
         end
     end
     
@@ -26,6 +29,15 @@ classdef Tree < handle
         function self=reset(self,varargin)
             % set root node
             self.node = dk.obj.Node(1,1,varargin{:});
+        end
+        
+        % shape of the tree
+        function [depth,width] = shape(self)
+            depth = [self.node.depth];
+            valid = [self.node.is_valid];
+            depth = depth(valid);
+            width = accumarray( depth(:), 1 );
+            depth = max(depth);
         end
         
         % add/remove single node

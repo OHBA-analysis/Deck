@@ -11,6 +11,7 @@ classdef Node < handle
         is_valid
         is_leaf
         is_empty
+        n_children
         fields
     end
     
@@ -26,6 +27,9 @@ classdef Node < handle
         end
         function y=get.is_valid(self)
             y=(self.depth > 0);
+        end
+        function n=get.n_children(self)
+            n=numel(self.children);
         end
     end
     
