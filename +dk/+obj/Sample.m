@@ -239,19 +239,19 @@ classdef Sample < handle
             self.alloc(cp);
         end
         
-        function out = iter(self,callback)
-            id = self.find();
-            ni = numel(id);
+        function out = iter(self,callback,idx)
+            if nargin < 3, idx = self.find(); end
+            ni = numel(idx);
             
             if nargout > 0
                 out = cell(1,ni);
                 for i = 1:ni
-                    k = id(i);
+                    k = idx(i);
                     out{i} = callback( k, self.x(k,:), self.y(k,:), self.meta(k) );
                 end
             else
                 for i = 1:ni
-                    k = id(i);
+                    k = idx(i);
                     callback( k, self.x(k,:), self.y(k,:), self.meta(k) );
                 end
             end

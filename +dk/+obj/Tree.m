@@ -5,18 +5,18 @@ classdef Tree < handle
     end
 
     properties (Transient,Dependent)
-        n_nodes, n_leaves, n_splits;
+        n_nodes, n_leaves, n_parents;
     end
     
     methods
         function n=get.n_nodes(self)
-            n=numel(self.node);
+            n=sum([self.node.is_valid]);
         end
         function n=get.n_leaves(self)
-            n=sum([self.node.is_leaf]);
+            n=sum([self.node.is_valid] & [self.node.is_leaf]);
         end
-        function n=get.n_splits(self)
-            n=self.n_nodes - self.n_leaves;
+        function n=get.n_parents(self)
+            n=sum([self.node.is_valid] & ~[self.node.is_leaf]);
         end
     end
     
@@ -40,6 +40,23 @@ classdef Tree < handle
             depth = max(depth);
         end
         
+        % serialisation
+        function s=serialise(self,file)
+            s.node = dk.arrayfun( @(n) n.serialise(), self.node, false );
+            s.version = '0.1';
+            if nargin > 1, save(file,'-v7','-struct','s'); end
+        end
+        function self=unserialise(self,s)
+        if ischar(s), s=load(s); end
+        switch s.version
+            case '0.1'
+                self.node = dk.arrayfun( @(n) dk.obj.Node(n), s.node, false );
+                self.node = [self.node{:}];
+            otherwise
+                error('Unknown version: %s',s.version);
+        end
+        end
+        
         % add/remove single node
         function k=add_node(self,p,varargin)
             k = length(self.node)+1;
@@ -49,6 +66,7 @@ classdef Tree < handle
         end
         function self=rem_node(self,k)
             % cannot remove node from array without screwing up indices, use cleanup
+            assert( k > 1, 'Cannot remove the root, use reset() instead.' );
             self.parent(k).rem_child(k);
             c = self.node(k).children;
             for i = 1:length(c)
@@ -79,6 +97,25 @@ classdef Tree < handle
         end
         function N=children(self,k)
             N=self.node( self.node(k).children );
+        end
+        
+        % group by level
+        function L=levels(self)
+            depth = [self.node.depth];
+            valid = find([self.node.is_valid]);
+            
+            [depth,order] = sort(depth(valid),'ascend');
+            valid = valid(order);
+            width = [find(diff(depth)==1), numel(depth)];
+            
+            n = numel(width);
+            L = cell(1,n);
+            e = 0;
+            for i = 1:n
+                b = e+1;
+                e = width(i);
+                L{i} = valid(b:e);
+            end
         end
         
         % remove deleted nodes and re-index the tree
@@ -129,14 +166,17 @@ classdef Tree < handle
             end
         end
         
-        function print(self)
+        % print to file (or console by default)
+        function print(self,fid)
+            if nargin < 2, fid=1; end
             N = self.n_nodes;
             for i = 1:N 
                 Ni = self.node(i);
                 if Ni.is_valid
-                    dk.println( '%d [%d] : %d children, %d data-fields', i, Ni.depth, numel(Ni.children), numel(Ni.fields) );
+                    fprintf( fid, '%d [%d] : %d children, %d data-fields\n', ...
+                        i, Ni.depth, numel(Ni.children), numel(Ni.fields) );
                 else
-                    dk.println( '%d [%d] : DELETED', i, Ni.depth );
+                    fprintf( fid, '%d [%d] : DELETED\n', i, Ni.depth );
                 end
             end
         end
