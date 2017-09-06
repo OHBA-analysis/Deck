@@ -7,7 +7,6 @@ classdef Node < handle
         depth
     end
     
-    % dependent properties
     properties (Transient,Dependent)
         is_valid
         is_leaf
@@ -15,6 +14,8 @@ classdef Node < handle
         n_children
         fields
     end
+    
+    % dependent properties
     methods
         function y=get.is_leaf(self)
             y=isempty(self.children);
@@ -33,6 +34,37 @@ classdef Node < handle
         end
     end
     
+    % i/o
+    methods
+        
+        function s=serialise(self,file)
+            f = {'data','parent','children','depth'};
+            n = numel(f);
+            s = struct();
+            for i = 1:n
+                s.(f{i}) = self.(f{i});
+            end
+            s.version = '0.1';
+            if nargin > 1, save(file,'-v7','-struct','s'); end
+        end
+        
+        function self=unserialise(self,s)
+        if ischar(s), s=load(s); end
+        switch s.version
+            case '0.1'
+                f = {'data','parent','children','depth'};
+                n = numel(f);
+                for i = 1:n
+                    self.(f{i}) = s.(f{i});
+                end
+            otherwise
+                error('Unknown version: %s',s.version);
+        end
+        end
+        
+    end
+    
+    % setup
     methods
         
         % constructor
@@ -84,31 +116,6 @@ classdef Node < handle
             self.parent = old2new(self.parent);
             self.children = old2new(self.children);
             assert( all([self.parent,self.children]), 'Error during remap (null index found).' );
-        end
-        
-        % serialisation
-        function s=serialise(self,file)
-            f = {'data','parent','children','depth'};
-            n = numel(f);
-            s = struct();
-            for i = 1:n
-                s.(f{i}) = self.(f{i});
-            end
-            s.version = '0.1';
-            if nargin > 1, save(file,'-v7','-struct','s'); end
-        end
-        function self=unserialise(self,s)
-        if ischar(s), s=load(s); end
-        switch s.version
-            case '0.1'
-                f = {'data','parent','children','depth'};
-                n = numel(f);
-                for i = 1:n
-                    self.(f{i}) = s.(f{i});
-                end
-            otherwise
-                error('Unknown version: %s',s.version);
-        end
         end
         
     end

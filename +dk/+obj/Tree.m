@@ -8,6 +8,7 @@ classdef Tree < handle
         n_nodes, n_leaves, n_parents;
     end
     
+    % dependent properties
     methods
         function n=get.n_nodes(self)
             n=sum([self.node.is_valid]);
@@ -20,6 +21,29 @@ classdef Tree < handle
         end
     end
     
+    % i/o
+    methods
+        
+        function s=serialise(self,file)
+            s.node = dk.arrayfun( @(n) n.serialise(), self.node, false );
+            s.version = '0.1';
+            if nargin > 1, save(file,'-v7','-struct','s'); end
+        end
+        
+        function self=unserialise(self,s)
+        if ischar(s), s=load(s); end
+        switch s.version
+            case '0.1'
+                self.node = dk.arrayfun( @(n) dk.obj.Node(n), s.node, false );
+                self.node = [self.node{:}];
+            otherwise
+                error('Unknown version: %s',s.version);
+        end
+        end
+        
+    end
+    
+    % setup
     methods
         
         function self = Tree(varargin)
@@ -31,6 +55,34 @@ classdef Tree < handle
             self.node = dk.obj.Node(1,1,varargin{:});
         end
         
+        % remove deleted nodes and re-index the tree
+        function self=cleanup(self)
+            
+            depth = [self.node.depth];
+            valid = [self.node.is_valid];
+            
+            % remap depth (this should not happen)
+            count = accumarray( 1+depth(:), 1 );
+            assert( all(count(2:end) > 0), 'Bug during removal.' );
+            
+            % remap valid indices, and sort by depth
+            [~,order] = sort(depth(valid));
+            old2new = zeros(size(self.node));
+            old2new(valid) = order;
+            
+            self.node = self.node(valid);
+            n = numel(self.node);
+            for i = 1:n
+                self.node(i).remap( old2new );
+            end
+            
+        end
+        
+    end
+    
+    % main
+    methods
+        
         % shape of the tree
         function [depth,width] = shape(self)
             depth = [self.node.depth];
@@ -38,23 +90,6 @@ classdef Tree < handle
             depth = depth(valid);
             width = accumarray( depth(:), 1 );
             depth = max(depth);
-        end
-        
-        % serialisation
-        function s=serialise(self,file)
-            s.node = dk.arrayfun( @(n) n.serialise(), self.node, false );
-            s.version = '0.1';
-            if nargin > 1, save(file,'-v7','-struct','s'); end
-        end
-        function self=unserialise(self,s)
-        if ischar(s), s=load(s); end
-        switch s.version
-            case '0.1'
-                self.node = dk.arrayfun( @(n) dk.obj.Node(n), s.node, false );
-                self.node = [self.node{:}];
-            otherwise
-                error('Unknown version: %s',s.version);
-        end
         end
         
         % add/remove single node
@@ -116,29 +151,6 @@ classdef Tree < handle
                 e = width(i);
                 L{i} = valid(b:e);
             end
-        end
-        
-        % remove deleted nodes and re-index the tree
-        function self=cleanup(self)
-            
-            depth = [self.node.depth];
-            valid = [self.node.is_valid];
-            
-            % remap depth (this should not happen)
-            count = accumarray( 1+depth(:), 1 );
-            assert( all(count(2:end) > 0), 'Bug during removal.' );
-            
-            % remap valid indices, and sort by depth
-            [~,order] = sort(depth(valid));
-            old2new = zeros(size(self.node));
-            old2new(valid) = order;
-            
-            self.node = self.node(valid);
-            n = numel(self.node);
-            for i = 1:n
-                self.node(i).remap( old2new );
-            end
-            
         end
         
         % traversal methods (note: the order is not guaranteed)
@@ -291,6 +303,7 @@ classdef Tree < handle
         
     end
     
+    % utils
     methods (Hidden)
         
         function w = compute_widths(self,sepfun)

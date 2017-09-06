@@ -46,7 +46,7 @@ function out = check_folder(folder)
     % make sure folder is not on path
     restore = false;
     folder  = dk.fs.realpath(folder);
-    if ~isempty(strfind(path,folder))
+    if ~isempty(strfind(path,folder)) %#ok
         rmpath(folder);
         restore = true;
     end

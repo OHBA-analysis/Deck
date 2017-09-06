@@ -95,6 +95,7 @@ classdef Sample < handle
         sparsity    % sparsity ratio (>0.2 means compression needed)
     end
     
+    % dependent properties
     methods
         
         function n = get.npts(self)
@@ -121,6 +122,37 @@ classdef Sample < handle
         
     end
     
+    % i/o
+    methods
+        
+        function s=serialise(self,file)
+            f = {'x','y','meta','used','last','bsize'};
+            n = numel(f);
+            s = struct();
+            for i = 1:n
+                s.(f{i}) = self.(f{i});
+            end
+            s.version = '0.1';
+            if nargin > 1, save(file,'-v7','-struct','s'); end
+        end
+        
+        function self=unserialise(self,s)
+        if ischar(s), s=load(s); end
+        switch s.version
+            case '0.1'
+                f = {'x','y','meta','used','last','bsize'};
+                n = numel(f);
+                for i = 1:n
+                    self.(f{i}) = s.(f{i});
+                end
+            otherwise
+                error('Unknown version: %s',s.version);
+        end
+        end
+        
+    end
+    
+    % setup
     methods
         
         function self = Sample(varargin)
