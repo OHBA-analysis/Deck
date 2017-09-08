@@ -40,11 +40,10 @@ classdef Node < handle
         function s=serialise(self,file)
             f = {'data','parent','children','depth'};
             n = numel(f);
-            s = struct();
+            s.version = '0.1';
             for i = 1:n
                 s.(f{i}) = self.(f{i});
             end
-            s.version = '0.1';
             if nargin > 1, save(file,'-v7','-struct','s'); end
         end
         

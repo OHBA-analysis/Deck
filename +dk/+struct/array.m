@@ -18,8 +18,18 @@ function sa = array( varargin )
 
     % make sure there are the same number of values for each field
     sizes = cellfun( @numel, values );
-    if nf > 1, assert( all(diff(sizes) == 0), 'Values should have the same size for each field.' ); end
-    ns = sizes(1); % number of structures
+    strval = cellfun( @ischar, values );
+    switch sum(~strval)
+        case 0 
+            ns = 1; % number of structures
+        case 1
+            ns = sizes(~strval);
+        otherwise
+            sizes = sizes(~strval);
+            ns = sizes(1);
+            assert( all(diff(sizes) == 0), ...
+                'Values should have the same size for each field.' ); 
+    end
 
     % create empty structure to allocate output
     mock = struct();
@@ -33,7 +43,9 @@ function sa = array( varargin )
     for i = 1:nf
         f = dk.str.to_substruct(fields{i});
 
-        if iscell(values{i})
+        if ischar(values{i})
+            for j = ns:-1:1, sa(j) = subsasgn( sa(j), f, values{i} ); end
+        elseif iscell(values{i})
             for j = ns:-1:1, sa(j) = subsasgn( sa(j), f, values{i}{j} ); end
         else
             for j = ns:-1:1, sa(j) = subsasgn( sa(j), f, values{i}(j) ); end

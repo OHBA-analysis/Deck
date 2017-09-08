@@ -25,8 +25,8 @@ classdef Tree < handle
     methods
         
         function s=serialise(self,file)
-            s.node = dk.arrayfun( @(n) n.serialise(), self.node, false );
             s.version = '0.1';
+            s.node = dk.arrayfun( @(n) n.serialise(), self.node, false );
             if nargin > 1, save(file,'-v7','-struct','s'); end
         end
         
@@ -207,93 +207,37 @@ classdef Tree < handle
         %    NodeEdge  Alias for MarkerEdgeColor
         %   NodeColor  Nx3 array of colours for each node
         %     ToolTip  Function handle to be called by datacursormode
+        %      Radial  Flag to draw the tree with radial geometry
         %
             
             opt = dk.obj.kwArgs(varargin{:});
+            name = opt.get('Name','[dk] Tree plot');
+            radial = opt.get('Radial',false);
             balance = opt.get('Balance',true);
             
-            % properties
-            depth = [self.node.depth];
-            D = max(depth);
-            N = self.n_nodes;
-            
-            % width and height
-            sepfun = opt.get( 'Sepfun', @(x)x );
-            width = self.compute_widths(sepfun);
-            height = width(1) ./ log10(9+(1:D));
-            
-            % parse options
-            linkopt = opt.get('Link', {} );
-            nodeopt = {'MarkerSize',opt.get('NodeSize',8),'MarkerEdgeColor',opt.get('NodeEdge','k')};
-            nodecol = opt.get('NodeColor',dk.cmap.interp( hsv(max(D,5)), depth ));
-            
-            % axis coordinate and offset for each node
-            coord = zeros(1,N);
-            offset = zeros(1,N);
-            
-            % open new figure for display
-            gobj.fig  = figure('Color','w','Name',opt.get('Name','[dk] Tree plot'));
-            gobj.node = gobjects(1,N);
-            gobj.link = gobjects(1,N); % first link is null
-            
-            % draw the root
-            coord(1) = width(1)/2;
-            gobj.node(1) = draw_node( width(1)/2, height(1), nodecol(1,:), nodeopt );
-            hold on;
-            
-            % draw tree level by level, starting from the root
-            for h = 1:D-1
-
-                % find nodes at that level, and their children
-                p = find( depth == h );
-
-                % draw the children of each parent
-                y = height(h+1);
-                np = numel(p);
-                for i = 1:np
-
-                    % skip if there are no children
-                    pi = p(i);
-                    if self.node(pi).is_leaf, continue; end
-                    
-                    % reorder children to balance the tree
-                    ci = self.node(pi).children;
-                    di = 1+self.node(pi).depth;
-                    nc = numel(ci);
-                    if balance
-                        ci = reorder_children( ci, width(ci) );
-                    end
-
-                    % draw the children in order
-                    x0 = offset(pi); % offset of the parent
-                    x0 = x0 + (width(pi) - sum(width(ci)))/2; % add separation increment
-                    for j = 1:nc
-                        cij = ci(j); 
-
-                        % save position of current node
-                        offset(cij) = x0;
-                        coord(cij) = x0 + width(cij)/2;
-
-                        % update offset for siblings
-                        x0 = x0 + width(cij);
-
-                        % draw node and link to parent
-                        glink = draw_link( coord(cij), y, coord(pi), height(h), linkopt );
-                        gnode = draw_node( coord(cij), y, nodecol(di,:), nodeopt );
-
-                        % save handles
-                        gobj.node(cij) = gnode;
-                        gobj.link(cij) = glink;
-
-                        % set datatip
-                        gnode.UserData.id = cij;
-                        glink.UserData.id = pi;
-                    end
-                end
-
-                fprintf('Level %d\n',h);
+            % compute widths
+            if radial
+                sepfun = opt.get( 'Sepfun', @(x)x/10 );
+            else
+                sepfun = opt.get( 'Sepfun', @(x)zeros(size(x)) );
             end
-            hold off; axis off;
+            nodes = self.compute_widths(sepfun);
+            
+            % drawing properties
+            defcol = hsv(max( nodes.d, 6 ));
+            linkopt = opt.get('Link', {} );
+            nodes = add_prop( nodes, ...
+                opt.get('NodeSize',0.2), ...
+                opt.get('NodeColor',dk.cmap.interp( defcol, nodes.depth )), ...
+                opt.get('NodeEdge','k') ...
+            );
+        
+            % draw the tree
+            if radial
+                gobj = self.radial_draw(name,nodes,balance,linkopt);
+            else
+                gobj = self.vertical_draw(name,nodes,balance,linkopt);
+            end
             
             % set data tip
             tooltip = opt.get( 'ToolTip', @datatip );
@@ -306,35 +250,230 @@ classdef Tree < handle
     % utils
     methods (Hidden)
         
-        function w = compute_widths(self,sepfun)
+        function nodes = compute_widths(self,sepfun)
         %
         % Compute the width required for displaying each node and its children.
         % The leaf nodes have a width of 1, which is equivalent to right and left margins of 1/2.
         %
-        % The width of leaf nodes is propagated to their parents (summing for all children), and then to 
-        % the grandparents, etc. Until we reach the root. Note that this _needs_ to be done level by level.
+        % The width of leaf nodes is propagated to their parents (summing for all children), then 
+        % to their grandparents, etc. Until we reach the root. 
+        % Note that this _needs_ to be done level by level.
         %
+        % Sepfun is used to insert a space between different families at each level. 
+        % This is done indirectly by adding width to nodes that are closer to the root. Then when
+        % we draw the nodes, the discrepancy between the width of the children, and that of the 
+        % parent, is the separation increment.
+        %
+        % The outputs are:
+        %   nod  Struct-array with fields {w,d,k} (width,depth,index) for each valid node.
+        %   tot  Total width at each depth (smaller vector).
+        %
+        % JH
 
             depth = [self.node.depth];
-            maxdepth = max(depth);
-            inc = sepfun(fliplr(0:maxdepth-1));
+            valid = [self.node.is_valid];
+            leaf  = [self.node.is_leaf];
+            
+            n = sum(valid);
+            d = depth(valid);
+            maxd = max(d);
+            inc = sepfun(fliplr(0:maxd-1));
 
             % initialise width
-            w = zeros(size(self.node));
-            w( [self.node.is_leaf] ) = 1; % set all leaves to 1
+            k = find(valid);
+            w = zeros(1,n);
+            w(leaf(valid)) = 1; % set all leaves to 1
 
             % propagate width level by level, starting from the bottom
-            for h = maxdepth:-1:2
-                k = find( depth == h );
-                p = [self.node(k).parent];
-                n = numel(k);
+            for h = maxd:-1:2
+                c = k( d == h );
+                p = [self.node(c).parent];
+                m = numel(c);
 
-                for i = 1:n
-                    w(k(i)) = w(k(i)) + inc(h);
-                    w(p(i)) = w(p(i)) + w(k(i));
+                for i = 1:m
+                    w(c(i)) = w(c(i)) + inc(h);
+                    w(p(i)) = w(p(i)) + w(c(i));
                 end
             end
+            
+            % compute total width for each level
+            tot = accumarray( d(:), w(:), [maxd,1] );
+            
+            % pack all this information
+            map(k) = 1:n; %disp(w)
+            nodes = struct( 'n', n, 'd', max(depth), ...
+                'width', w, 'depth', d, 'index', k, 'lw', tot, 'map', map );
 
+        end
+        
+        % draw tree with a vertical layout
+        function gobj = vertical_draw(self,name,nodes,balance,linkopt)
+
+            N = nodes.n;
+            D = nodes.d;
+            W = nodes.width;
+            %H = W(1) ./ log2(1+(1:D));
+            H = W(1) ./ sqrt(1:D);
+
+            % axis coordinate and offset for each node
+            coord = zeros(1,N);
+            offset = zeros(1,N);
+
+            % open new figure for display
+            gobj.fig  = figure('Color','w','Name',name);
+            gobj.node = gobjects(1,N);
+            gobj.link = gobjects(1,N); % first link is null
+
+            % draw the root
+            coord(1) = W(1)/2;
+            gobj.node(1) = draw_node( W(1)/2, H(1), nodes.prop(1) );
+            hold on;
+
+            % draw tree level by level, starting from the root
+            for d = 1:D-1
+
+                % find nodes at that level, and their children
+                p = nodes.index( nodes.depth == d );
+
+                % draw the children of each parent
+                y = H(d+1);
+                np = numel(p);
+                for j = 1:np
+
+                    % skip if there are no children
+                    pj = p(j);
+                    kj = nodes.map(pj);
+                    if self.node(pj).is_leaf, continue; end
+
+                    % reorder children to balance the tree
+                    cj = self.node(pj).children;
+                    wj = W(nodes.map(cj));
+                    nc = numel(cj);
+                    if balance
+                        cj = reorder_children( cj, wj );
+                    end
+
+                    % draw the children in order
+                    x0 = offset(kj); % offset of the parent
+                    x0 = x0 + (W(kj) - sum(wj))/2; % add separation increment
+                    for i = 1:nc
+                        cji = cj(i); 
+                        kji = nodes.map(cji);
+
+                        % save position of current node
+                        offset(kji) = x0;
+                        coord(kji) = x0 + W(kji)/2;
+
+                        % update offset for siblings
+                        x0 = x0 + W(kji);
+
+                        % draw node and link to parent
+                        glink = draw_link( coord(kji), y, coord(kj), H(d), linkopt );
+                        gnode = draw_node( coord(kji), y, nodes.prop(kji) );
+
+                        % set datatip
+                        gnode.UserData.id = cji;
+                        glink.UserData.id = pj;
+                        
+                        % save handles
+                        gobj.node(kji) = gnode;
+                        gobj.link(kji) = glink;
+                    end
+                end
+
+                fprintf('Level %d\n',d);
+            end
+            hold off; axis equal tight off;
+
+        end
+        
+        % draw tree with radial layout
+        function gobj = radial_draw(self,name,nodes,balance,linkopt)
+            
+            N = nodes.n;
+            D = nodes.d;
+            W = nodes.width;
+            L = max(nodes.lw);
+            
+            maxd = max(D);
+            R = 0:maxd-1;
+            F = 0.75;
+
+            % axis coordinate and offset for each node
+            angle = zeros(1,N);
+            offset = zeros(1,N);
+
+            % open new figure for display
+            gobj.fig  = figure('Color','w','Name',name);
+            gobj.node = gobjects(1,N);
+            gobj.link = gobjects(1,N); % first link is null
+
+            % draw the root
+            angle(1) = 0;
+            gobj.node(1) = draw_node( 0, 0, nodes.prop(1) );
+            hold on;
+
+            % draw tree level by level, starting from the root
+            for d = 1:D-1
+
+                % find nodes at that level, and their children
+                p = nodes.index( nodes.depth == d );
+                
+                % draw the children of each parent
+                r = R(d+1);
+                f = F;
+                np = numel(p);
+                for j = 1:np
+
+                    % skip if there are no children
+                    pj = p(j);
+                    kj = nodes.map(pj);
+                    aj = angle(kj);
+                    if self.node(pj).is_leaf, continue; end
+
+                    % reorder children to balance the tree
+                    cj = self.node(pj).children;
+                    wj = W(nodes.map(cj));
+                    nc = numel(cj);
+                    if balance
+                        cj = reorder_children( cj, wj );
+                    end
+
+                    % draw the children in order
+                    x0 = offset(kj); % offset of the parent
+                    x0 = x0 + (W(kj) - sum(wj))/2;
+                    for i = 1:nc
+                        cji = cj(i); 
+                        kji = nodes.map(cji);
+
+                        % save position of current node
+                        offset(kji) = x0;
+                        angle(kji) = 2*pi*f*(x0 + W(kji)/2)/L - pi*(0.5 + f);
+
+                        % update offset for siblings
+                        x0 = x0 + W(kji);
+                        aji = angle(kji);
+
+                        % draw node and link to parent
+                        glink = draw_link( r*cos(aji), r*sin(aji), R(d)*cos(aj), R(d)*sin(aj), linkopt );
+                        gnode = draw_node( r*cos(aji), r*sin(aji), nodes.prop(kji) );
+
+                        %fprintf( 'Node %d: %.2f\n', kji, 180*aji/pi );
+                        
+                        % set datatip
+                        gnode.UserData.id = cji;
+                        glink.UserData.id = pj;
+                        
+                        % save handles
+                        gobj.node(kji) = gnode;
+                        gobj.link(kji) = glink;
+                    end
+                end
+
+                fprintf('Level %d\n',d);
+            end
+            hold off; axis equal tight off;
+            
         end
         
     end
@@ -342,13 +481,51 @@ classdef Tree < handle
 end
 
 % Isolate functions which actually draw stuff.
-function h = draw_node(x,y,c,opt)
-    opt = [ opt, {'MarkerFaceColor',c} ];
+function h = draw_node2(x,y,p)
+    opt = { 'MarkerSize', p.size, 'MarkerFaceColor', p.face, 'MarkerEdgeColor', p.edge };
     h = plot(x,y,'o',opt{:});
+end
+function h = draw_node3(x,y,p)
+    opt = { 'FaceColor', p.face, 'EdgeColor', p.edge, 'LineWidth', 0.2 };
+    h = dk.ui.circle( [x,y], p.size, opt{:} );
+end
+function h = draw_node(x,y,p)
+    opt = { 'EdgeColor', p.edge, 'LineWidth', 0.2 };
+    h = dk.ui.disk( [x,y], p.size, 31, p.face, opt{:} );
 end
 
 function h = draw_link(x,y,xx,yy,opt)
     h = plot([x,xx],[y,yy],'k-',opt{:});
+end
+
+% make sure that input has n rows
+function x = check_size(x,n)
+    if iscell(x), x = vertcat(x{:}); end
+    if ischar(x) || size(x,1) < n
+        x = repmat(x,n,1);
+    end
+    assert( numel(x)==n || size(x,1)==n, 'Bad input size.' );
+end
+
+% create struct-array of node properties
+function nodes = add_prop(nodes,sz,fc,ec)
+
+    n = nodes.n;
+    assert( isnumeric(sz), 'Size should be numeric.' );
+    if numel(sz) < n, sz = sz*ones(n,1); end
+    assert( numel(sz)==n, 'Bad input size.' );
+    
+    fc = check_size(fc,n);
+    ec = check_size(ec,n);
+    
+    prop = dk.struct.repeat( {'size','face','edge'}, 1, n );
+    for i = 1:n
+        prop(i).size = sz(i);
+        prop(i).face = fc(i,:);
+        prop(i).edge = ec(i,:);
+    end
+    nodes.prop = prop;
+    
 end
 
 function txt = datatip(~,evt)

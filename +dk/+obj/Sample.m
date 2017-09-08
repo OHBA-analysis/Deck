@@ -128,11 +128,10 @@ classdef Sample < handle
         function s=serialise(self,file)
             f = {'x','y','meta','used','last','bsize'};
             n = numel(f);
-            s = struct();
+            s.version = '0.1';
             for i = 1:n
                 s.(f{i}) = self.(f{i});
             end
-            s.version = '0.1';
             if nargin > 1, save(file,'-v7','-struct','s'); end
         end
         
@@ -157,7 +156,9 @@ classdef Sample < handle
         
         function self = Sample(varargin)
             self.clear();
-            if nargin > 0
+            if nargin == 1 && isstruct(varargin{1})
+                self.unserialise(varargin{1});
+            elseif nargin > 1
                 self.reset(varargin{:});
             end
         end
@@ -197,12 +198,11 @@ classdef Sample < handle
             self.x(k,:) = x;
             self.y(k,:) = y;
             
-            if nargin > 3
-                if isstruct(varargin{1})
-                    self.meta(k) = varargin{1};
-                else
-                    self.meta(k) = struct(varargin{:});
-                end
+            n = nargin - 3;
+            for i = 1:2:n
+                field = varargin{i};
+                value = varargin{i+1};
+                self.meta(k).(field) = value;
             end
         end
         function k = addn(self,x,y,varargin)
@@ -219,12 +219,11 @@ classdef Sample < handle
             self.x(k,:) = x;
             self.y(k,:) = y;
             
-            if nargin > 3
-                if isstruct(varargin{1})
-                    self.meta(k) = varargin{1};
-                else
-                    self.meta(k) = dk.struct.array(varargin{:});
-                end
+            n = nargin - 3;
+            for i = 1:2:n
+                field = varargin{i};
+                value = varargin{i+1};
+                self.meta(k).(field) = value;
             end
         end
         function [x,y,m] = data(self,k)

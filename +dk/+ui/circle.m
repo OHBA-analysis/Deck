@@ -1,16 +1,21 @@
-function h = circle( R, C, npts, varargin )
+function h = circle( C, R, varargin )
 %
-% h = dk.ui.circle( radius, centre=[0 0], npts=51, varargin )
+% h = dk.ui.circle( centre, radius=1, varargin )
 %
 % Draw a circle with specified centre and radius.
-% Additional arguments are forwarded to plot, and the output is a handle to the plot.
+% Additional arguments are forwarded to rectangle, and the output is a graphical handle.
+%
+% There are 4 properties:
+%   - EdgeColor
+%   - FaceColor
+%   - LineWidth
+%   - LineStyle
 %
 % JH
 
-    if nargin < 2 || isempty(C), C=[0 0]; end
-    if nargin < 3 || isempty(npts), npts=51; end
+    if nargin < 1 || isempty(C), C=[0,0]; end
+    if nargin < 2 || isempty(R), R=1; end
 
-    t = linspace(0,2*pi,npts);
-    h = plot( C(1)+R*cos(t), C(2)+R*sin(t), varargin{:} );
+    h = rectangle( 'Position', [C-R,2*R,2*R], 'Curvature', [1,1], varargin{:} );
 
 end
