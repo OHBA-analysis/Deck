@@ -10,14 +10,18 @@ classdef Tree < handle
     
     % dependent properties
     methods
+        function v=valid(self) % quick function to find valid nodes
+            v=[self.node.depth] > 0;
+        end
+        
         function n=get.n_nodes(self)
-            n=sum([self.node.is_valid]);
+            n=sum(self.valid());
         end
         function n=get.n_leaves(self)
-            n=sum([self.node.is_valid] & [self.node.is_leaf]);
+            n=sum(self.valid() & [self.node.is_leaf]);
         end
         function n=get.n_parents(self)
-            n=sum([self.node.is_valid] & ~[self.node.is_leaf]);
+            n=sum(self.valid() & ~[self.node.is_leaf]);
         end
     end
     
@@ -59,7 +63,7 @@ classdef Tree < handle
         function self=cleanup(self)
             
             depth = [self.node.depth];
-            valid = [self.node.is_valid];
+            valid = depth > 0;
             
             % remap depth (this should not happen)
             count = accumarray( 1+depth(:), 1 );
@@ -85,9 +89,7 @@ classdef Tree < handle
         
         % shape of the tree
         function [depth,width] = shape(self)
-            depth = [self.node.depth];
-            valid = [self.node.is_valid];
-            depth = depth(valid);
+            depth = nonzeros([self.node.depth]);
             width = accumarray( depth(:), 1 );
             depth = max(depth);
         end
@@ -123,7 +125,7 @@ classdef Tree < handle
             end
         end
         
-        % semantic access to nodes
+        % proxy for node properties
         function N=root(self)
             N=self.node(1);
         end
@@ -134,27 +136,60 @@ classdef Tree < handle
             N=self.node( self.node(k).children );
         end
         
-        % group by level
-        function L=levels(self)
+        function [L,N] = levels(self)
+        % 
+        % [L,N] = levels(self)
+        %
+        % Group nodes by level, and return a cell with indices for each level.
+        % If second output is collected, it contains a cell of node-structs.
+        % 
+        % JH
+        
             depth = [self.node.depth];
             valid = find([self.node.is_valid]);
             
             [depth,order] = sort(depth(valid),'ascend');
             valid = valid(order);
-            width = [find(diff(depth)==1), numel(depth)];
+            stride = [find(diff(depth)==1), numel(depth)];
             
-            n = numel(width);
+            n = numel(stride);
             L = cell(1,n);
             e = 0;
             for i = 1:n
                 b = e+1;
-                e = width(i);
+                e = stride(i);
                 L{i} = valid(b:e);
+            end
+            
+            if nargout > 1
+                N = dk.cellfun( @(ind) self.node(ind), L, false );
             end
         end
         
-        % traversal methods (note: the order is not guaranteed)
+        function N = level(self,D)
+        %
+        % N = level(self,D)
+        %
+        % Get a struct-array of nodes at a given depth.
+        %
+        % JH
+        
+            N = self.node( [self.node.depth] == D );
+        end
+        
+        
+        % traversal methods
         function bfs(self,callback,cur)
+        %
+        % bfs(self,callback)
+        %
+        % Breadth-first traversal methods.
+        % Note that the order of traversal is not guaranteed.
+        % The callback function is called as follows:
+        %
+        %   callback( node_index, node )
+        %
+        
             if nargin < 3, cur = 1; end
             next = cell(size(cur));
             for i = 1:length(cur)
@@ -168,6 +203,16 @@ classdef Tree < handle
             end
         end
         function dfs(self,callback,cur)
+        %
+        % dfs(self,callback)
+        %
+        % Depth-first traversal methods.
+        % Note that the order of traversal is not guaranteed.
+        % The callback function is called as follows:
+        %
+        %   callback( node_index, node )
+        %
+        
             if nargin < 3, cur=1; end
             assert( isscalar(cur), 'Expected a single node.' );
             curnode = self.node(cur);
@@ -178,40 +223,61 @@ classdef Tree < handle
             end
         end
         
-        % print to file (or console by default)
         function print(self,fid)
+        %
+        % print(self,fid)
+        %
+        % Print to file (or console by default).
+        % Each line has one of the two following format:
+        %
+        %   ParentID>NodeID [Depth] : NChildren children, NFields data-fields
+        %   #NodeID [Depth] : DELETED
+        % 
+        %JH
+        
             if nargin < 2, fid=1; end
             N = self.n_nodes;
             for i = 1:N 
                 Ni = self.node(i);
                 if Ni.is_valid
-                    fprintf( fid, '%d [%d] : %d children, %d data-fields\n', ...
-                        i, Ni.depth, numel(Ni.children), numel(Ni.fields) );
+                    fprintf( fid, '%d>%d [%d] : %d children, %d data-fields\n', ...
+                        Ni.parent, i, Ni.depth, numel(Ni.children), numel(Ni.fields) );
                 else
-                    fprintf( fid, '%d [%d] : DELETED\n', i, Ni.depth );
+                    fprintf( fid, '#%d [%d] : DELETED\n', i, Ni.depth );
                 end
             end
         end
         
         function gobj = plot(self,varargin)
         %
-        % Draw the tree in a figure.
+        % gobj = plot(self,varargin)
+        %
+        % Draw the tree.
         %
         % Options:
         %
-        %        Name  Figure name
-        %        Link  Link options (see line options)
+        %      Newfig  Open new figure to draw.
+        %             >Default: true
+        %        Link  Link options (cf Line properties)
+        %             >Default: {} (none)
         %      Sepfun  Function of the depth adding width to separate branches
+        %             >Default: @(x)x/10 or @(x)zeros(size(x))
         %     Balance  Balancing flag (children reordering)
-        %    NodeSize  Alias for MarkerSize
-        %    NodeEdge  Alias for MarkerEdgeColor
-        %   NodeColor  Nx3 array of colours for each node
+        %             >Default: true
+        %    NodeSize  Size of the node
+        %             >Default: 0.2
+        %   NodeColor  Face-color of the node
+        %             >Default: hsv colormap
+        %    NodeEdge  Colour of the edges
+        %             >Default: 'k'
         %     ToolTip  Function handle to be called by datacursormode
+        %             >Default: shows "id: NodeID"
         %      Radial  Flag to draw the tree with radial geometry
+        %             >Default: false
         %
+        % JH
             
             opt = dk.obj.kwArgs(varargin{:});
-            name = opt.get('Name','[dk] Tree plot');
             radial = opt.get('Radial',false);
             balance = opt.get('Balance',true);
             
@@ -233,10 +299,13 @@ classdef Tree < handle
             );
         
             % draw the tree
+            if opt.get('Newfig',true)
+                figure('Color','w','Name','[dk] Tree plot');
+            end
             if radial
-                gobj = self.radial_draw(name,nodes,balance,linkopt);
+                gobj = self.radial_draw(nodes,balance,linkopt);
             else
-                gobj = self.vertical_draw(name,nodes,balance,linkopt);
+                gobj = self.vertical_draw(nodes,balance,linkopt);
             end
             
             % set data tip
@@ -307,7 +376,7 @@ classdef Tree < handle
         end
         
         % draw tree with a vertical layout
-        function gobj = vertical_draw(self,name,nodes,balance,linkopt)
+        function gobj = vertical_draw(self,nodes,balance,linkopt)
 
             N = nodes.n;
             D = nodes.d;
@@ -320,7 +389,6 @@ classdef Tree < handle
             offset = zeros(1,N);
 
             % open new figure for display
-            gobj.fig  = figure('Color','w','Name',name);
             gobj.node = gobjects(1,N);
             gobj.link = gobjects(1,N); % first link is null
 
@@ -381,14 +449,14 @@ classdef Tree < handle
                     end
                 end
 
-                fprintf('Level %d\n',d);
+                %fprintf('Level %d\n',d);
             end
             hold off; axis equal tight off;
 
         end
         
         % draw tree with radial layout
-        function gobj = radial_draw(self,name,nodes,balance,linkopt)
+        function gobj = radial_draw(self,nodes,balance,linkopt)
             
             N = nodes.n;
             D = nodes.d;
@@ -404,7 +472,6 @@ classdef Tree < handle
             offset = zeros(1,N);
 
             % open new figure for display
-            gobj.fig  = figure('Color','w','Name',name);
             gobj.node = gobjects(1,N);
             gobj.link = gobjects(1,N); % first link is null
 
@@ -470,7 +537,7 @@ classdef Tree < handle
                     end
                 end
 
-                fprintf('Level %d\n',d);
+                %fprintf('Level %d\n',d);
             end
             hold off; axis equal tight off;
             

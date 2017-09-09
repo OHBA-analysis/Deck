@@ -205,7 +205,7 @@ classdef Sample < handle
                 self.meta(k).(field) = value;
             end
         end
-        function k = addn(self,x,y,varargin)
+        function k = addn(self,x,y)
             n = size(x,1);
             self.reserve(n);
             
@@ -218,13 +218,6 @@ classdef Sample < handle
             
             self.x(k,:) = x;
             self.y(k,:) = y;
-            
-            n = nargin - 3;
-            for i = 1:2:n
-                field = varargin{i};
-                value = varargin{i+1};
-                self.meta(k).(field) = value;
-            end
         end
         function [x,y,m] = data(self,k)
             x = self.x(k,:);
@@ -285,6 +278,14 @@ classdef Sample < handle
                     k = idx(i);
                     callback( k, self.x(k,:), self.y(k,:), self.meta(k) );
                 end
+            end
+        end
+        
+        % bulk assign of metadata field by copying the value
+        function self = assign(self,index,field,value)
+            n = numel(index);
+            for i = 1:n
+                self.meta(index(i)).(field) = value;
             end
         end
         

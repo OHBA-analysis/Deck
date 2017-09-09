@@ -24,7 +24,7 @@ classdef Node < handle
             f=fieldnames(self.data);
         end
         function y=get.is_empty(self)
-            y=(numel(self.fields) > 0);
+            y=(numel(self.fields) == 0);
         end
         function y=get.is_valid(self)
             y=(self.depth > 0);
