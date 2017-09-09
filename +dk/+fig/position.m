@@ -1,5 +1,7 @@
 function [cp,hw,sn] = position(f)
 %
+% [cp,hw,sn] = dk.fig.position(f)
+%
 % cp : center pixel
 % hw : height x width
 % sn : screen number

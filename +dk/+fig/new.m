@@ -11,12 +11,21 @@ function f = new( name, figsize, screen, varargin )
 %
 % JH
 
-    f = figure( 'name', name, varargin{:} );
-    if nargin > 2 && ~isempty(screen)
+    if nargin < 3, screen=[]; end
+    if nargin < 2, figsize=[]; end
+    if nargin < 1, name=''; end
+    
+    if isempty(name)
+        f = figure( varargin{:} );
+    else
+        f = figure( 'Name', name, varargin{:} );
+    end
+    
+    if ~isempty(screen)
         dk.fig.movetoscreen(f,screen);
     end
-    if nargin > 1 && ~isempty(figsize)
-        dk.fig.resize( f, figsize );
+    if ~isempty(figsize)
+        dk.fig.resize(f,figsize);
     end
 
 end

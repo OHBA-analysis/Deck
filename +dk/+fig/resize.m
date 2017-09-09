@@ -1,8 +1,13 @@
 function resize( f, height, width )
 % 
-% Resize the window of figure "fig" to a size given in pixels.
+% dk.fig.resize( f, [h,w] )
+% dk.fig.resize( f, h, w )
+%
+% Resize the window of figure "fig" to a given size.
+% If both sizes are between 0 and 1, the sizes are interpreted relative 
+% to the current screen size.
 % 
-% Contact: jhadida [at] fmrib.ox.ac.uk
+% JH
 
     if nargin == 2
         width  = height(2);
@@ -34,7 +39,8 @@ function resize( f, height, width )
         wh = fliplr(hw .* si.size);
     end
 
-    u = get(f,'units'); set(f,'units','pixels');
+    u = get(f,'units'); 
+    set(f,'units','pixels');
     set( f, 'position', [ si.centre-wh/2, wh ] );
     set(f,'units',u);
 
