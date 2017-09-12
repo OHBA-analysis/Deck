@@ -15,4 +15,12 @@ function [tstat,t] = timeit( nrep, fun, varargin )
     end
     t = diff([0,t]);
     tstat = [mean(t),std(t),median(t)];
+    
+    if nargout == 0
+        astr = dk.time.sec2str(tstat(1));
+        sstr = dk.time.sec2str(tstat(2));
+        mstr = dk.time.sec2str(tstat(3));
+        dk.println( 'Runtime:\n\t avg %s\n\t std %s\n\t med %s', astr, sstr, mstr );
+    end
+    
 end

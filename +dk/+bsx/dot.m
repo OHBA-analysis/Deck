@@ -1,4 +1,5 @@
 function C = dot( A, B, dim )
+%
 % C = dk.bsx.dot( A, B, dim )
 %
 % A vectorized version of the dot-product (called "singleton-expansion" in Matlab).
@@ -10,7 +11,7 @@ function C = dot( A, B, dim )
 % Output:
 %	C is an array of size max(size(A),size(B)), with the constraint size(C,dim) == 1.
 %
-% Contact: jhadida [at] fmrib.ox.ac.uk
+% JH
 
     if nargin < 3, dim = 1; end
     C = sum(bsxfun(@times,A,B),dim);

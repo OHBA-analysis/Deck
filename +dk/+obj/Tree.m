@@ -177,6 +177,31 @@ classdef Tree < handle
             N = self.node( [self.node.depth] == D );
         end
         
+        function [C,N] = descent(self,k)
+        %
+        % C = descent(self,k)
+        %
+        % List of node indices for all nodes descending from node k.
+        % If second output is requested, then the function returns a vector
+        % with the corresponding nodes.
+        %
+        % JH
+        
+            C = {};
+            t = self.node(k).children;
+            
+            while ~isempty(t)
+                C{end+1} = t; %#ok
+                t = [ self.node(t).children ];
+            end
+            
+            C = [C{:}];
+            if nargout > 1
+                N = self.node(C);
+            end
+
+        end
+        
         
         % traversal methods
         function bfs(self,callback,cur)
@@ -465,7 +490,9 @@ classdef Tree < handle
             
             maxd = max(D);
             R = 0:maxd-1;
-            F = 0.75;
+            %R = R.*log1p(R);
+            %R = R.*sqrt(R);
+            F = 0.85;
 
             % axis coordinate and offset for each node
             angle = zeros(1,N);
