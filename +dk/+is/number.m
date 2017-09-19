@@ -1,3 +1,3 @@
 function y = number(varargin)
-    y = cellfun( @(x) isnumeric(x) && isscalar(x), varargin, 'UniformOutput', true );
+    y = dk.cellfun( @(x) isnumeric(x) && isscalar(x), varargin, true );
 end
