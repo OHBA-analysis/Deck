@@ -48,22 +48,49 @@ This should create **two** new files in the current directory:
  - `MyProcessingTask.m`
  - `MyProcessingTask.mapred.json`
 
-The first file contains a class definition with two methods.
+The first file contains a **class definition** with two methods:
 
- - `inputs = get_inputs(self,index)`: this method should return the parameters (as a struct) for the iteration corresponding to the input index, or a struct-array for **all** (resp. a subset of) iterations if called without index (resp. with an array of indices).
- You might also want to have a look at `dk.struct.array` for a practical implementation.
- - `output = process(self,inputs,folder,varargin)`: this method should run the computations of interest for a given structure of inputs, and will be invoked with a folder name to save intermediary results, and an additional structure of options if you specified any (see configuration below).
+ - `inputs = get_inputs(self,index)`: if called with a single index, this method should return a struct of parameters for the corresponding iteration.
+ Otherwise if called with an array of indices (or without input), it should return a struct-array for the corresponding iterations (or all iterations).
+ You might want to have a look at `dk.struct.array` for a practical implementation.
+ - `output = process(self,inputs,folder,varargin)`: this method should run the computations of interest for a given struct of parameters, and will be invoked with a folder where intermediary results can be saved, and an additional structure of options if you specified it (see configuration below). For testing purposes (before you run it on the cluster), you might want to implement this method to accept only one input.
 
-Note that for testing the processing locally on your machine, before you run it on the cluster, you may want to implement the method `process` such that it requires a single argument.
+The second file contains **processing options** with five main categories:
+
+ - `id`: this field is assigned automatically when calling `dk.mapred.init`;
+ - `cluster`: assigned by `set_cluster` during configuration, and contains options to be passed to `fs_sub`, such as the queue name, your e-mail, and the name of your process;
+ - `exec`: assigned by `configure` during configuration, and contains all necessary information to distribute the computations on the cluster;
+ - `folders`: assigned by `set_folders` during configuration, the paths of the various folders
+ - `files`: the names of the files aggregating the main outputs, you may want to customise this;
+
+## Configuration
+
+The methods to call are in `dk.mapred.Abstract`, specifically:
+
+ - `configure`: number of workers and options, the number of jobs is given by the length of the struct-array returned by `get_inputs()`;
+ - `set_cluster`: set cluster options, such as queue name and e-mail;
+ - `set_folder`: set working folders.
+
+## Running on the cluster
+
+Call `mapred_build`.
+
+While it runs, track the task that are finished with `mapred_status`.
+
+Once it has run, call `mapred_backup`.
 
 ## Creating your own template
 
+Put them in folder `dk.mapred.path('templates')`.
+You can use `${variable}` syntax in the class template.
 
+Available templates can be listed with `dk.mapred.list_templates`.
 
-- Installation
-- Configuration
-- `dk.mapred.install`
-- `dk.mapred.Abstract`
-- `dk.mapred.init`
-- Templates
-- Python interface
+When calling `dk.mapred.init`, the second argument is the name of the template, and the third argument allows you to specify interpolation strings for template `${variables}`.
+
+## TODO
+
+ - Create Python module instead of independent scripts.
+ - Create abstract cluster interface, and implement one for `fsl_sub`.
+ - Instead of the fourth argument in `dk.mapred.init`, add a method to `dk.mapred.Abstract` to edit any first-level field in the configuration.
+ - Make `start` folder optional (if empty, don't put it in the Matlab command).
