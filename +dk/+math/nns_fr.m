@@ -20,6 +20,7 @@ function k = nns_fr( x, q, r )
 
     n = size(q,1);
     k = cell(1,n);
+    if isscalar(r), r=r*ones(1,n); end
     
     % filter points within an L1 distance of r
     for i = 1:n
