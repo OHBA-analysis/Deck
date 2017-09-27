@@ -62,23 +62,12 @@ function [frq,dfc] = fourier_transform( vals, fs, npts )
     else
 
         % shift the spectrum to center frequencies around 0
-        dfc = myshift( dfc );
+        dfc = dk.math.fftshift( dfc );
         frq = ( floor(1-npts/2):(npts/2) )*df;
 
     end
 
     % make sure frq is a column vector
     frq = frq(:);
-
-end
-
-% Matlab's fftshift puts the Nyquist frequency as the lowest negative frequency.
-% For consistency with the real-input one-sided output, we implement our own shift, in which
-% the Nyquist frequency is kept as the last positive frequency.
-function y = myshift( x )
-
-    n = size(x,1);
-    m = floor( n/2 + 1 );
-    y = vertcat( x(m+1:end,:), x(1:m,:) );
 
 end
