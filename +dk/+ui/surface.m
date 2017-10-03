@@ -56,6 +56,6 @@ function h = surface( x, y, z, varargin )
     end
     
     % axes
-    axis vis3d tight; grid on; box off;
+    axis tight vis3d; grid on; box off;
     
 end
