@@ -18,5 +18,6 @@ function style = export( fig, fname, style )
     end
     
     hgexport( fig, fname, style );
+    dk.println( '[dk.fig.export] Saved as: %s', fname );
     
 end
