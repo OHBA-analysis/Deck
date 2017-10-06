@@ -1,8 +1,11 @@
 function tile( gsize, figures, screen )
 % 
-% ui.fig.tile( grid_size, figcell )
+% dk.fig.tile( gsize, figures, screen )
 %
 % Move and resize a group of figures given in input according to a specified grid size [nrows, ncols].
+% figures should be a cell of figure handles, or a vector of figure numbers.
+%
+% If screen is not specified, the tile is done on the screen that contains most of the figures listed.
 % 
 % JH
 
