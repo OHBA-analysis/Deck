@@ -63,7 +63,6 @@ function val = parse_value(car)
             if car.rem >= 3 && strcmpi(car.sub(4), 'null')
                 val = [];
                 car.inc(4);
-                return;
             end
     end
 end
