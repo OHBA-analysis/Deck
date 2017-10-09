@@ -61,23 +61,26 @@ function [best,step] = dichotomy( is_greater_than, range, maxerr, maxshift )
     assert( maxerr > eps, 'Maxerr is too small.' );
     
     % adjust range by shifting it left or right
-    shift = 0;
-    while ~is_greater_than(range(1))
-        if shift < maxshift
-            range = range - delta;
-            shift = shift + 1;
-        else
-            error( 'Search range should be lower.' );
+    if maxshift > 0
+        shift = 0;
+        while ~is_greater_than(range(1))
+            if shift < maxshift
+                range = range - delta;
+                shift = shift + 1;
+            else
+                error( 'Search range should be lower.' );
+            end
+        end
+        while is_greater_than(range(2))
+            if shift < maxshift
+                range = range + delta;
+                shift = shift + 1;
+            else
+                error( 'Search range should be higher.' );
+            end
         end
     end
-    while is_greater_than(range(2))
-        if shift < maxshift
-            range = range + delta;
-            shift = shift + 1;
-        else
-            error( 'Search range should be higher.' );
-        end
-    end
+    
     
     % dichotomy search
     best = mean(range);
