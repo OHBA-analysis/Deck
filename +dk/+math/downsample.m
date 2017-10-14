@@ -20,7 +20,10 @@ function [y, ty]  = downsample( x, tx, fs, win )
     
     % check that fs is greater than current sampling rate
     newdt = 1/fs;
-    if abs(newdt-dt) < eps, y=x; ty=tx; return; end
+    if abs(newdt-dt)/newdt < 1e-6
+        y=x; ty=tx; 
+        return; 
+    end
     assert( newdt > dt, 'Requested sampling rate is higher than current one, use dk.math.upsample instead.' );
     
     % save last timepoint

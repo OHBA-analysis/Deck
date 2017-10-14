@@ -8,7 +8,7 @@ function s = stats( X, dim, red )
 % JH
 
     if nargin < 2, dim = 1; end
-    if nargin < 3, red = @(x) x; end
+    if nargin < 3, red = @dk.forward; end
 
     s = struct( ...
         'mean', red(nanmean(X,dim)), ...
