@@ -1,7 +1,7 @@
 classdef Datastore < handle
     
     properties
-        folder;
+        folder; % the folder bound to the datastore
     end
     
     methods
@@ -18,6 +18,15 @@ classdef Datastore < handle
         end
                 
         function assign(self,folder,create)
+        %
+        % assign(self,folder,create=false)
+        %
+        %   Binds input folder to datastore instance.
+        %   Input folder is resolved (follow symlinks) beforehand.
+        %   If create is false, and folder does not already exist, an error is thrown.
+        % 
+        % JH
+        
             if nargin < 3, create=false; end
             
             folder = dk.fs.realpath(folder);
@@ -31,22 +40,34 @@ classdef Datastore < handle
         end
         
         function f = file(self,varargin)
+        % Full path to file (extension MUST be set manually)
             f = fullfile(self.folder,varargin{:});
         end
         
         function f = matfile(self,varargin)
+        % Full path to MAT file with extension
             f = dk.str.set_ext( self.file(varargin{:}), 'mat' );
         end
         
         function y = exists(self,varargin)
+        % Check whether relative path exists
             y = dk.fs.is_file( self.file(varargin{:}) );
         end
         
         function f = find(self,varargin)
+        % Find pattern in folder
             f = dir(fullfile( self.folder, varargin{:} ));
         end
         
         function f = save(self,name,varargin)
+        %
+        % save(self,name,varargin)
+        %
+        % Save input to f = self.matfile(name).
+        % Input can either be a struct, or a key/value list.
+        % MAT file is saved with -v7 option.
+        %
+        % JH
             
             dk.reject( isempty(self.folder), '[dk.Datastore] Folder is not set.' );
             
@@ -70,6 +91,21 @@ classdef Datastore < handle
         end
         
         function varargout = load(self,name,varargin)
+        %
+        % load(self,name,varargin)
+        %
+        % Load self.matfile(name) from the storage folder.
+        % Specific variables can be retrieved by specifying them in input.
+        % If the fieldname does not exist, the default value is [].
+        %
+        % Several outputs possible:
+        %
+        %   x = load('myfile.mat','foo'); % x=foo
+        %   x = load('myfile.mat','foo','bar'); % x=struct({foo,bar})
+        %   [x,y] = load('myfile.mat','foo','bar'); % x=foo and y=bar
+        %   [x,y] = load('myfile.mat','foo','bar','baz'); % x=foo and y=bar
+        %
+        % JH
             
             dk.reject( isempty(self.folder), '[dk.Datastore] Folder is not set.' );
             

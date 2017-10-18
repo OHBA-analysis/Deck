@@ -1,8 +1,8 @@
-function h = home()
+function h = home(varargin)
 %
 % On UNIX systems, returns the value of the environment variable $HOME.
 %
-% Contact: jhadida [at] fmrib.ox.ac.uk
+% JH
 
-    h = getenv('HOME');
+    h = fullfile( getenv('HOME'), varargin{:} );
 end
