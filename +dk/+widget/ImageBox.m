@@ -56,7 +56,7 @@ classdef ImageBox < handle
         % 
         function self = set_images(self,data)
         
-            assert( isstruct(img) && all(isfield(img,{'img','name','opt'})), 'Bad input data.' );
+            assert( dk.is.struct(img,{'img','name','opt'}), 'Bad input data.' );
             self.images = data;
             
             if self.check_handle('popup')

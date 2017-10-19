@@ -1,5 +1,6 @@
-function [M,blocks] = block_diagonal( n, blocks )
-% M = block_diagonal( n, blocks )
+function [M,blocks] = blkdiag( n, blocks )
+% 
+% M = dk.mtx.blkdiag( n, blocks )
 %
 % Create a nxn logical block-diagonal matrix.
 %

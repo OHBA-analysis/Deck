@@ -1,6 +1,6 @@
 function [c,o] = matlab(n)
 % 
-% c = matlab( n=7 )
+% c = matlab( n=7, reorder=false )
 %
 % Default Matlab colors in 2016+
 %
