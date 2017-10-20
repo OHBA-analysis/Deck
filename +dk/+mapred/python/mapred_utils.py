@@ -82,7 +82,7 @@ def find_config():
         return os.path.join( os.getcwd(), 'config.json' )
 
     # Don't know what else to do
-    raise "Could not find configuration file!"
+    raise Exception("Could not find configuration file!")
 
 # Parse config file, validate fields and reformat if needed
 def parse_config(filename):
@@ -140,7 +140,7 @@ def parse_config(filename):
         try:
             cfg['worker'] % (1)
         except:
-            raise "[files.worker] Worker filename cannot be formatted."
+            raise Exception("[files.worker] Worker filename cannot be formatted.")
 
     def _parse_folders(cfg):
 
