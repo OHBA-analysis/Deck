@@ -1,6 +1,6 @@
 function x = fftshift(x,dim)
 %
-% x = dk.math.fftshift(x,dim=ns)
+% x = dk.ts.fftshift(x,dim=ns)
 %
 % Matlab's fftshift puts the Nyquist frequency as the lowest negative frequency.
 % For consistency with the real-input one-sided output, we implement our own shift, in which

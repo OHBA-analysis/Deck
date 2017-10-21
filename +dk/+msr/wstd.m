@@ -1,6 +1,6 @@
 function s = wstd( x, w, dim )
 %
-% s = dk.math.wstd( x, w, dim=1 )
+% s = dk.msr.wstd( x, w, dim=1 )
 %
 % Compute weighted std of input sample along specified dimension.
 %

@@ -32,7 +32,7 @@ function [ph,fh] = plot_prctile( x, y, lo, hi, popts, fopts )
         fopts = {'LineWidth',1,'EdgeColor',color_red,'FaceAlpha',.7};
     end
     
-    [y,x] = dk.util.format_ts(y,x,'vert');
+    [y,x] = dk.ts.format(y,x,'vert');
     assert( isscalar(lo) && isscalar(hi), 'Lower/higher percentiles should integers between 0 and 100.' );
     
     n = size(y,2);

@@ -7,6 +7,6 @@ function R = between_vectors( v1, v2 )
     
     cr = cross(v1,v2);
     ag = atan2( norm(cr), sum(v1.*v2) );
-    R  = dk.math.rotation.from_axis_angle(cr,ag);
+    R  = dk.rot.from_axis_angle(cr,ag);
 
 end

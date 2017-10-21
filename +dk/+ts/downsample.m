@@ -1,6 +1,6 @@
 function [y, ty]  = downsample( x, tx, fs, win )
 %
-% [y, ty] = dk.math.downsample( x, tx, fs, win=hamming )
+% [y, ty] = dk.ts.downsample( x, tx, fs, win=hamming )
 %
 % Downsample a time-series using sliding-window.
 %
@@ -10,7 +10,7 @@ function [y, ty]  = downsample( x, tx, fs, win )
     
     if nargin < 4, win = 'hamming'; end
     
-    [x,tx] = dk.util.format_ts(x,tx,'vertical');
+    [x,tx] = dk.ts.format(x,tx,'vertical');
     
     % make sure input is sampled arithmetically
     dt = diff(tx);
@@ -24,7 +24,7 @@ function [y, ty]  = downsample( x, tx, fs, win )
         y=x; ty=tx; 
         return; 
     end
-    assert( newdt > dt, 'Requested sampling rate is higher than current one, use dk.math.upsample instead.' );
+    assert( newdt > dt, 'Requested sampling rate is higher than current one, use dk.ts.upsample instead.' );
     
     % save last timepoint
     tlast = tx(end);
@@ -36,9 +36,9 @@ function [y, ty]  = downsample( x, tx, fs, win )
     
     % if too large, upsample to a suitable rate before downsampling
     if PREC(actual_fs,target_fs) < 2 % the two MSD must be equal
-        dk.debug('[dk.math.downsample] Upsampling before downsampling to correct for frequency discrepancy.');
+        dk.debug('[dk.ts.downsample] Upsampling before downsampling to correct for frequency discrepancy.');
         newdt  = newdt / ceil(newdt/dt);
-        [x,tx] = dk.math.upsample( x, tx, 1/newdt, 'linear' );
+        [x,tx] = dk.ts.upsample( x, tx, 1/newdt, 'linear' );
     end
     
     % compute sliding parameters
@@ -47,7 +47,7 @@ function [y, ty]  = downsample( x, tx, fs, win )
     nwin  = 1 + floor( (size(x,1) - wsize)/wstep );
     
     % prepare window
-    wy = dk.math.window( win, wsize );
+    wy = dk.ts.window( win, wsize );
     wy = wy(:)' / sum(wy);
     
     % sliding average

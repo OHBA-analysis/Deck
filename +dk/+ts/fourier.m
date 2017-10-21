@@ -1,4 +1,4 @@
-function [frq,dfc] = fourier_transform( vals, fs, npts )
+function [frq,dfc] = fourier( vals, fs, npts )
 % FOURIER_TRANSFORM computes the Fast Fourier Transform of a given time-series.
 % Fo real inputs, the positive spectrum is returned with correctly scaled amplitude/power.
 % For complex inputs, the full spectrum centered around frequency 0 is returned.
@@ -62,7 +62,7 @@ function [frq,dfc] = fourier_transform( vals, fs, npts )
     else
 
         % shift the spectrum to center frequencies around 0
-        dfc = dk.math.fftshift( dfc );
+        dfc = dk.ts.fftshift( dfc );
         frq = ( floor(1-npts/2):(npts/2) )*df;
 
     end

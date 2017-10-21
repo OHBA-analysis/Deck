@@ -1,4 +1,4 @@
-function signal = hilbert_inverse( envelope, phase )
+function signal = hilbinv( envelope, phase )
 %
 % Compute the inverse Hilbert transform from an input envelope and phase.
 % Note that this does not restore the DC component of the original signal, 

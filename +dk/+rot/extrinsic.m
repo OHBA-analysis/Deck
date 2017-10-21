@@ -1,0 +1,6 @@
+function R = extrinsic( alpha, beta, gamma )
+
+	R = dk.rot.around_y(alpha) ...
+		* dk.rot.around_x(beta) ...
+		* dk.rot.around_y(gamma);
+end

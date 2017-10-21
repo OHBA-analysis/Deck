@@ -20,7 +20,7 @@ function [og,on] = gramschmidt(M)
     % Allocate & initialize
     og = M; 
     on = zeros(size(M));
-    on(:,1) = og(:,1)/dk.math.norm_l2(og(:,1));
+    on(:,1) = og(:,1)/dk.msr.norm_l2(og(:,1));
     
     % Ortho(gon/norm)alize
     for k = 2:n        
@@ -29,7 +29,7 @@ function [og,on] = gramschmidt(M)
         u = v - dk.math.bsxdot( u, dk.math.bsxdot(u,v) ./ sum(u.*u), 2);
         
         og(:,k) = u;
-        on(:,k) = u/dk.math.norm_l2(u);
+        on(:,k) = u/dk.msr.norm_l2(u);
     end
 
 end

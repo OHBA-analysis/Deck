@@ -2,7 +2,7 @@ function x = ifftshift(x,dim)
 %
 % x = ifftshift(x,dim)
 %
-% Inverse of dk.math.fftshift.
+% Inverse of dk.ts.fftshift.
 %
 % JH
 

@@ -1,6 +1,6 @@
 function [m,M] = extrema( X, dim )
 %
-% [m,M] = dk.math.extrema( X, dim )
+% [m,M] = dk.msr.extrema( X, dim )
 %
 % Compute extrema (min,max) on input data X along dimension dim.
 %

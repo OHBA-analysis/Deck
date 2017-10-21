@@ -1,14 +1,15 @@
-function [lmin,lmax] = local_extrema( x, inc_endpoints, strict )
+function [lmin,lmax] = extrema( x, inc_endpoints, strict )
 %
-% [lmin,lmax] = LOCAL_EXTREMA( data, inc_endpoints=false, strict=false )
+% [lmin,lmax] = dk.ts.extrema( data, inc_endpoints=false, strict=false )
 %
-% This function is an extremely fast local extrema finder (returns indices).
+% This function is a fast local extrema finder (returns indices).
 % In the case of plateau in the data, the function returns the index of the _first_ point.
+% If nargout == 0, a figure is opened, displaying the extrema.
 %
 % Example:
 %
 %   data = [25 8 15 5 5 10 10 10 3 1 20 7];
-%   dk.math.local_extrema(data);
+%   dk.ts.extrema(data);
 %
 % JH
 

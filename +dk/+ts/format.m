@@ -1,6 +1,6 @@
-function [x,tx] = format_ts( x, tx, type )
+function [x,tx] = format( x, tx, type )
 %
-% [x, tx] = dk.util.format_ts( x, tx, type='vert' )
+% [x, tx] = dk.ts.format( x, tx, type='vert' )
 % 
 % Format time-series data vertically or horizontally.
 %

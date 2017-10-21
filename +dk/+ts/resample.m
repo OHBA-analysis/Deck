@@ -1,6 +1,6 @@
 function [y, ty] = resample( x, tx, fs, method )
 %
-% [y, ty] = dk.math.resample( x, tx, fs=[], method=pchip )
+% [y, ty] = dk.ts.resample( x, tx, fs=[], method=pchip )
 %
 % Wrapper for Matlab function, taking care to demean/remean and using high-precision non-extrapolating method by default.
 % Note that if input fs is empty, this method resamples the input at equally spaced points.
@@ -10,7 +10,7 @@ function [y, ty] = resample( x, tx, fs, method )
     if nargin < 4, method = 'pchip'; end
     if nargin < 3, fs = []; end
     
-    [x,tx] = dk.util.format_ts(x,tx,'vertical');
+    [x,tx] = dk.ts.format(x,tx,'vertical');
     if isreal(x)
 
         m = mean(x,1);
@@ -45,8 +45,8 @@ function [y, ty] = resample( x, tx, fs, method )
     else
         
         % resample magnitude and angle separately for complex signals
-        [y,ty] = dk.math.resample( abs(x), tx, fs, method );
-        y = y .* exp(1i*dk.math.resample( unwrap(angle(x),[],1), tx, fs, method ));
+        [y,ty] = dk.ts.resample( abs(x), tx, fs, method );
+        y = y .* exp(1i*dk.ts.resample( unwrap(angle(x),[],1), tx, fs, method ));
         
     end
 

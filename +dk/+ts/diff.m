@@ -1,6 +1,6 @@
 function [dx,ck] = diff( x, h, dim, horizon, tangency )
 %
-% [dx,ck] = dk.math.diff( x, h, dim, horizon=4, tangency=4 )
+% [dx,ck] = dk.ts.diff( x, h, dim, horizon=4, tangency=4 )
 %
 % Numerical differentiation of sampled sequence.
 %
@@ -8,7 +8,7 @@ function [dx,ck] = diff( x, h, dim, horizon, tangency )
 %     t = linspace(-2,13,400); 
 %     h = t(2)-t(1); 
 %     x = sin(t); 
-%     y = dk.math.diff( x, h );
+%     y = dk.ts.diff( x, h );
 %     plot(t,x,t,y);
 %
 % Reference: 

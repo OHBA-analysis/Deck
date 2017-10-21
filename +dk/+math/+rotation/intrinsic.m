@@ -1,6 +1,0 @@
-function R = intrinsic( alpha, beta, gamma )
-
-	R = dk.math.rotation.around_z(alpha) ...
-		* dk.math.rotation.around_y(beta) ...
-		* dk.math.rotation.around_z(gamma);
-end

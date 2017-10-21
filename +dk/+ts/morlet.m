@@ -1,6 +1,6 @@
 function [out,scale] = morlet( vals, fs, freq )
 %
-% [out,scale] = dk.math.morlet( vals, fs, freq )
+% [out,scale] = dk.ts.morlet( vals, fs, freq )
 %
 % Fast continuous wavelet transform capable of computing several signals at once.
 % Unless there is only one query frequency, the output is a cell array where each cell corresponds to a frequency.

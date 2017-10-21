@@ -9,6 +9,6 @@ function r = rmsd( A, B, dims, dimm )
 	if nargin < 4, dimm=1; end
     if nargin < 3, dims=2; end
     
-	r = dk.math.rms( bsxfun(@minus,A,B), dims, dimm );
+	r = dk.msr.rms( bsxfun(@minus,A,B), dims, dimm );
 	
 end

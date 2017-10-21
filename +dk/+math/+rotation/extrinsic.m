@@ -1,6 +1,0 @@
-function R = extrinsic( alpha, beta, gamma )
-
-	R = dk.math.rotation.around_y(alpha) ...
-		* dk.math.rotation.around_x(beta) ...
-		* dk.math.rotation.around_y(gamma);
-end

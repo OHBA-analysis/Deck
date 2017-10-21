@@ -1,6 +1,6 @@
 function [w,h] = window( name, len, varargin )
 %
-% [win,handle] = dk.math.window( name, len, varargin )
+% [win,handle] = dk.ts.window( name, len, varargin )
 %
 % List of available windows in Matlab.
 % If inputs and outputs are omitted, the function displays all windows in a figure.
@@ -71,7 +71,7 @@ function show_all()
     figure;
     for i = 1:n
         subplot(h,w,i); name = names{i};
-        plot( x, dk.math.window(name,L) ); title(name);
+        plot( x, dk.ts.window(name,L) ); title(name);
     end
 
 end

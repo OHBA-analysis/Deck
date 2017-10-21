@@ -1,6 +1,6 @@
 function varargout = ansig( x, fs )
 %
-% [env,phi,frq] = dk.math.ansig( x, fs=1 )
+% [env,phi,frq] = dk.ts.ansig( x, fs=1 )
 %
 % Decomposed analytic signal from input data.
 % 
@@ -19,8 +19,8 @@ function varargout = ansig( x, fs )
 %
 % If only one output is set, then the complex analytic signal is returned. That is:
 %
-%   [env,~] = dk.math.ansig(x); % real-valued envelope returned 
-%   as = dk.math.ansig(x); % complex-valued analytic signal returned
+%   [env,~] = dk.ts.ansig(x); % real-valued envelope returned 
+%   as = dk.ts.ansig(x); % complex-valued analytic signal returned
 %
 % If no output is collected, a new figure is opened, showing the trajectory of the analytic
 % signal in the complex plane.
@@ -46,7 +46,7 @@ function varargout = ansig( x, fs )
         case 3
             % estimate frequency only if required
             phi = unwrap( angle(sig), [], 1 );
-            frq = dk.math.diff( phi, 1/fs ) / (2*pi);
+            frq = dk.ts.diff( phi, 1/fs ) / (2*pi);
             varargout = { abs(sig), phi, frq };
     end
 
