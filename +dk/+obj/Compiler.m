@@ -1,12 +1,41 @@
 classdef Compiler < handle
 % 
+% dk.obj.Compiler()
+%
 % A very useful class to compile C++ libraries and Mex files using the function mex.
 % Most relevant options are available as public attributes, and methods allow to:
 %   - define/undefine macros
 %   - add/remove libraries or include paths
 %
-% Once you are done specifying the options of your compilation, run "build" in order to commit the internal state.
-% You can print the command to the console (for debuging/verbose) and compile using "print" and "compile".
+% Options set as properties:
+%     out_name  -output out_name
+%      out_dir  -outdir out_dir
+%     opt_file  -f opt_file
+%    use_cpp0x  CXXFLAGS="$CXXFLAGS -std=c++0x"
+% use_64b_size ¬-compatibleArrayDims / -largeArrayDims
+%     mex_file ¬-c
+%      dry_run  -n
+%     optimize  -O
+%        debug  -g
+%      verbose  -v
+%       silent  -silent
+%
+% Methods for flags, defines, includes, etc:
+%   flag: to be included in CXXFLAGS
+%   -D  (un)define
+%   -l  (add|rem)_lib
+%   -L  (add|rem)_inc
+%   -I  (add|rem)_lib_path
+%
+%
+% To compile a typical application:
+%   set all desired options, flags, etc
+%   set all files (start with the .cxx and then .o if any)
+%   make sure you set mex_file=true if you want to produce a Mex file
+%   run build() to update the internal state
+%   run print() to show the command built
+%   run compile() to do it
+%   
 %
 % JH
 
@@ -16,8 +45,8 @@ classdef Compiler < handle
         % opt_file: full path to a custom mexopts.sh
         out_dir, out_name, opt_file;
         
-        % use_64b_size : use uint64_t types for matrix indexing (cf -largeArrayDims)
-        % use_cpp0x    : define compiler option -std=c++0x
+        % use_64b_size: use uint64_t types for matrix indexing (cf -largeArrayDims)
+        % use_cpp0x: define compiler option -std=c++0x
         use_64b_size, use_cpp0x;
         
         % if true,  compilation produces a Mex-file

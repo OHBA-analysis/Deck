@@ -1,7 +1,39 @@
 classdef kwArgs < handle
 % 
+% dk.obj.kwArgs()
+%
 % A very basic name/value pair parser for function inputs.
 % For more formal control over function inputs (including validation), checkout Matlab's inputParser.
+%
+% By default, names are NOT case sensitive. Set the option 
+%
+% Construction:
+%   parse( struct )
+%   parse( key, value, ... )
+%   parse( varargin )
+%
+%   parse( true, ... ) to set case-sensitive names
+%
+%   merge()
+%   clear()
+%   reset_accessed()
+%
+% Manipulate options:
+%   set( name, value )
+%   rem( name )
+%   get( name, default )
+%   pop( name, default )
+%   has( name )
+%   has_nonempty( name )
+%
+% Process options:
+%   sanitise( name, callback )
+%   validate( name, callback )
+%   sanitise_opt( name, callback )
+%   validate_opt( name, callback )
+%
+% Check accessed options:
+%   access_report()
 %
 % JH
 
@@ -78,7 +110,7 @@ classdef kwArgs < handle
             self.parsed = struct();
             self.reset_accessed();
             
-            % get inputs
+            % unwrap inputs
             args = varargin;
             while iscell(args) && numel(args) == 1
                 args = args{1};
@@ -87,12 +119,21 @@ classdef kwArgs < handle
             % either a cell of key-values or a structure
             if iscell(args)
                 
+                n = numel(args); % we know n >= 2
+                
+                % allow parse( true, varargin ) to set case-sensitive
+                if islogical(args{1})
+                    self.CaseSensitive = args{1};
+                    self.parse( args{2:end} );
+                    return;
+                end
+                
+                % edit name case
                 if ~self.CaseSensitive
                     args(1:2:end) = dk.cellfun( @lower, args(1:2:end), false );
                 end
                 
                 % don't do struct(args{:}) to avoid issues with cells and doublons
-                n = numel(args);
                 for i = 1:2:n
                     self.parsed.(args{i}) = args{i+1};
                 end

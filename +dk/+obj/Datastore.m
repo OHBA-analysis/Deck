@@ -1,5 +1,22 @@
 classdef Datastore < handle
-    
+%
+% dk.obj.Datastore()
+%
+% Bind to a folder on the file-system, and load/save from it, find patterns, etc.
+% You can get more information about particular functions by typing:
+%   help dk.obj.Datastore.NAME_OF_FUNCTION
+% 
+% Construction:
+%   assign, clear
+%
+% Load/save:
+%   load, save
+%
+% Other:
+%   exists, find
+%
+% JH
+
     properties
         folder; % the folder bound to the datastore
     end
@@ -21,11 +38,11 @@ classdef Datastore < handle
         %
         % assign(self,folder,create=false)
         %
-        %   Binds input folder to datastore instance.
-        %   Input folder is resolved (follow symlinks) beforehand.
-        %   If create is false, and folder does not already exist, an error is thrown.
+        % Binds input folder to datastore instance.
+        % Input folder is resolved (follow symlinks) beforehand.
+        % If create=false, and folder does not already exist, an error is thrown.
+        % No issue if create=true and folder already exists.
         % 
-        % JH
         
             if nargin < 3, create=false; end
             
@@ -67,7 +84,6 @@ classdef Datastore < handle
         % Input can either be a struct, or a key/value list.
         % MAT file is saved with -v7 option.
         %
-        % JH
             
             dk.reject( isempty(self.folder), '[dk.Datastore] Folder is not set.' );
             
@@ -105,7 +121,6 @@ classdef Datastore < handle
         %   [x,y] = load('myfile.mat','foo','bar'); % x=foo and y=bar
         %   [x,y] = load('myfile.mat','foo','bar','baz'); % x=foo and y=bar
         %
-        % JH
             
             dk.reject( isempty(self.folder), '[dk.Datastore] Folder is not set.' );
             

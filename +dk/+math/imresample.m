@@ -28,13 +28,15 @@ function [x,y,img] = imresample( x, y, img, method, thr, prc )
     
     % transpose image if needed
     if size(img,1) ~= ny && size(img,2) == ny
-        img = img.';
+        img = transpose(img);
     end
     assert( all( [ny,nx]==size(img) ), 'Size mismatch between inputs.' );
     
     % test relative variation
     rvar = @(z) std(z)/max(eps,mean(z));
     if rvar(dx)>thr || rvar(dy)>thr
+        
+        dk.info( '[dk.ui.imresample] Triggering resampling due to variable x or y steps.' );
         
         dx = prctile(dx,prc); xnew = x(1):dx:x(end);
         dy = prctile(dy,prc); ynew = y(1):dy:y(end);

@@ -1,10 +1,18 @@
-function Y = rescale( X, range, method )
+function Y = rescale( X, range, dim, method )
+%
+% Y = dk.math.rescale( X, range=[0,1], dim=ns )
+%
+% Rescale X linearly along dimension dim within specified range.
+% If dim is not specified, the rescaling occurs along the first non-singleton dimension.
+%
+% JH
 
     if nargin < 2, range = [0 1]; end
-    if nargin < 3, method = 'linear'; end
+    if nargin < 3, dim = dk.util.nsdim(X); end
+    if nargin < 4, method = 'linear'; end
     
-    xmin = min(X(:));
-    xmax = max(X(:));
+    xmin = min(X,[],dim);
+    xmax = max(X,[],dim);
     
     m = range(1);
     M = range(2);
@@ -12,7 +20,8 @@ function Y = rescale( X, range, method )
     switch lower(method)
     
         case 'linear'
-            Y = m + (M-m)*(X-xmin)/max( xmax-xmin, eps );
+            Y = (M-m)*dk.bsx.sub(X,xmin);
+            Y = m + dk.bsx.rdiv( Y, max( xmax-xmin, eps ) );
             
         otherwise
             error('Unknown method "%s".',method);

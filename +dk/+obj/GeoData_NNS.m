@@ -1,5 +1,23 @@
 classdef GeoData_NNS < handle
-    
+%
+% dk.obj.GeoData_NNS
+%
+% Nearest-neighbour search on data associated with spatial coordinates.
+% This is currently not a dynamical structure (ie, not suitable for streams).
+%
+% Initialisation:
+%   obj.init( coord, data ) where
+%       coord   Npts x Ndim matrix
+%        data   1 x Npts cell or matrix
+%
+% Find nearest neighbour with:
+%   [idx,dst] = find( x, tol=1e-12 )
+%   
+% Get data associated with nearest-neighbour with:
+%   [data,idx] = get_data( x, tol=1e-12 )
+%
+% JH
+
     properties
         coord 
         data
@@ -24,6 +42,8 @@ classdef GeoData_NNS < handle
         
         function init(self,coord,data)
         %
+        % init(coord,data)
+        %
         % (Re-)initialise object with specified points and associated data.
         %
         % coord  Npts x Ndim matrix of coordinates
@@ -43,6 +63,8 @@ classdef GeoData_NNS < handle
         
         function [idx,dst] = find(self,x,tol)
         %
+        % [idx,dst] = find(x,tol=1e-12)
+        %
         % Index of closest point if its distance is within tolerance, otherwise 0.
         %
         
@@ -54,6 +76,8 @@ classdef GeoData_NNS < handle
         end
         
         function [y,idx] = get_data(self,x,tol)
+        %
+        % [y,idx] = get_data(x,tol)
         %
         % Get data associated with nearest neighbour, and throw error if nothing is found.
         %
