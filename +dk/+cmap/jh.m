@@ -1,4 +1,4 @@
-function c = jh(n)
+function c = jh(n,varargin)
  %
  % My colormap (heavily inspired by Matlab)
  %
