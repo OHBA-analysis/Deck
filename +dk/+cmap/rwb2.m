@@ -1,18 +1,17 @@
-function c = rwb( n, signed )
+function c = rwb2( n, signed )
 %
-% c = rwb( n=64, signed=false )
+% c = rwb2( n=64, signed=false )
 %
 
     if nargin < 1, n = 64; end
     if nargin < 2, signed = false; end
     
     method = 'linear';
-    w = [0.6,0.2,0.2,0.9];
-    r = dk.clr.palette(0,w);
-    b = dk.clr.palette(0.6,w);
+    w = [0.5,0.2,0.5,0.9];
+    r = dk.clr.palette(hsv2rgb([0,.9,.8]),w);
+    b = dk.clr.palette(hsv2rgb([.6,.9,.8]),w);
     g = 0.9*[1 1 1];
-    
-    t = [0,.10,.45,.65,1];
+    t = [0,.15,.45,.65,1];
     
     if signed
         if mod(n,2)==0, n=n+1; end

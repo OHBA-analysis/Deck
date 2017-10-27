@@ -55,7 +55,10 @@ classdef Sample < handle
 %   The callback should be a function-handle accepting the following inputs:
 %       callback( k:index, x:row, y:row, meta:struct )
 %   It does not need to return an output, BUT IF IT DOES NOT, you should not request
-%   an output to the function iter (this will cause an error otherwise).
+%   an output to the function iter (this will cause an error otherwise). If it does 
+%   return something, the output is a cell of same length as the number of points 
+%   IN USE (that is, the indices in the output cell do not necessarily correspond 
+%   to the indices of the points within the instance!).
 %   
 %
 % ------------------------------
