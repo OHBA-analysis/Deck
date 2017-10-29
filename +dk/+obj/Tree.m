@@ -38,11 +38,15 @@ classdef Tree < handle
         if ischar(s), s=load(s); end
         switch s.version
             case '0.1'
-                self.node = dk.arrayfun( @(n) dk.obj.Node(n), s.node, false );
+                self.node = dk.cellfun( @(n) dk.obj.Node(n), s.node, false );
                 self.node = [self.node{:}];
             otherwise
                 error('Unknown version: %s',s.version);
         end
+        end
+        
+        function same=compare(self,other)
+            same = dk.compare( self.serialise(), other.serialise() );
         end
         
     end

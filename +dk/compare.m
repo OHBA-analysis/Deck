@@ -1,5 +1,7 @@
 function c = compare( v1, v2 )
 %
+% c = dk.compare( v1, v2 )
+%
 % Generic comparison function between two values v1 and v2.
 % Performs a recursive comparison on types:
 %   cell, struct, numeric, logical
@@ -44,7 +46,10 @@ function c = compare( v1, v2 )
             ( isempty(v1) || max(abs(v1(:)-v2(:))) < FP_THRESHOLD );
     
     elseif islogical(v1)
-        c = islogical(v2) && (numel(v1) == numel(v2)) && ~xor(v1,v2);
+        c = islogical(v2) && (numel(v1) == numel(v2)) && ~any(xor(v1,v2));
+        
+    elseif isa(v1,'function_handle')
+        c = isa(v2,'function_handle') && strcmp(func2str(v1), func2str(v2));
         
     else
         try

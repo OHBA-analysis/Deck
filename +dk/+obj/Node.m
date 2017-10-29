@@ -61,6 +61,10 @@ classdef Node < handle
         end
         end
         
+        function same=compare(self,other)
+            same = dk.compare( self.serialise(), other.serialise() );
+        end
+        
     end
     
     % setup
@@ -69,10 +73,13 @@ classdef Node < handle
         % constructor
         function self = Node(varargin)
             self.clear();
-            if nargin == 1 && isstruct(varargin{1})
-                self.unserialise(varargin{1});
-            else
-                self.assign(varargin{:});
+            switch nargin
+                case 0
+                    % nothing to do
+                case 1
+                    self.unserialise(varargin{1});
+                otherwise
+                    self.assign(varargin{:});
             end
         end
         

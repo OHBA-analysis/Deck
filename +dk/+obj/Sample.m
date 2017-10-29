@@ -152,6 +152,10 @@ classdef Sample < handle
         end
         end
         
+        function same=compare(self,other)
+            same = dk.compare( self.serialise(), other.serialise() );
+        end
+        
     end
     
     % setup
