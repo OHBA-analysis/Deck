@@ -49,7 +49,7 @@ function fig = imgrid( slices, names, samerng, varargin )
         samerng = false; 
     end
     if samerng
-        r = dk.cellfun( @(x) [min(x(:)), max(x(:))], slices, false );
+        r = dk.cellfun( @slice_range, slices, false );
         r = vertcat(r{:});
         r = [min(r(:,1)), max(r(:,2))];
     else
@@ -68,5 +68,16 @@ function fig = imgrid( slices, names, samerng, varargin )
     fig.UserData.names  = names;
     fig.UserData.range  = r;
     fig.UserData.grid   = [h,l];
+
+end
+
+function r = slice_range(s)
+
+    s = dk.util.filtnum(s);
+    r = [min(s), max(s)];
+    
+    if diff(r) < 1e-6
+        r = mean(r) + [-1,1]/2;
+    end
 
 end

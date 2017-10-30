@@ -18,7 +18,7 @@ function [crange,ctype] = range( x, ctype, crange )
     
     % color range
     if isempty(crange)
-        crange = prctile( x(:), [1 99] );
+        crange = prctile( dk.util.filtnum(x), [1 99] );
     end
     
     % truncate to 2 significant digits
