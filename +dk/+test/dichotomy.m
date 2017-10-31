@@ -14,7 +14,7 @@ function [best,step] = dichotomy( value, range, varargin )
         [b,s] = dk.test.dichotomy( pi );
         dk.test.assert( abs(b-pi) <= s, 'T1: ok', 'T1: value not found' );
         
-        [b,s] = dk.test.dichotomy( pi, [1,0], 1e-3, 3 );
+        [b,s] = dk.test.dichotomy( pi, [1,0], 1e-3, 3*[1,1] );
         dk.test.assert( abs(b-pi) <= s, 'T2-1: ok', 'T2-1: value not found' );
         dk.test.assert( s < 1e-3, 'T2-2: ok', 'T2-2: precision not achieved' );
                 
