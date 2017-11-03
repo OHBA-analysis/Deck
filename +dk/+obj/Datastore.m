@@ -58,7 +58,10 @@ classdef Datastore < handle
         
         function f = file(self,varargin)
         % Full path to file (extension MUST be set manually)
-            f = fullfile(self.folder,varargin{:});
+            f = fullfile(varargin{:});
+            if f(1) ~= filesep
+                f = fullfile(self.folder,f);
+            end
         end
         
         function f = matfile(self,varargin)
@@ -74,6 +77,30 @@ classdef Datastore < handle
         function f = find(self,varargin)
         % Find pattern in folder
             f = dir(fullfile( self.folder, varargin{:} ));
+        end
+        
+        function move(self,src,dst)
+        %
+        % Move file
+        %
+            
+            src = self.file(src);
+            dst = self.file(dst);
+            
+            dk.reject( dk.fs.is_file(dst), 'Destination already exists.' );
+            movefile( src, dst );
+        end
+        
+        function remove(self,name)
+        %
+        % Remove file
+        
+            name = self.file(name);
+            if dk.fs.is_file(name)
+                delete(name);
+            else
+                warning( 'File not found: %s', name );
+            end
         end
         
         function f = save(self,name,varargin)

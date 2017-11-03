@@ -1,8 +1,19 @@
 function [d,fmt] = datestr( type )
 %
+% [d,fmt] = datestr( type=default )
+%
 % Return string representation of current date.
 % Supports a variety of named format, some without time or time-only.
 % First output is the string, second output is the format.
+%
+%        Chronolexical: longstamp, stamp, shortstamp
+%   convertible to int: longnum, num, shortnum
+%            Time-only: time, longtime
+%   convertible to int: timenum, longtimenum
+%            Date-only: longdate, date, shortdate, datenum
+%                 Full: datetime (default)
+%
+% Note 1: long formats include milliseconds
 %
 % JH
 
