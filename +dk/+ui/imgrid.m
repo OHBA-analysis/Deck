@@ -41,7 +41,7 @@ function fig = imgrid( slices, names, samerng, varargin )
     
     % default names
     if nargin < 2 || isempty(names)
-        names = dk.arrayfun( @(k) sprintf('Slice %d',k), 1:n, false );
+        names = dk.mapfun( @(k) sprintf('Slice %d',k), 1:n, false );
     end
     
     % value range
@@ -49,7 +49,7 @@ function fig = imgrid( slices, names, samerng, varargin )
         samerng = false; 
     end
     if samerng
-        r = dk.cellfun( @slice_range, slices, false );
+        r = dk.mapfun( @slice_range, slices, false );
         r = vertcat(r{:});
         r = [min(r(:,1)), max(r(:,2))];
     else

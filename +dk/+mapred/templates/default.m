@@ -10,7 +10,7 @@ classdef ${Class} < dk.mapred.Abstract
         function inputs = get_inputs(self,index)
 
             inputs = linspace(0,2*pi,100);
-            %inputs = dk.arrayfun( @(x) struct('x',x), inputs, false );
+            %inputs = dk.mapfun( @(x) struct('x',x), inputs, false );
             %inputs = [inputs{:}];
 
             if nargin > 1

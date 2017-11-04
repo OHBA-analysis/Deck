@@ -1,6 +1,6 @@
-function s = to_string( v, fmt )
+function s = tostr( v, fmt )
 %
-% s = to_string( v, fmt )
+% s = dk.tostr( v, fmt )
 %
 % Convert input to string representation.
 % Second input is used to print numeric values.
@@ -49,7 +49,7 @@ function s = to_string( v, fmt )
         
     % Input is a cell, apply to each element (returns a cell of strings)
     elseif iscell(v)
-        s = dk.cellfun( @(x) dk.to_string(x,fmt), v, false );
+        s = dk.mapfun( @(x) dk.tostr(x,fmt), v, false );
         
     % Other unsupported cases
     else

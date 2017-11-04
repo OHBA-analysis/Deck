@@ -1,6 +1,6 @@
 function out = mapfun( fun, val, unif )
 %
-% out = mapfun( fun, val, unif=false )
+% out = dk.mapfun( fun, val, unif=false )
 %
 % Use cellfun, arrayfun or structfun depending on the type of input.
 % Fine not to collect output (in which case no need for fun to return anything).

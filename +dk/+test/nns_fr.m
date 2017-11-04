@@ -19,7 +19,7 @@ function nns_fr( x, q, r )
     end
     
     Nr = 50;
-    dk.util.timeit( Nr, @dk.math.nns_fr, x, q, r );
+    dk.timeit( Nr, @dk.math.nns_fr, x, q, r );
 
 end
 

@@ -158,7 +158,7 @@ classdef Datastore < handle
 
             if nargin > 2
                 % extract specific variables
-                data = dk.cellfun( @(n) dk.struct.get( data, n, [] ), varargin, false );
+                data = dk.mapfun( @(n) dk.struct.get( data, n, [] ), varargin, false );
 
                 if nargout == 1 && nargin > 3
                     % more than one field required, but only one output: return a structure

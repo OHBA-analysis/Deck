@@ -24,7 +24,7 @@ function [num,pos] = numbers( str, varargin )
 % JH
 
     % all options to lower case
-    opt = dk.cellfun( @lower, varargin, false );
+    opt = dk.mapfun( @lower, varargin, false );
 
     % parse all numbers
     expr = '-?[0-9]+(\.[0-9]+)?([e|E][-0-9]+)?';
@@ -36,7 +36,7 @@ function [num,pos] = numbers( str, varargin )
 
     % put together outputs
     pos = [ first(:), last(:) ];
-    num = dk.arrayfun( @(k) str2double(str( first(k):last(k) )), 1:numel(first), true );
+    num = dk.mapfun( @(k) str2double(str( first(k):last(k) )), 1:numel(first), true );
 
     % filter depending on options
     %isint = @(x) isequal( x, fix(x) );

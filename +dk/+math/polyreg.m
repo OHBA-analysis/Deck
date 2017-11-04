@@ -13,7 +13,7 @@ function [coef,rsq] = polyreg( x, y, n, doplot )
     
     % format data suitably
     [x,o] = sort(x(:));
-    y = dk.to_col(y(o));
+    y = dk.tocol(y(o));
     
     % run polyfit estimation
     coef = polyfit( x, y, n );

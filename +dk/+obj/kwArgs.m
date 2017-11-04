@@ -130,7 +130,7 @@ classdef kwArgs < handle
                 
                 % edit name case
                 if ~self.CaseSensitive
-                    args(1:2:end) = dk.cellfun( @lower, args(1:2:end), false );
+                    args(1:2:end) = dk.mapfun( @lower, args(1:2:end), false );
                 end
                 
                 % don't do struct(args{:}) to avoid issues with cells and doublons

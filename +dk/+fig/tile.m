@@ -13,12 +13,12 @@ function tile( gsize, figures, screen )
     
     % figure numbers given as an input array
     if isnumeric(figures)
-        figures = dk.arrayfun( @(k) figure(k), figures, false );
+        figures = dk.mapfun( @(k) figure(k), figures, false );
     end
     
     % array of figures given in input, make it a cell
     if ~iscell(figures)
-        figures = dk.arrayfun( @(x) x, figures, false );
+        figures = dk.mapfun( @(x) x, figures, false );
     end
 
     % dimensions of the grid

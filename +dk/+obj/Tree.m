@@ -30,7 +30,7 @@ classdef Tree < handle
         
         function s=serialise(self,file)
             s.version = '0.1';
-            s.node = dk.arrayfun( @(n) n.serialise(), self.node, false );
+            s.node = dk.mapfun( @(n) n.serialise(), self.node, false );
             if nargin > 1, save(file,'-v7','-struct','s'); end
         end
         
@@ -38,7 +38,7 @@ classdef Tree < handle
         if ischar(s), s=load(s); end
         switch s.version
             case '0.1'
-                self.node = dk.cellfun( @(n) dk.obj.Node(n), s.node, false );
+                self.node = dk.mapfun( @(n) dk.obj.Node(n), s.node, false );
                 self.node = [self.node{:}];
             otherwise
                 error('Unknown version: %s',s.version);
@@ -166,7 +166,7 @@ classdef Tree < handle
             end
             
             if nargout > 1
-                N = dk.cellfun( @(ind) self.node(ind), L, false );
+                N = dk.mapfun( @(ind) self.node(ind), L, false );
             end
         end
         

@@ -24,15 +24,10 @@ function output = array2string( values, format, varargin )
         colNames = opt.get( 'col', {} );
     
     % Parse values into a cell
-    if isnumeric(values) || islogical(values)
+    if isnumeric(values) || islogical(values) || iscell(values)
         
         assert( ismatrix(values), 'Sorry, multidimensional arrays are not supported.' );
-        V = dk.arrayfun( @(x) dk.to_string(x,numFmt), values, false );
-        
-    elseif iscell(values)
-        
-        assert( ismatrix(values), 'Sorry, multidimensional arrays are not supported.' );
-        V = dk.cellfun( @(x) dk.to_string(x,numFmt), values, false );
+        V = dk.mapfun( @(x) dk.tostr(x,numFmt), values, false );
         
     elseif istable(values)
         

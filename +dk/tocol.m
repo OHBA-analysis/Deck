@@ -1,8 +1,10 @@
-function y = to_col(x)
+function y = tocol(x)
+%
+% y = dk.tocol(x)
 %
 % Transform input x into a column array.
 %
-% Contact: jhadida [at] fmrib.ox.ac.uk
+% JH
 
     y = x(:);
 end

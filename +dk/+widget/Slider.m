@@ -64,7 +64,7 @@ classdef Slider < handle
             % set range
             assert( isnumeric(range) && numel(range)==2, 'Range should be a 1x2 vector.' );
             
-            self.range = sort(dk.to_row(range));
+            self.range = sort(dk.torow(range));
             dr = diff(range);
             
             assert( diff(self.range) > eps, 'Range must be a non-singleton interval.' );
@@ -77,7 +77,7 @@ classdef Slider < handle
                     'Step should be a positive scalar or 1x2 vector.' );
                 
                 if ns == 1, step = [step, min( dr/3, 10*step )]; end
-                self.step = sort(dk.to_row(step));
+                self.step = sort(dk.torow(step));
                 
             else
                 self.step = [0.01 0.1]*dr;

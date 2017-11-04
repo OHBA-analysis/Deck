@@ -21,7 +21,7 @@ function cname = path2name(fpath)
     end
     
     cname = strjoin([ ...
-        dk.cellfun(@(s) s(2:end),segments(first:end-1),false), ... remove +
+        dk.mapfun(@(s) s(2:end),segments(first:end-1),false), ... remove +
         { dk.str.rem_ext(segments{end},'.m') } ... remove extension
     ], '.');
 

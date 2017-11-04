@@ -58,7 +58,7 @@ function dist = violin( data, varargin )
 
     % convert label to string
     if isnumeric(opt_label)
-        opt_label = dk.arrayfun( @num2str, opt_label, false );
+        opt_label = dk.mapfun( @num2str, opt_label, false );
     end
     assert( iscellstr(opt_label), 'Labels should either be numeric or a cellstring.' );
     assert( numel(opt_label) == nd, 'There should be one label per column.' );

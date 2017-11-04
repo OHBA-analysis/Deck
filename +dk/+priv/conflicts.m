@@ -36,7 +36,7 @@ function sub = find_subfolders(folder)
     sub = dir(folder);
     sub = {sub([sub.isdir]).name};
     sub = sub(cellfun( @valid_folder, sub ));
-    sub = dk.cellfun( @(x)fullfile(folder,x), sub, false );
+    sub = dk.mapfun( @(x)fullfile(folder,x), sub, false );
 end
 
 function out = check_folder(folder)
@@ -54,9 +54,9 @@ function out = check_folder(folder)
     % list m-scripts and mex-files
     files = dir(fullfile( folder, '*.m' ));
     files = [ files; dir(fullfile( folder, ['*.' mexext] )) ];
-    files = dk.cellfun( @basename, {files.name}, false );
+    files = dk.mapfun( @basename, {files.name}, false );
     
-    existing = dk.cellfun( @which, files, false );
+    existing = dk.mapfun( @which, files, false );
     conflict = cellfun( @(x) ~isempty(x), existing );
     
     if any(conflict)
@@ -70,7 +70,7 @@ function out = check_folder(folder)
             fprintf('\t %s <> %s \n',files{i},existing{i});
         end
         
-        out = dk.cellfun( @(x) fullfile(folder,x), files, false );
+        out = dk.mapfun( @(x) fullfile(folder,x), files, false );
         
     else
         fprintf('ok\n'); out = {};

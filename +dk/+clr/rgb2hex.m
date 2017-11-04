@@ -23,8 +23,8 @@ end
 function out = convert_rgb(in)
 
     assert( numel(in)==3, 'Expected 1x3 vector in input.' );
-    out = dk.arrayfun( @dec2hex, in, false );
-    out = dk.cellfun( @do_pad, out, false );
+    out = dk.mapfun( @dec2hex, in, false );
+    out = dk.mapfun( @do_pad, out, false );
     out = [ '#' out{:} ];
 
 end

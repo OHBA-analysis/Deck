@@ -43,7 +43,7 @@ classdef MultiTab < handle
                         self.add( v.name, v.data );
                     else
                         assert( nargin == 2, 'Struct-array inputs should be the only argument.' );
-                        v = dk.arrayfun( @(x) x, v, false );
+                        v = dk.mapfun( @(x) x, v, false );
                         self.build(v{:});
                     end
                 elseif iscell(v)
@@ -191,7 +191,7 @@ classdef MultiTab < handle
         
         % get data of all tabs
         function data = all_data(self)
-            data = dk.arrayfun( @(x) x.data, self.tab, false );
+            data = dk.mapfun( @(x) x.data, self.tab, false );
         end
         
         % tab width (all equal)

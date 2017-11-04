@@ -13,7 +13,7 @@ function vol2avi( filename, volume, fps, resize )
         volume = dk.ui.load_slices( volume );
     end
     volume  = dk.ui.vol2slices( volume ); % make sure it is a cell
-    volume  = dk.cellfun( @mat2gray, volume, false );
+    volume  = dk.mapfun( @mat2gray, volume, false );
     nslices = size(volume,3);
     
     % write other slices to file

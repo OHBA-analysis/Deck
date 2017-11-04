@@ -24,7 +24,7 @@ function p = palette( c, w )
         figure;
         im = ones(75,100);
         f = fieldnames(p);
-        im = dk.cellfun( @(ff) dk.bsx.mul(reshape(p.(ff),[1,1,3]),im), f, false );
+        im = dk.mapfun( @(ff) dk.bsx.mul(reshape(p.(ff),[1,1,3]),im), f, false );
         imshow(vertcat(im{:}));
     end
 

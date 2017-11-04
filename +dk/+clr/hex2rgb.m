@@ -8,7 +8,7 @@ function out = hex2rgb( in )
 % JH
 
     if iscell(in)
-        out = dk.cellfun( @convert_hex, in, false );
+        out = dk.mapfun( @convert_hex, in, false );
     else
         out = convert_hex(in);
     end

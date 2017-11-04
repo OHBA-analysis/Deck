@@ -40,7 +40,7 @@ classdef Template < handle
         function v = placeholders(self)
 
             v = regexp( self.text, '[^$]\$\{[\w\d_-]+\}', 'match' );
-            v = unique(dk.cellfun( @(x) x(4:end-1), v, false ));
+            v = unique(dk.mapfun( @(x) x(4:end-1), v, false ));
             if nargout == 0, cellfun(@disp,v); end
 
         end

@@ -2,8 +2,7 @@ function [tstat,t] = timeit( nrep, fun, varargin )
 % 
 % [tstat,t] = timeit( nrep, fun, data )
 % 
-% Apply function a number of times, measure the execution time,
-% and return statistics on these times.
+% Apply function a number of times, measure the execution time, and return time stats.
 % Optionally provide arguments for the function.
 %
 % JH

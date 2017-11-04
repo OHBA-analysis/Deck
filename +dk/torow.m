@@ -1,8 +1,10 @@
-function y = to_row(x)
+function y = torow(x)
+%
+% y = dk.torow(x)
 %
 % Transform input x into a row array.
 %
-% Contact: jhadida [at] fmrib.ox.ac.uk
+% JH
 
     y = x(:)';
 end

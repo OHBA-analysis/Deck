@@ -44,7 +44,7 @@ function Ynew = interp_field( Xold, Yold, Xnew, type )
             I = zeros( Nnew*Nold, d );
             
             for i = 1:d
-                I(:,i) = dk.to_col(dk.math.pairwise_differences( Xnew(:,i), Xold(:,i) ));
+                I(:,i) = dk.tocol(dk.math.pairwise_differences( Xnew(:,i), Xold(:,i) ));
             end
             
             I = sum( (I / S) .* I, 2);

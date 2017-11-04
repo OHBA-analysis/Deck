@@ -17,7 +17,7 @@ function p = filtpath( varargin )
     folders = varargin;
     assert( iscellstr(folders), 'Input folders should be a strings.' );
     folders = horzcat( matlabroot, folders );
-    folders = horzcat( folders, dk.cellfun( @dk.fs.realpath, folders, false ) );
+    folders = horzcat( folders, dk.mapfun( @dk.fs.realpath, folders, false ) );
     folders = unique( folders );
 
     % current path
@@ -37,7 +37,7 @@ function out = contains( folders, data )
     n = numel(folders);
     
     for i = 1:n
-        out = out | dk.cellfun( @(v) any(v==1), strfind( data, folders{i} ), true );
+        out = out | dk.mapfun( @(v) any(v==1), strfind( data, folders{i} ), true );
     end
 
 end

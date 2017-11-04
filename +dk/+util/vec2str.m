@@ -7,5 +7,5 @@ function str = vec2str(vec,sep)
 % JH
 
     if nargin < 2, sep=', '; end
-    str = strjoin( dk.arrayfun( @num2str, vec, false ), sep );
+    str = strjoin( dk.mapfun( @num2str, vec, false ), sep );
 end

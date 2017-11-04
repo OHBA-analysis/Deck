@@ -308,7 +308,7 @@ function config = fix_config(config)
 
     if ~iscell(config.exec.workers)
         n = size(config.exec.workers,1);
-        config.exec.workers = dk.arrayfun( @(k) config.exec.workers(k,:), 1:n, false );
+        config.exec.workers = dk.mapfun( @(k) config.exec.workers(k,:), 1:n, false );
     end
 
 end

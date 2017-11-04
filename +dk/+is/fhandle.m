@@ -1,3 +1,3 @@
 function y = fhandle(varargin)
-    y = dk.cellfun( @(x) isa(x,'function_handle'), varargin, true );
+    y = dk.mapfun( @(x) isa(x,'function_handle'), varargin, true );
 end
