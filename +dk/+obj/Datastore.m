@@ -164,7 +164,6 @@ classdef Datastore < handle
                     % more than one field required, but only one output: return a structure
                     varargout = {cell2struct( data, varargin, 2 )};
                 else
-                    % only one field required: return its value
                     varargout = data;
                 end
             else
