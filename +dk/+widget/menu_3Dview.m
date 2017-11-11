@@ -15,7 +15,7 @@ function h = menu_3Dview( ax, label )
     fig = ancestor( ax, 'figure' );
     
     function local_callback(orient)
-        switch orient
+        switch lower(orient)
             case 'left'
                 o = [ -90, 0 ];
             case 'right'
@@ -28,23 +28,36 @@ function h = menu_3Dview( ax, label )
                 o = [ 0, 90 ];
             case 'under'
                 o = [ -180, -90 ];
-            case 'backleft'
+            case {'righttilt','right-tilt','rtilted'}
+                o = [ 90, -10 ];
+            case {'lefttilt','left-tilt','ltilted'}
+                o = [ -90, -10 ];
+            case {'backleft','back-left'}
                 o = [ -45, 0 ];
-            case 'backright'
+            case {'backright','back-right'}
                 o = [ 45, 0 ];
-            case 'frontleft'
+            case {'frontleft','front-left'}
                 o = [ -135, 0 ];
-            case 'frontright'
+            case {'frontright','front-right'}
                 o = [ -225, 0 ];
-            case 'sideleft'
+            case {'bol','back-over-left'}
+                o = [ -45, 20 ];
+            case {'bor','back-over-right'}
+                o = [ 45, 20 ];
+            case {'fol','front-over-left'}
+                o = [ -135, 20 ];
+            case {'for','front-over-right'}
+                o = [ -225, 20 ];
+            case {'sideleft','side-left'}
                 o = [ -60, 20 ];
-            case 'sideright'
+            case {'sideright','side-right'}
                 o = [ 60, 20 ];
         end
         view(ax,o(1),o(2));
     end
 
     h = uimenu( fig, 'label', label );
+    fig.UserData.orient = @local_callback;
     
     uimenu( h, 'label', 'Left', 'callback', @(varargin) local_callback('left') );
     uimenu( h, 'label', 'Right', 'callback', @(varargin) local_callback('right') );
