@@ -25,7 +25,10 @@ function [fig,h] = colorbar( range, label, varargin )
 %            See 'doc text' for details.
 %      dims  Dimensions in normalised units (0,1):
 %               [TextSize ImageSize Separation Margin]
-%            Note: TextSize + ImageSize should be <= 0.8 (space for labels)
+%            Note: 
+%               - TextSize + ImageSize should be <= 0.8 (space for labels)
+%               - Dimensions do not need to sum to 1
+%               - Default is [25,30,5,3] / 100
 %
 % JH
 
