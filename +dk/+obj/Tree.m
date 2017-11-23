@@ -129,6 +129,20 @@ classdef Tree < handle
             end
         end
         
+        % set/get node property
+        function set_prop(self,name,val)
+            v = find(self.valid());
+            n = numel(v);
+            for i = 1:n
+                self.node(v(i)).data.(name) = dk.getelem(val,i);
+            end
+        end
+        
+        function val = get_prop(self,name,unif)
+            if nargin < 3, unif=false; end
+            val = dk.mapfun( @(k) self.node(k).data.(name), find(self.valid()), unif );
+        end
+        
         % proxy for node properties
         function N=root(self)
             N=self.node(1);
@@ -362,9 +376,15 @@ classdef Tree < handle
         % we draw the nodes, the discrepancy between the width of the children, and that of the 
         % parent, is the separation increment.
         %
-        % The outputs are:
-        %   nod  Struct-array with fields {w,d,k} (width,depth,index) for each valid node.
-        %   tot  Total width at each depth (smaller vector).
+        % The output is a structure with fields:
+        %   n  Total number of nodes
+        %   d  Maximum depth
+        %   width  Vector of width for each node
+        %   depth  Vector of depth for each node
+        %   index  Tree index of each node
+        %   lw     Level width (total width at each depth)
+        %   map    Reverse mapping between the ordering of these vectors,
+        %          and indices of nodes in the tree.
         %
         % JH
 
