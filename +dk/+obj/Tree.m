@@ -137,7 +137,6 @@ classdef Tree < handle
                 self.node(v(i)).data.(name) = dk.getelem(val,i);
             end
         end
-        
         function val = get_prop(self,name,unif)
             if nargin < 3, unif=false; end
             val = dk.mapfun( @(k) self.node(k).data.(name), find(self.valid()), unif );
@@ -218,6 +217,26 @@ classdef Tree < handle
                 N = self.node(C);
             end
 
+        end
+        
+        % iteration on valid nodes
+        function out = iter(self,callback)
+        %
+        % out = iter(callback)
+        %
+        % Iterate on valid nodes, and call callback function with arguments (index,node).
+        % Callback needs not return anything if output is not collected.
+        % Otherwise, cell of outputs is collected.
+        %
+        % JH
+            
+            index = find(self.valid());
+            if nargout == 0
+                dk.mapfun( @(k) callback(k, self.node(k)), index );
+            else
+                out = dk.mapfun( @(k) callback(k, self.node(k)), index, false );
+            end
+            
         end
         
         
@@ -303,12 +322,16 @@ classdef Tree < handle
         %             >Default: true
         %        Link  Link options (cf Line properties)
         %             >Default: {} (none)
+        %      Height  Function of width and depth giving the height of links.
+        %              Should generally be a decreasing function of depth.
+        %              Can also be scalar or array.
+        %             >Default: @(w,d) w(1) ./ sqrt(1:d)
         %      Sepfun  Function of the depth adding width to separate branches
         %             >Default: @(x)x/10 or @(x)zeros(size(x))
         %     Balance  Balancing flag (children reordering)
         %             >Default: true
-        %    NodeSize  Size of the node
-        %             >Default: 0.2
+        %    NodeSize  RELATIVE size of the node (between 0 and 1)
+        %             >Default: 0.5
         %   NodeColor  Face-color of the node
         %             >Default: hsv colormap
         %    NodeEdge  Colour of the edges
@@ -319,6 +342,14 @@ classdef Tree < handle
         %             >Default: false
         %
         % JH
+        
+            %H = mean(W) * (D:-1:1);
+            %H = W(1) ./ log2(1+(1:D));
+            %H = W(1) ./ log1p(1:D);
+            %H = W(1) ./ sqrt(1:D);
+            %R = 0:D-1;
+            %R = R.*log1p(R);
+            %R = R.*sqrt(R);
             
             opt = dk.obj.kwArgs(varargin{:});
             radial = opt.get('Radial',false);
@@ -332,11 +363,28 @@ classdef Tree < handle
             end
             nodes = self.compute_widths(sepfun);
             
+            % compute heights
+            height = opt.get('Height', @(w,d) w(1)/2 ./ (1:d) );
+            if dk.is.fhandle(height)
+                height = height( nodes.width, nodes.d );
+            elseif isscalar(height)
+                height = height * ones(1,nodes.d);
+            else
+                assert( numel(height) >= nodes.d, 'Heights vector is not long enough.' );
+            end
+            
+            height = cumsum(height(:));
+            height = height - height(1); % root at 0
+            if ~radial
+                height = -height; 
+            end
+            nodes.height = height;
+            
             % drawing properties
             defcol = hsv(max( nodes.d, 6 ));
             linkopt = opt.get('Link', {} );
             nodes = add_prop( nodes, ...
-                opt.get('NodeSize',0.2), ...
+                opt.get('NodeSize',0.5), ...
                 opt.get('NodeColor',dk.cmap.interp( defcol, nodes.depth )), ...
                 opt.get('NodeEdge','k') ...
             );
@@ -388,12 +436,14 @@ classdef Tree < handle
         %
         % JH
 
-            depth = [self.node.depth];
-            valid = [self.node.is_valid];
-            leaf  = [self.node.is_leaf];
+            depth  = [self.node.depth];
+            valid  = [self.node.is_valid];
+            leaf   = [self.node.is_leaf];
+            degree = [self.node.n_children];
             
             n = sum(valid);
             d = depth(valid);
+            g = degree(valid);
             maxd = max(d);
             inc = sepfun(fliplr(0:maxd-1));
 
@@ -415,12 +465,13 @@ classdef Tree < handle
             end
             
             % compute total width for each level
-            tot = accumarray( d(:), w(:), [maxd,1] );
+            Lwidth = accumarray( d(:), w(:), [maxd,1] ); % width of each level
+            Lsize  = accumarray( d(:), 1, [maxd,1] ); % number of nodes at each level
             
             % pack all this information
-            map(k) = 1:n; %disp(w)
-            nodes = struct( 'n', n, 'd', max(depth), ...
-                'width', w, 'depth', d, 'index', k, 'lw', tot, 'map', map );
+            map(k) = 1:n; 
+            nodes = struct( 'n', n, 'd', max(depth), 'lw', Lwidth, 'ls', Lsize, ...
+                'width', w, 'depth', d, 'index', k, 'deg', g, 'map', map );
 
         end
         
@@ -430,8 +481,7 @@ classdef Tree < handle
             N = nodes.n;
             D = nodes.d;
             W = nodes.width;
-            %H = W(1) ./ log2(1+(1:D));
-            H = W(1) ./ sqrt(1:D);
+            H = nodes.height;
 
             % axis coordinate and offset for each node
             coord = zeros(1,N);
@@ -453,7 +503,6 @@ classdef Tree < handle
                 p = nodes.index( nodes.depth == d );
 
                 % draw the children of each parent
-                y = H(d+1);
                 np = numel(p);
                 for j = 1:np
 
@@ -485,8 +534,8 @@ classdef Tree < handle
                         x0 = x0 + W(kji);
 
                         % draw node and link to parent
-                        glink = draw_link( coord(kji), y, coord(kj), H(d), linkopt );
-                        gnode = draw_node( coord(kji), y, nodes.prop(kji) );
+                        glink = draw_link( coord(kji), H(d+1), coord(kj), H(d), linkopt );
+                        gnode = draw_node( coord(kji), H(d+1), nodes.prop(kji) );
 
                         % set datatip
                         gnode.UserData.id = cji;
@@ -509,14 +558,10 @@ classdef Tree < handle
             
             N = nodes.n;
             D = nodes.d;
+            R = nodes.height / (2*pi);
             W = nodes.width;
             L = max(nodes.lw);
-            
-            maxd = max(D);
-            R = 0:maxd-1;
-            %R = R.*log1p(R);
-            %R = R.*sqrt(R);
-            F = 0.85;
+            F = 0.9;
 
             % axis coordinate and offset for each node
             angle = zeros(1,N);
@@ -538,7 +583,8 @@ classdef Tree < handle
                 p = nodes.index( nodes.depth == d );
                 
                 % draw the children of each parent
-                r = R(d+1);
+                rc = R(d+1);
+                rp = R(d);
                 f = F;
                 np = numel(p);
                 for j = 1:np
@@ -573,8 +619,8 @@ classdef Tree < handle
                         aji = angle(kji);
 
                         % draw node and link to parent
-                        glink = draw_link( r*cos(aji), r*sin(aji), R(d)*cos(aj), R(d)*sin(aj), linkopt );
-                        gnode = draw_node( r*cos(aji), r*sin(aji), nodes.prop(kji) );
+                        glink = draw_link( rc*cos(aji), rc*sin(aji), rp*cos(aj), rp*sin(aj), linkopt );
+                        gnode = draw_node( rc*cos(aji), rc*sin(aji), nodes.prop(kji) );
 
                         %fprintf( 'Node %d: %.2f\n', kji, 180*aji/pi );
                         
@@ -617,7 +663,7 @@ function h = draw_link(x,y,xx,yy,opt)
 end
 
 % make sure that input has n rows
-function x = check_size(x,n)
+function x = check_numrows(x,n)
     if iscell(x), x = vertcat(x{:}); end
     if ischar(x) || size(x,1) < n
         x = repmat(x,n,1);
@@ -632,13 +678,18 @@ function nodes = add_prop(nodes,sz,fc,ec)
     assert( isnumeric(sz), 'Size should be numeric.' );
     if numel(sz) < n, sz = sz*ones(n,1); end
     assert( numel(sz)==n, 'Bad input size.' );
+    assert( all(sz >= 0 & sz <= 1), 'Sizes should be between 0 and 1.' );
     
-    fc = check_size(fc,n);
-    ec = check_size(ec,n);
+    % face and edge color
+    fc = check_numrows(fc,n);
+    ec = check_numrows(ec,n);
+    
+    % normalisation factor for the size
+    w = min(nonzeros( nodes.width ./ nodes.deg ))/2;
     
     prop = dk.struct.repeat( {'size','face','edge'}, 1, n );
     for i = 1:n
-        prop(i).size = sz(i);
+        prop(i).size = sz(i)*w;
         prop(i).face = fc(i,:);
         prop(i).edge = ec(i,:);
     end
