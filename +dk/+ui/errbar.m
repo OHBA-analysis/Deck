@@ -1,12 +1,9 @@
 function h = errbar( x, y, L, t, varargin )
 %
-% h = dk.ui.errbar( x, y, Ylength, Xwidth, varargin )
+% h = dk.ui.errbar( x, y, Ylength, Xwidth=[], varargin )
 %
-% Add error bars to the current 2d axes, centered at specified coord (x,y), and with specified length and tick-width.
-% If x, y and Ylength are vectors, then multiple bars are plotted.
-% If Ylength is 2xN, then row1=LOWER bnd and row2=UPPER bnd.
-% Xwidth should be a scalar and is replicated for each bar.
-%
+% Add error bars to the current 2d axes, centered at specified coord (x,y), 
+%  and with specified length and tick-width.
 %
 %   -------    ^
 %      |       |
@@ -16,14 +13,17 @@ function h = errbar( x, y, L, t, varargin )
 %   <----->
 %      Xwidth
 %
-% Additional inputs are forwarded to plot.
+% o If x, y and Ylength are vectors, then multiple bars are plotted.
+% o If Ylength is 2xN, then row1=LOWER bnd and row2=UPPER bound.
+% o Xwidth should be SCALAR and is replicated for each bar.
+% o If omitted or empty, Xwidth defaults to mean(diff(sort(x)))/4.
+% o Additional inputs are forwarded to plot.
 %
 % JH
     
     n = numel(x);
     assert( numel(y)==n, 'x and y size mismatch.' );
     assert( any( numel(L) == n*[1,2] ), 'x and Ylength size mismatch.' );
-    assert( isscalar(t), 'Xwidth should be scalar.' );
     
     if numel(L) == 2*n
         assert( ismatrix(L) && any(size(L)==2), 'Ylength should be 2xN.' );
@@ -32,7 +32,12 @@ function h = errbar( x, y, L, t, varargin )
         L = dk.torow(L);
         L = [L; L];
     end
-
+    
+    if nargin < 4 || isempty(t)
+        t = mean(diff(sort(x))) / 4;
+    end
+    assert( isscalar(t), 'Xwidth should be scalar.' );
+    
     % make all vectors rows
     x = dk.torow(x);
     y = dk.torow(y);

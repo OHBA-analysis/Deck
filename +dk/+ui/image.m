@@ -40,6 +40,9 @@ function [h,crange] = image( img, varargin )
     end
     
     % plot image
+    if isstruct(img)
+        img = {img.x, img.y, img.z};
+    end
     if iscell(img)
         
         % x and y axes are given

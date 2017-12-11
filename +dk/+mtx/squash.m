@@ -38,7 +38,7 @@ function [mat,rev] = squash( mat, dim )
     nr = prod(insize(dim));
     nc = prod(insize(other));
     
-    % save information for reverse transforamtion
+    % save information for reverse transformation
     rev.nd      = nd;
     rev.insize  = size(mat);
     rev.outsize = [nr,nc];
