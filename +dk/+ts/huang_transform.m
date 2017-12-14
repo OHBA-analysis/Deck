@@ -1,4 +1,17 @@
 function [imfs,status] = huang_transform( data, varargin )
+%
+% [imfs,status] = dk.ts.huang_transform( data, varargin )
+%
+% Compute EMD on input data.
+% data should be a scalar-valued time-course (vectorised internally).
+%
+% OPTIONS
+%
+%    sd_thresh  Stop decomposition if std goes below this threshold.
+%      max_img  Maximum number of IMFs
+%   min_energy  Stop decomposition if energy goes below this threshold.
+%
+% JH
 
     % parse options
     opt = dk.obj.kwArgs(varargin{:});
