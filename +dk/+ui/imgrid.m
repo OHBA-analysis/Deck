@@ -74,7 +74,7 @@ end
 function r = slice_range(s)
 
     s = dk.util.filtnum(s);
-    r = [min(s), max(s)];
+    r = prctile( s, [1,99] );
     
     if diff(r) < 1e-6
         r = mean(r) + [-1,1]/2;

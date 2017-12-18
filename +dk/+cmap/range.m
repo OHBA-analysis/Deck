@@ -56,17 +56,17 @@ function [crange,ctype] = range( x, ctype, crange )
     
     % set color-scale
     mg = max(abs(crange));
-    if cauto
+    %if cauto
     switch lower(ctype)
         case 'none'
             % nothing to do
-        case 'pos'
+        case {'pos','positive'}
             crange = crange .* [0 1]; % force lo to 0
-        case {'neg','revneg'}
+        case {'neg','negative','revneg'}
             crange = crange .* [1 0]; % force hi to 0
-        case {'bisym','sym','revsym'}
+        case {'bisym','sym','symmetric','revsym'}
             crange = mg * [-1 1]; % symmetric
     end
-    end
+    %end
     
 end

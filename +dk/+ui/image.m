@@ -84,11 +84,11 @@ function [h,crange] = image( img, varargin )
     
     % set color-scale
     switch lower(ctype)
-        case {'neg','revsym'}
+        case {'neg','negative','revsym'}
             cmap = flipud(cmap_unsigned);
-        case 'bisym'
+        case {'bisym','symmetric'}
             cmap = cmap_signed;
-        case 'bool'
+        case {'bool','gray'}
             cmap = gray(64);
         otherwise
             cmap = cmap_unsigned;
