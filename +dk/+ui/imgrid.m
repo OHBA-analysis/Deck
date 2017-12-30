@@ -49,9 +49,10 @@ function fig = imgrid( slices, names, samerng, varargin )
         samerng = false; 
     end
     if samerng
-        r = dk.mapfun( @slice_range, slices, false );
-        r = vertcat(r{:});
-        r = [min(r(:,1)), max(r(:,2))];
+        %r = dk.mapfun( @slice_range, slices, false );
+        %r = vertcat(r{:});
+        %r = [min(r(:,1)), max(r(:,2))];
+        r = dk.cmap.multirange( slices );
     else
         r = [];
     end
