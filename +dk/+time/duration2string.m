@@ -9,8 +9,13 @@ function str = duration2string( duration )
 
     if any( isinf(duration) | isnan(duration) )
         str = '<undefined>';
-    elseif (d > 0 )
-		str = sprintf( '%u days and %02uh %02umin %02usec', d, h, m, s );
+    elseif ( d > 0 )
+        if d > 365
+            [y,d] = dk.math.quorem(d,365);
+            str = sprintf( '%u years, %u days and %02uh %02umin %02usec', y, d, h, m, s );
+        else
+            str = sprintf( '%u days and %02uh %02umin %02usec', d, h, m, s );
+        end
     elseif ( h > 0 )
 		str = sprintf( '%uh %02umin %02usec', h, m, s );
     elseif ( m > 0 )

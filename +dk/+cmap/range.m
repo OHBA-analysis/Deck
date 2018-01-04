@@ -19,9 +19,6 @@ function [crange,ctype] = range( x, ctype, crange )
     % color range
     if isempty(crange)
         crange = prctile( dk.util.filtnum(x), [1 99] );
-        cauto  = true;
-    else
-        cauto  = false;
     end
     
     % truncate to 2 significant digits
@@ -56,17 +53,19 @@ function [crange,ctype] = range( x, ctype, crange )
     
     % set color-scale
     mg = max(abs(crange));
-    %if cauto
     switch lower(ctype)
-        case 'none'
+        case {'none','manual'}
             % nothing to do
         case {'pos','positive'}
-            crange = crange .* [0 1]; % force lo to 0
+            if lo < hi/4
+                crange = crange .* [0 1]; % force lo to 0
+            end
         case {'neg','negative','revneg'}
-            crange = crange .* [1 0]; % force hi to 0
+            if hi > lo/4
+                crange = crange .* [1 0]; % force hi to 0
+            end
         case {'bisym','sym','symmetric','revsym'}
             crange = mg * [-1 1]; % symmetric
     end
-    %end
     
 end

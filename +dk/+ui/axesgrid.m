@@ -26,10 +26,10 @@ function ax = axesgrid( nrows, ncols, varargin )
         fig  = opt.get( 'figure', nan );
 
     % create figure if needed
-    if isnan(fig)
-        fig = figure();
-    else
+    if ishandle(fig)
         figure(fig); clf;
+    else
+        fig = figure();
     end
     set( fig, 'units', 'normalized' );
     
@@ -37,8 +37,11 @@ function ax = axesgrid( nrows, ncols, varargin )
     axwidth  = (1 - xmar - xpad)/ncols;
     axheight = (1 - ymar - ypad)/nrows;
     
-    xspace = xpad / (ncols-1);
-    yspace = ypad / (nrows-1);
+    xspace = 0;
+    yspace = 0;
+    
+    if ncols > 1, xspace = xpad / (ncols-1); end
+    if nrows > 1, yspace = ypad / (nrows-1); end
     
     % work out the position of each axes
     axpos = cell(nrows,ncols);

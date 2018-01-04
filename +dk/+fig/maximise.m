@@ -1,6 +1,8 @@
 function maximise( f )
+% 
+% maximise( f )
 %
-% Maximise figure f on the correct screen.
+% Maximise figure f (without changing screen).
 %
 % JH
 

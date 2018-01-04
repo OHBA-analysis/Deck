@@ -155,6 +155,7 @@ classdef kwArgs < handle
         
         function self = merge(self,varargin)
             
+            if nargin < 2, return; end
             p = self.parsed;
             self.parse(varargin{:});
             self.parsed = dk.struct.merge( p, self.parsed );

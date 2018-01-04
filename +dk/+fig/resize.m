@@ -9,7 +9,12 @@ function resize( f, height, width )
 % 
 % JH
 
-    if nargin == 2
+    if nargin > 2 && islogical(width)
+        inner = width;
+    else
+        inner = false;
+    end
+    if nargin == 2 || numel(height)==2
         width  = height(2);
         height = height(1);
     end
@@ -38,10 +43,14 @@ function resize( f, height, width )
     else
         wh = fliplr(hw .* si.size);
     end
-
+    
     u = get(f,'units'); 
     set(f,'units','pixels');
-    set( f, 'position', [ si.centre-wh/2, wh ] );
+    if inner
+        set( f, 'innerposition', [ si.centre-wh/2, wh ] );
+    else
+        set( f, 'position', [ si.centre-wh/2, wh ] );
+    end
     set(f,'units',u);
 
 end

@@ -10,7 +10,7 @@ function [h,crange] = image( img, varargin )
     opt = dk.obj.kwArgs( varargin{:} );
     
     crange     = opt.get('crange',     [] );
-    ctype      = opt.get('ctype',      'auto' );
+    ctype      = opt.get('ctype',      '' );
     
     title_str  = opt.get('title',      '' );
     label_x    = opt.get('xlabel',     '' );
@@ -32,6 +32,14 @@ function [h,crange] = image( img, varargin )
     else
         cmap_unsigned = [];
         cmap_signed   = [];
+    end
+    if isempty(ctype) 
+        ctype = 'auto';
+%         if ~isempty(crange)
+%             ctype = 'manual';
+%         else
+%             ctype = 'auto';
+%         end
     end
     
     % subplot if asked
