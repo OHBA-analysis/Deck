@@ -96,7 +96,12 @@ function s=write_array(x,w,t)
     name = {'logical','numeric','char','struct','cell'};
     name = name{t};
     
-    x = struct( 'size', dim, 'stride', str, 'value', reshape(x,1,numel(x)) );
+    switch t
+        case 5 % special handling for cells (see issue #5)
+            x = struct( 'size', dim, 'stride', str, 'value', {reshape(x,1,numel(x))} );
+        otherwise
+            x = struct( 'size', dim, 'stride', str, 'value', reshape(x,1,numel(x)) );
+    end
     s = write_struct(x,w,w.shapepfx);
     
 end
