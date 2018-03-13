@@ -192,7 +192,7 @@ classdef Sample < handle
         
         function rem(self,k)
             self.used(k) = false;
-            dk.wreject( self.sparsity > 0.9, 'Storage is very sparse, your should run compress().' );
+            dk.wreject( self.sparsity > 0.9, 'Storage is very sparse, you should run compress().' );
         end
         function k = add(self,x,y,varargin)
             k = self.last+1;
