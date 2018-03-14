@@ -37,7 +37,7 @@ echo ">> dk_startup;"
 
 ### Otherwise
 
- - Clone this repository wherever you like (`git clone https://github.com/jhadida/deck.git "/wherever/I/Like"`), or download a zip from by clicking the green button at the top of this page.
+ - Clone this repository wherever you like (`git clone https://github.com/jhadida/deck.git "/wherever/I/Like"`), or download a zip by clicking the green button at the top of this page.
  - From the Matlab console, add the folder to your path using `addpath('/wherever/I/Like');`. (Do **NOT** use `genpath`!)
  - Then, type `dk_startup`.
 
@@ -50,7 +50,7 @@ All Deck functions can be called as if they were methods of an object `dk.<submo
 
 As you can see in the folder `+dk`, there is a lot of stuff in there. The documentation is being written on and off (sorry), but for now you'll either need to guess from the names that 'such' function might be relevant, or ask someone who knows, or maybe try one at random :)
 
-Either way, there is a help-text written for most functions, which should be enough to get you started (if you're a hacker, the code should be fairly legible). To get help about a function, type `help dk.some.function` from the Matlab console. If that's not helpful, and you really want to know, [open an issue](https://github.com/jhadida/deck/issues) asking for documentation about that particular function.
+Either way, there is a help-text written for most functions, which should be enough to get you started (if you're a hacker, the code should also be fairly legible). To get help about a function, type `help dk.some.function` from the Matlab console. If that's not helpful, and you really want to know, [open an issue](https://github.com/jhadida/deck/issues) asking for documentation about that particular function.
 
 ### Undefined variable "dk" or class "dk.blah".
 
@@ -75,7 +75,8 @@ You can see what versions are available [here](https://github.com/jhadida/deck/r
 
 ## Contributions
 
-All contributions are welcome. Bugs can be reported by creating new issues (check the existing open+closed ones before posting please).
+This is free software, all contributions are welcome. 
+Bugs can be reported by creating new issues (check the existing open+closed ones before posting please).
 
 For contributing, you'll need a [GitHub account](https://github.com/join). Also, checkout [the docs](https://help.github.com/articles/connecting-to-github-with-ssh/) to link your various computers with your account using SSH keys (avoids having to type passwords).
 
@@ -84,3 +85,4 @@ Then, the recipe is: [fork](https://help.github.com/articles/fork-a-repo/) it, c
 ## Bugs
 
 Report anything fishy by creating a [new issue](https://github.com/jhadida/deck/issues). 
+
