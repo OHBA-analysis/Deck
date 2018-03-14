@@ -44,7 +44,7 @@ Matlab shorthands or aliases:
 
  - Instead of `bsxfun( @times ... )`, use `dk.bsx.mul`
  - Instead of `isstruct() && isscalar() && all(isfield())`, use `dk.is.struct`
- - Instead of `cellfun( @foo, data, 'UniformOutput', false )`, use `dk.cellfun( @foo, data, false )`
+ - Instead of `cellfun( @foo, data, 'UniformOutput', false )`, use `dk.mapfun( @foo, data, false )`
 
 Lower-level stuff:
 

@@ -48,9 +48,6 @@ echo ">> dk_startup;"
 
 All Deck functions can be called as if they were methods of an object `dk.<submodule>.<function>( <args> )`. For example: `dk.util.array2string( [1,2,3], 'latex' );`
 
-As you can see in the folder `+dk`, there is a lot of stuff in there. The documentation is being written on and off (sorry), but for now you'll either need to guess from the names that 'such' function might be relevant, or ask someone who knows, or maybe try one at random :)
-
-Either way, there is a help-text written for most functions, which should be enough to get you started (if you're a hacker, the code should also be fairly legible). To get help about a function, type `help dk.some.function` from the Matlab console. If that's not helpful, and you really want to know, [open an issue](https://github.com/jhadida/deck/issues) asking for documentation about that particular function.
 
 ### Undefined variable "dk" or class "dk.blah".
 
@@ -72,6 +69,17 @@ git checkout tag/v0.1 # or whatever version you want
 ```
 
 You can see what versions are available [here](https://github.com/jhadida/deck/releases).
+
+## Documentation
+
+As you can see in the folder `+dk`, there is a lot of stuff in there. 
+The documentation is being written on and off (sorry), and can be read by browsing the source folders on GitHub. 
+Go ahead, click on [`+dk/+str`](https://github.com/jhadida/deck/tree/master/%2Bdk/%2Bstr) for example.
+
+If you are looking for something specific, you'll either need to guess from the names that 'such' function might be relevant, or ask someone who knows, or maybe try something at random :)
+Either way, there is a help-text written for most functions, which should be enough to get you started (if you're a hacker, the code should also be fairly legible). 
+To get help about a function, type `help dk.some.function` from the Matlab console. 
+If that's not helpful, and you really want to know, [open an issue](https://github.com/jhadida/deck/issues) asking for documentation about that particular function.
 
 ## Contributions
 
