@@ -1,4 +1,4 @@
-classdef Sample < handle
+classdef Mapping < handle
 %
 % Storage for associating multidimensional coordinates with multivariate data and metadata.
 % The storage is allocated and grown automatically to avoid reallocating the arrays too often.
@@ -161,7 +161,7 @@ classdef Sample < handle
     % setup
     methods
         
-        function self = Sample(varargin)
+        function self = Mapping(varargin)
             self.clear();
             if nargin == 1 && isstruct(varargin{1})
                 self.unserialise(varargin{1});
