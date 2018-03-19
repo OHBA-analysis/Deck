@@ -1,6 +1,11 @@
 function c = jh(n,varargin)
  %
- % My colormap (heavily inspired by Matlab)
+ % c = dk.cmap.jh(n=7)
+ %
+ % My colormap (heavily inspired by Matlab).
+ %
+ % Goes from blue to red, through green.
+ % Behaves "well" for values of n<7.
  %
  
     c = [ ...
