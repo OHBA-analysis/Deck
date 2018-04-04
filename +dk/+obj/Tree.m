@@ -2,10 +2,16 @@ classdef Tree < handle
     
     properties
         node
+        bsize
     end
 
+    properties (SetAccess = protected)
+        last
+    end
+    
     properties (Transient,Dependent)
         n_nodes, n_leaves, n_parents;
+        sparsity, capacity;
     end
     
     % dependent properties
@@ -23,23 +29,37 @@ classdef Tree < handle
         function n=get.n_parents(self)
             n=sum(self.valid() & ~[self.node.is_leaf]);
         end
+        
+        function s=get.sparsity(self)
+            s = 1 - self.last / self.n_nodes;
+        end
+        function n=get.capacity(self)
+            n = numel(self.node) - self.last;
+        end
     end
     
     % i/o
     methods
         
         function s=serialise(self,file)
-            s.version = '0.1';
+            s.version = '0.2';
             s.node = dk.mapfun( @(n) n.serialise(), self.node, false );
+            s.last = self.last;
+            s.bsize = self.bsize;
             if nargin > 1, save(file,'-v7','-struct','s'); end
         end
         
         function self=unserialise(self,s)
         if ischar(s), s=load(s); end
+        self.node = dk.mapfun( @(n) dk.obj.Node(n), s.node, false );
+        self.node = [self.node{:}];
         switch s.version
             case '0.1'
-                self.node = dk.mapfun( @(n) dk.obj.Node(n), s.node, false );
-                self.node = [self.node{:}];
+                self.last = numel(self.node);
+                self.bsize = 100;
+            case '0.2'
+                self.last = s.last;
+                self.bsize = s.bsize;
             otherwise
                 error('Unknown version: %s',s.version);
         end
@@ -59,8 +79,25 @@ classdef Tree < handle
         end
         
         function self=reset(self,varargin)
+            % initialise storage
+            self.node = [];
+            self.bsize = 100;
+            self.alloc(self.bsize);
+            
             % set root node
             self.node = dk.obj.Node(1,1,varargin{:});
+            self.last = 1;
+        end
+        
+        % allocate storage for additional nodes
+        % NOTE: this relies on dk.obj.Node() to be invalid by default
+        function alloc(self,n)
+            assert( n > 0, 'Allocation size should be positive.' );
+            if isempty(self.node)
+                self.node = repmat( dk.obj.Node(), 1, n );
+            else
+                self.node(end+n) = dk.obj.Node();
+            end
         end
         
         % remove deleted nodes and re-index the tree
@@ -69,7 +106,7 @@ classdef Tree < handle
             depth = [self.node.depth];
             valid = depth > 0;
             
-            % remap depth (this should not happen)
+            % check gaps in depth (this should not happen)
             count = accumarray( 1+depth(:), 1 );
             assert( all(count(2:end) > 0), 'Bug during removal.' );
             
@@ -83,6 +120,7 @@ classdef Tree < handle
             for i = 1:n
                 self.node(i).remap( old2new );
             end
+            self.last = n;
             
         end
         
@@ -100,14 +138,24 @@ classdef Tree < handle
         
         % add/remove single node
         function k=add_node(self,p,varargin)
-            k = length(self.node)+1;
+            assert( self.node(p).is_valid, 'Invalid parent' );
+            
+            k = self.last+1;
             d = self.node(p).depth+1;
+            if k > numel(self.node)
+                self.alloc(self.bsize);
+            end
+            
             self.node(k) = dk.obj.Node(d,p,varargin{:});
             self.node(p).add_child(k);
+            self.last = k;
         end
         function self=rem_node(self,k)
-            % cannot remove node from array without screwing up indices, use cleanup
+            assert( isscalar(k), 'This method removes one node at a time, use rem_nodes instead.' );
             assert( k > 1, 'Cannot remove the root, use reset() instead.' );
+            
+            % cannot remove node from array without screwing up indices
+            % to free up memory, use cleanup
             self.parent(k).rem_child(k);
             c = self.node(k).children;
             for i = 1:length(c)
@@ -116,13 +164,20 @@ classdef Tree < handle
             self.node(k).clear();
         end
         
-        % add/remove multiple nodes
+        % add n children to node p, and return their indices
         function k=add_nodes(self,p,n)
             k = zeros(1,n);
+            e = self.last + n;
+            while e > numel(self.node)
+                self.alloc(self.bsize);
+            end
             for i = 1:n
                 k(i) = self.add_node(p);
             end
+            self.last = k(end);
         end
+        
+        % remove nodes by index
         function rem_nodes(self,k)
             for i = 1:numel(k)
                 self.rem_node(k(i));
@@ -130,16 +185,22 @@ classdef Tree < handle
         end
         
         % set/get node property
-        function set_prop(self,name,val)
-            v = find(self.valid());
-            n = numel(v);
+        % val should either be iterable or scalar
+        % returns indices of valid nodes
+        function k = set_prop(self,name,val)
+            k = find(self.valid());
+            n = numel(k);
+            if n > 1 && isscalar(val)
+                val = dk.mapfun( @(x) val, 1:n, false ); % make a cell
+            end
             for i = 1:n
-                self.node(v(i)).data.(name) = dk.getelem(val,i);
+                self.node(k(i)).data.(name) = dk.getelem(val,i); 
             end
         end
-        function val = get_prop(self,name,unif)
+        function [val,idx] = get_prop(self,name,unif)
             if nargin < 3, unif=false; end
-            val = dk.mapfun( @(k) self.node(k).data.(name), find(self.valid()), unif );
+            idx = find(self.valid());
+            val = dk.mapfun( @(k) self.node(k).data.(name), idx, unif );
         end
         
         % proxy for node properties
@@ -158,7 +219,7 @@ classdef Tree < handle
         % [L,N] = levels(self)
         %
         % Group nodes by level, and return a cell with indices for each level.
-        % If second output is collected, it contains a cell of node-structs.
+        % If second output is collected, it contains a cell of node-arrays.
         % 
         % JH
         
@@ -220,21 +281,22 @@ classdef Tree < handle
         end
         
         % iteration on valid nodes
-        function out = iter(self,callback)
+        function [out,idx] = iter(self,callback)
         %
-        % out = iter(callback)
+        % [out,idx] = iter(callback)
         %
         % Iterate on valid nodes, and call callback function with arguments (index,node).
         % Callback needs not return anything if output is not collected.
         % Otherwise, cell of outputs is collected.
+        % Second output corresponds to node indices.
         %
         % JH
             
-            index = find(self.valid());
+            idx = find(self.valid());
             if nargout == 0
-                dk.mapfun( @(k) callback(k, self.node(k)), index );
+                dk.mapfun( @(k) callback(k, self.node(k)), idx );
             else
-                out = dk.mapfun( @(k) callback(k, self.node(k)), index, false );
+                out = dk.mapfun( @(k) callback(k, self.node(k)), idx, false );
             end
             
         end

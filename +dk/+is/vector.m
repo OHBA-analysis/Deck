@@ -1,9 +1,13 @@
 function y = vector( x, n )
 %
-% y = vector( x, n )
+% y = vector( x )
+% y = vector( x, numel )
+% y = vector( x, shape )
 %
 % Check whether input is numeric vector
-% Optionally check for number of elements or shape
+% Optionally check for:
+%  - number of elements 
+%  - or shape ('row' or 'col')
 %
 
     y = isnumeric(x) && isvector(x);

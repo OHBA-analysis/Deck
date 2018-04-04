@@ -3,6 +3,9 @@ function [crange,ctype] = range( x, ctype, crange )
 % [crange,ctype] = dk.cmap.range( x, ctype='auto', crange=[] )
 %
 % Infer color range from input data.
+% Output:
+%   crange  1x2 array with lower/upper bounds
+%    ctype  If input as 'auto', output is one of: bisym, pos, neg
 %
 % JH
 

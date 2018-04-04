@@ -1,4 +1,10 @@
 function y = squarepos( x, strict )
+%
+% y = squarepos( x, strict=true )
+%
+% Check that input x is a square matrix with positive entries.
+% If strict is false, then non-negative entries are accepted.
+%
 
     if nargin < 2, strict=true; end
 

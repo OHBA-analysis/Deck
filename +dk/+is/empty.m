@@ -1,6 +1,13 @@
 function y = empty(varargin)
-% Behaves intuitively with struct
-    y = cellfun( @do_test, varargin, 'UniformOutput', true );
+%
+% y = empty(x)
+% y = empty( x1, x2, ... )
+%
+% Check if input(s) is/are empty.
+% Behaves intuitively with structs.
+%
+
+    y = dk.mapfun( @do_test, varargin, true );
 end
 
 function y = do_test(x)

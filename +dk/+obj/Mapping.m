@@ -28,24 +28,31 @@ classdef Mapping < handle
 % ------------------------------
 % ## Storage and usage
 %
+%   The coordinate data is stored in the rows of x  (nmax x ndim).
+%   The associated data is stored in the rows of y  (nmax x nvar).
+%   The associated metadata is stored in meta as a struct.
+%
 %   The properties can be accessed anytime for reading.
 %   The indices are preserved when removing points, BUT NOT when using compress().
 %
 %   New entries should be added one by one using the method: 
 %       add( x, y, 'Field1',Value1, 'Field2',...)
-%   Fieldnames for the metadata are case-sensitive, and are common to all entries.
+%   Only x and y are required, the field/value input correspond to metadata.
+%   The fieldnames are case-sensitive, and are common to all entries.
+%   Omitted fields are assigned the value [] by default.
 %   
 %   Multiple entries can be added at once using the method addn() instead, but in
-%   that case, the metadata should either be input as a struct-array directly, or
-%   the values should be iterable (ie either a vector or a cell).
+%   that case, only x and y can be assigned (i.e. no metadata). The metadata should
+%   then be set manually using
+%       meta(index).field = value                               % field-by-field assignment
+%       meta(index) = structure                                 % requires all fields to be set
+%       meta(index) = dk.struct.merge( meta(index), structure ) % ensures all fields are set
+%   or in bulk using 
+%       assign( indices, field, value )
 %
 %   One or several points can be removed at once using: rem([i1,i2,i3,...]).
 %   Removal simply marks the point as unused, and does not cause reallocation.
 %   The indices of all points in-use are returned by find().
-%
-%   The coordinate data is stored in the rows of x.
-%   The associated data is stored in the rows of y.
-%   The associated metadata is stored in meta as a struct.
 %   
 %   The data at index k can also be accessed with positional outputs [x,y,meta] 
 %   using data(k). If k is a vector, then the outputs are matrices and struct-arrays.
@@ -58,7 +65,8 @@ classdef Mapping < handle
 %   an output to the function iter (this will cause an error otherwise). If it does 
 %   return something, the output is a cell of same length as the number of points 
 %   IN USE (that is, the indices in the output cell do not necessarily correspond 
-%   to the indices of the points within the instance!).
+%   to the indices of the points within the instance!). The corresponding indices are
+%   returned as the second output.
 %   
 %
 % ------------------------------
@@ -214,10 +222,11 @@ classdef Mapping < handle
         end
         function k = addn(self,x,y)
             n = size(x,1);
-            self.reserve(n);
-            
             b = self.last+1;
             e = self.last+n;
+            while e > self.nmax
+                self.alloc(self.bsize);
+            end
             k = b:e;
             
             self.last = e;
@@ -240,7 +249,7 @@ classdef Mapping < handle
             self.x = vertcat(self.x, nan(n,nd));
             self.y = vertcat(self.y, nan(n,nv));
             self.used = vertcat(self.used, false(n,1));
-            self.meta(nm+n) = self.meta(1);
+            self.meta(nm+n) = mkstruct( fieldnames(self.meta) );
         end
         function n = reserve(self,n)
             n = max(0, n - self.capacity);
@@ -270,7 +279,7 @@ classdef Mapping < handle
             self.alloc(cp);
         end
         
-        function out = iter(self,callback,idx)
+        function [out,idx] = iter(self,callback,idx)
             if nargin < 3, idx = self.find(); end
             ni = numel(idx);
             
@@ -304,4 +313,12 @@ end
 % Create a nx1 empty struct-array.
 function s = structcol(n)
     s = repmat( struct(), n, 1 );
+end
+
+% Create struct with specified fields
+function s = mkstruct(f)
+    n = numel(f);
+    c = cell(1,2*n);
+    c(1:2:end) = f;
+    s = struct(c{:});
 end

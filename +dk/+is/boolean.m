@@ -1,3 +1,10 @@
 function y = boolean(varargin)
-    y = cellfun( @(x) islogical(x) && isscalar(x), varargin, 'UniformOutput', true );
+%
+% y = boolean(x)
+% y = boolean(x1, x2, ...)
+%
+% Check if input(s) is/are boolean.
+%
+
+    y = dk.mapfun( @(x) isscalar(x) && islogical(x), varargin, true );
 end

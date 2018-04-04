@@ -3,7 +3,7 @@ function y = struct( x, fields, scalar )
 % y = dk.is.struct( x, fields={}, scalar=true )
 % 
 % Checks whether input is a structure with specified fields.
-% scalar flag can be used to check that it is scalar (ie, not a struct-array).
+% Set the scalar flag to false in order to accept struct-arrays.
 % 
 % fields can be a string or a cell of strings.
 % If fields is empty, then fields are not checked.
