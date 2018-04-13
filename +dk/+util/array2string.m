@@ -54,6 +54,8 @@ function output = array2string( values, format, varargin )
                 V = vertcat( reshape(colNames,[1,nc]), ...
                     arrayfun( @(x) '--', 1:nc, 'UniformOutput', false ), V );
                 rowpad = {'';'--'};
+            otherwise
+                error('Unknown format: %s', format);
         end
     end
     
@@ -86,6 +88,9 @@ function output = array2string( values, format, varargin )
             sep.beg = ' | ';
             sep.val = ' | ';
             sep.row = ' | ';
+            
+        otherwise
+            error('Unknown format: %s', format);
             
     end
     
