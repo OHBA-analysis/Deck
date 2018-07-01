@@ -1,5 +1,11 @@
-classdef Node < handle
-    
+classdef Node
+%
+% Node object to be used with the Tree object.
+%
+% A tree node stores its parent, depth, list of children.
+% In addition, it has data attached to it in the form of a struct.
+%
+
     properties (SetAccess = protected)
         data
         parent

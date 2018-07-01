@@ -10,19 +10,23 @@ function s = set( s, field, value, overwrite )
     if nargin < 4, overwrite=false; end
 
     if ~isfield(s,field) || overwrite
-        n = numel(s);
-
-        if isscalar(value)
-            for i = 1:n, s(i).(field) = value; end
-        elseif numel(value) == n
-            if iscell(value)
-                for i = 1:n, s(i).(field) = value{i}; end
-            else
-                for i = 1:n, s(i).(field) = value(i); end
-            end
-        else
-            error('Number of value(s) does not match structure size.');
-        end
+        [s.(field)] = deal(value);
     end
 
 end
+
+
+% OLD VERSION
+%
+%         n = numel(s);
+%         if isscalar(value)
+%             for i = 1:n, s(i).(field) = value; end
+%         elseif numel(value) == n
+%             if iscell(value)
+%                 for i = 1:n, s(i).(field) = value{i}; end
+%             else
+%                 for i = 1:n, s(i).(field) = value(i); end
+%             end
+%         else
+%             error('Number of value(s) does not match structure size.');
+%         end

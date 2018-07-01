@@ -1,22 +1,31 @@
-function c = compare( v1, v2 )
+function c = compare( v1, v2, cmp_shape, fp_thresh )
 %
-% c = dk.compare( v1, v2 )
+% c = dk.compare( v1, v2, cmp_shape=true, fp_thresh=1e-10 )
 %
 % Generic comparison function between two values v1 and v2.
-% Performs a recursive comparison on types:
-%   cell, struct, numeric, logical
+% Performs a recursive comparison on cells and structs.
+% Floating point comparison is done with absolute threshold fp_thresh.
+% Function handle comparison is done based on their string representation.
 %
-% and any other type/class which implements the operator ==.
+% Any other type/class should implements the operator ==.
 %
 % JH
 
-    FP_THRESHOLD = 1e-10;
+    if nargin < 3, cmp_shape=true; end
+    if nargin < 4, fp_thresh=1e-10; end
+    
+    if cmp_shape
+        cmp_shape = @(a,b) ndims(a)==ndims(b) && all(size(a) == size(b));
+    else
+        cmp_shape = @(a,b) true;
+    end
 
     if isstruct(v1)
         
         n = numel(v1);
         f = fieldnames(v1);
         c = isstruct(v2) && (numel(v2) == n);
+        c = c && cmp_shape(v1,v2);
         i = 1;
         
         while c && (i <= n)
@@ -30,6 +39,7 @@ function c = compare( v1, v2 )
         
         n = numel(v1);
         c = iscell(v2) && (numel(v2) == n);
+        c = c && cmp_shape(v1,v2);
         i = 1;
         
         while c && (i <= n)
@@ -42,11 +52,11 @@ function c = compare( v1, v2 )
         
     elseif isnumeric(v1)
         %c = isnumeric(v2) && (numel(v1) == numel(v2)) && all( v1(:) == v2(:) );
-        c = isnumeric(v2) && (numel(v1) == numel(v2)) && ...
-            ( isempty(v1) || max(abs(v1(:)-v2(:))) < FP_THRESHOLD );
+        c = isnumeric(v2) && cmp_shape(v1,v2) && ...
+            ( isempty(v1) || max(abs(v1(:)-v2(:))) < fp_thresh );
     
     elseif islogical(v1)
-        c = islogical(v2) && (numel(v1) == numel(v2)) && ~any(xor(v1,v2));
+        c = islogical(v2) && cmp_shape(v1,v2) && ~any(xor(v1,v2));
         
     elseif isa(v1,'function_handle')
         c = isa(v2,'function_handle') && strcmp(func2str(v1), func2str(v2));

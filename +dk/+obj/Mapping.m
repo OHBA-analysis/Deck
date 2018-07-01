@@ -1,14 +1,7 @@
-classdef Mapping < handle
+classdef Mapping < dk.priv.GrowingContainer
 %
 % Storage for associating multidimensional coordinates with multivariate data and metadata.
 % The storage is allocated and grown automatically to avoid reallocating the arrays too often.
-%
-% ## WARNING
-%
-%   DO NOT MODIFY THE SHAPE/SIZE/TYPE OF ANY PROPERTY!
-%   DO NOT MODIFY THE VALUE OF: last
-%
-%   THE METHOD compress() INVALIDATES ANY PREVIOUS INDEXING!
 %
 %
 % ------------------------------
@@ -31,15 +24,26 @@ classdef Mapping < handle
 %   The coordinate data is stored in the rows of x  (nmax x ndim).
 %   The associated data is stored in the rows of y  (nmax x nvar).
 %   The associated metadata is stored in meta as a struct.
+%   
+%   A data-point is identified by an index k, which corresponds to:
+%       a row in x and y, 
+%       and a struct in meta.
+%   All data associated with a data-point k can be accessed with data(k), which returns three
+%   outputs [x,y,meta]. If k is a vector, then the outputs are matrices and struct-arrays.
+%   This is useful if you often use x, y and the metadata together; otherwise it is faster to
+%   access individual properties directly.
 %
-%   The properties can be accessed anytime for reading.
-%   The indices are preserved when removing points, BUT NOT when using compress().
+%   Properties can be accessed anytime for reading.
+%   Particular rows/fields can be edited manually, but DO NOT overwrite the properties themselves. 
+%   Indices are preserved when removing points, BUT NOT when using compress().
 %
-%   New entries should be added one by one using the method: 
+%   New data-points can be added one by one using the method: 
 %       add( x, y, 'Field1',Value1, 'Field2',...)
 %   Only x and y are required, the field/value input correspond to metadata.
-%   The fieldnames are case-sensitive, and are common to all entries.
-%   Omitted fields are assigned the value [] by default.
+%   The fieldnames are case-sensitive, and are common to all entries: setting a field 'foo' for 
+%   any data-point will cause every other data-point to have a field with the same name.
+%   New field names can be set dynamically during usage.
+%   When adding a data-point as above, omitted fields are assigned the value [] by default.
 %   
 %   Multiple entries can be added at once using the method addn() instead, but in
 %   that case, only x and y can be assigned (i.e. no metadata). The metadata should
@@ -49,41 +53,19 @@ classdef Mapping < handle
 %       meta(index) = dk.struct.merge( meta(index), structure ) % ensures all fields are set
 %   or in bulk using 
 %       assign( indices, field, value )
-%
-%   One or several points can be removed at once using: rem([i1,i2,i3,...]).
-%   Removal simply marks the point as unused, and does not cause reallocation.
-%   The indices of all points in-use are returned by find().
 %   
-%   The data at index k can also be accessed with positional outputs [x,y,meta] 
-%   using data(k). If k is a vector, then the outputs are matrices and struct-arrays.
-%   This can be useful if you always use x, y and the metadata together for any index.
-%
 %   Finally, all points in-use can be iterated using the method: iter( @callback )
 %   The callback should be a function-handle accepting the following inputs:
 %       callback( k:index, x:row, y:row, meta:struct )
-%   It does not need to return an output, BUT IF IT DOES NOT, you should not request
-%   an output to the function iter (this will cause an error otherwise). If it does 
-%   return something, the output is a cell of same length as the number of points 
+%   It does not need to return an output, BUT IF IT DOES NOT, you should not collect an output 
+%   from the function iter (this will cause an error). 
+%   If it does return something, the output is a cell of same length as the number of points 
 %   IN USE (that is, the indices in the output cell do not necessarily correspond 
-%   to the indices of the points within the instance!). The corresponding indices are
-%   returned as the second output.
+%   to the indices of the points within the instance!). The corresponding indices are returned 
+%   as the second output.
 %   
 %
-% ------------------------------
-% ## Memory management
-%
-%   The memory allocation is managed dynamically, and evolves with the instance.
-%   Manual allocations for N entries can be forced using the method alloc(N).
-%
-%   In most cases, you will want to use reserve(N) instead, which checks whether
-%   the capacity allows the addition of N new points without dynamic reallocation.
-%   
-%   If you remove a lot of points, you should run compress() to optimise the storage.
-%   A remap of previous indices is returned in output, and can be used simply as:
-%       new_index = remap(old_index)
-%   
-%   You can also monitor the sparsity to assess whether compression is needed.
-%   A warning will be issued everytime a point is removed if the sparsity is above 90%.
+% See also: dk.priv.GrowingContainer
 %
 % JH
 
@@ -91,26 +73,19 @@ classdef Mapping < handle
         x           % nmax x npts matrix
         y           % nmax x nvar matrix
         meta        % struct-array of metadata
-        used        % nmax x 1 logical
-        last        % index of last used point
-        bsize       % default reallocation size
     end
     
     properties (Transient,Dependent)
-        nmax        % number of points allocated
         npts        % number of points in use
         ndim        % number of columns in x
         nvar        % number of columns in y
-        ready       % check if the object has been initialised
-        capacity    % number of points that can be added without reallocation
-        sparsity    % sparsity ratio (>0.2 means compression needed)
     end
     
     % dependent properties
     methods
         
         function n = get.npts(self)
-            n = sum(self.used);
+            n = self.nelm;
         end
         function n = get.ndim(self)
             n = size(self.x,2);
@@ -118,43 +93,29 @@ classdef Mapping < handle
         function n = get.nvar(self)
             n = size(self.y,2);
         end
-        function n = get.nmax(self)
-            n = numel(self.used);
-        end
-        function y = get.ready(self)
-            y = ~isempty(self.x);
-        end
-        function n = get.capacity(self)
-            n = self.nmax - self.last;
-        end
-        function s = get.sparsity(self)
-            s = 1 - self.npts / self.last;
-        end
-        
     end
     
     % i/o
     methods
         
         function s=serialise(self,file)
-            f = {'x','y','meta','used','last','bsize'};
-            n = numel(f);
-            s.version = '0.1';
-            for i = 1:n
-                s.(f{i}) = self.(f{i});
-            end
+            s = self.gcToStruct();
+            s.x = self.x;
+            s.y = self.y;
+            s.meta = self.meta;
+            s.version = '0.2';
             if nargin > 1, save(file,'-v7','-struct','s'); end
         end
         
         function self=unserialise(self,s)
         if ischar(s), s=load(s); end
         switch s.version
-            case '0.1'
-                f = {'x','y','meta','used','last','bsize'};
-                n = numel(f);
-                for i = 1:n
-                    self.(f{i}) = s.(f{i});
-                end
+            case {'0.1','0.2'}
+                self.x = s.x;
+                self.y = s.y;
+                self.meta = s.meta;
+                self.gcFromStruct(s);
+                
             otherwise
                 error('Unknown version: %s',s.version);
         end
@@ -179,104 +140,35 @@ classdef Mapping < handle
         end
         
         function clear(self)
+            self.gcClear();
             self.x = [];
             self.y = [];
             self.meta = structcol(0);
-            self.used = false(0);
-            self.bsize = 0;
-            self.last = 0;
         end
         
         function reset(self,nd,nv,b)
             if nargin < 4, b=500; end
-            
+            self.gcInit(b);
             self.x = nan( b, nd );
             self.y = nan( b, nv );
             self.meta = structcol(b);
-            self.used = false(b,1);
-            self.bsize = b;
-            self.last = 0;
         end
         
-        function rem(self,k)
-            self.used(k) = false;
-            dk.wreject( self.sparsity > 0.9, 'Storage is very sparse, you should run compress().' );
-        end
         function k = add(self,x,y,varargin)
-            k = self.last+1;
-            if k > self.nmax
-                self.alloc(self.bsize);
-            end
-            
-            self.last = k;
-            self.used(k) = true;
-            self.x(k,:) = x;
-            self.y(k,:) = y;
-            
-            n = nargin - 3;
-            for i = 1:2:n
-                field = varargin{i};
-                value = varargin{i+1};
-                self.meta(k).(field) = value;
-            end
-        end
-        function k = addn(self,x,y)
             n = size(x,1);
-            b = self.last+1;
-            e = self.last+n;
-            while e > self.nmax
-                self.alloc(self.bsize);
-            end
-            k = b:e;
+            assert( ismatrix(x) && size(x,2)==self.ndim, 'Bad x.' );
+            assert( ismatrix(y) && size(y,2)==self.nvar && size(y,1)==n, 'Bad y.' );
             
-            self.last = e;
-            self.used(k) = true;
-            
+            k = self.gcAdd(n);
             self.x(k,:) = x;
             self.y(k,:) = y;
+            self.assign(k,varargin{:});
         end
         function [x,y,m] = data(self,k)
+            assert( k < self.last && self.used(k), 'Index out of bounds or unused.' );
             x = self.x(k,:);
             y = self.y(k,:);
             m = self.meta(k);
-        end
-        
-        function alloc(self,n)
-            nd = self.ndim;
-            nv = self.nvar;
-            nm = self.nmax;
-            
-            self.x = vertcat(self.x, nan(n,nd));
-            self.y = vertcat(self.y, nan(n,nv));
-            self.used = vertcat(self.used, false(n,1));
-            self.meta(nm+n) = mkstruct( fieldnames(self.meta) );
-        end
-        function n = reserve(self,n)
-            n = max(0, n - self.capacity);
-            if n > 0
-                self.alloc(n);
-            end
-        end
-        
-        function id = find(self)
-            id = find(self.used);
-        end
-        function remap = compress(self)
-            np = self.npts;
-            nc = self.last;
-            id = self.find();
-            cp = self.capacity;
-            
-            remap = zeros(nc,1);
-            remap(id) = 1:np;
-            
-            self.x = self.x(id,:);
-            self.y = self.y(id,:);
-            self.meta = self.meta(id);
-            self.used = self.used(id);
-            
-            self.last = np;
-            self.alloc(cp);
         end
         
         function [out,idx] = iter(self,callback,idx)
@@ -298,13 +190,33 @@ classdef Mapping < handle
         end
         
         % bulk assign of metadata field by copying the value
-        function self = assign(self,index,field,value)
-            n = numel(index);
-            for i = 1:n
-                self.meta(index(i)).(field) = value;
+        function self = assign(self,k,varargin)
+            n = nargin-2;
+            assert( dk.is.even(n) && iscellstr(varargin(1:2:end)), 'Bad assignment.' );
+            for i = 1:2:n
+                [self.meta(k).(varargin{i})] = deal(varargin{i+1});
             end
         end
         
+    end
+    
+    methods (Hidden)
+        
+        function childAlloc(self,n)
+            nd = self.ndim;
+            nv = self.nvar;
+            nm = self.nmax;
+            
+            self.x = vertcat(self.x, nan(n,nd));
+            self.y = vertcat(self.y, nan(n,nv));
+            self.meta(nm+n) = dk.struct.make( fieldnames(self.meta) );
+        end
+        
+        function childCompress(self,id,remap)
+            self.x = self.x(id,:);
+            self.y = self.y(id,:);
+            self.meta = self.meta(id);
+        end
         
     end
     
@@ -315,10 +227,3 @@ function s = structcol(n)
     s = repmat( struct(), n, 1 );
 end
 
-% Create struct with specified fields
-function s = mkstruct(f)
-    n = numel(f);
-    c = cell(1,2*n);
-    c(1:2:end) = f;
-    s = struct(c{:});
-end
