@@ -1,65 +1,93 @@
 classdef Tree < handle
-    
-    properties
-        node
-        bsize
-    end
+%
+% Tree implementation, using a dk.obj.DataArray as extensible storage.
+% The columns of the storage are:
+%   parent
+%   depth
+%   nchildren
+%
+% Most operations are as efficient as expected, except:
+%   list children       O(n)
+%   list offspring      O(n log(n))
+%   remove node         O(n log(n))
+% where n is the total number of nodes. 
+%
+% Traversal methods are non-recursive.
+%
+% JH
 
-    properties (SetAccess = protected)
-        last
+    properties (SetAccess = private, Hidden)
+        store
     end
     
-    properties (Transient,Dependent)
-        n_nodes, n_leaves, n_parents;
-        sparsity, capacity;
+    properties (Transient, Dependent)
+        n_nodes, nn
+        n_leaves, nl
+        n_parents, np
+        sparsity
     end
     
-    % dependent properties
     methods
-        function v=valid(self) % quick function to find valid nodes
-            v=[self.node.depth] > 0;
+        
+        function self = Tree(varargin)
+            self.clear();
+            if nargin > 0
+                if ischar(varargin{1})
+                    self.unserialise(varargin{1});
+                else
+                    self.reset(varargin{:});
+                end
+            end
+                
         end
         
-        function n=get.n_nodes(self)
-            n=sum(self.valid());
-        end
-        function n=get.n_leaves(self)
-            n=sum(self.valid() & [self.node.is_leaf]);
-        end
-        function n=get.n_parents(self)
-            n=sum(self.valid() & ~[self.node.is_leaf]);
+        function clear(self)
+            self.store = dk.obj.DataArray();
         end
         
-        function s=get.sparsity(self)
-            s = 1 - self.last / self.n_nodes;
+        function reset(self,bsize,varargin)
+            if nargin < 2, bsize=100; end
+            self.store = dk.obj.DataArray( {'parent','depth','nchildren','child','sibling'}, bsize );
+            self.store.add( [0,1,0,0,0], varargin{:} );
         end
-        function n=get.capacity(self)
-            n = numel(self.node) - self.last;
+        
+        % dependent properties
+        function n = get.nn(self), n = self.store.nelm; end
+        function n = get.np(self), n = nnz(self.store.col('nchildren')); end
+        function n = get.nl(self), n = self.nn - self.np; end
+        
+        function n = get.n_nodes(self), n = self.nn; end
+        function n = get.n_leaves(self), n = self.nl; end
+        function n = get.n_parents(self), n = self.np; end
+        
+        function s = get.sparsity(self), s = self.store.sparsity; end
+        function r = ready(self), r = self.nn > 0; end
+        
+        % compress storage and reindex the tree
+        function remap = compress(self,res)
+            if nargin < 2, res = self.store.bsize; end
+            remap = self.store.compress();
+            remap = [0; remap(:)];
+            self.store.data(:,[1,4,5]) = remap(1+self.store.data(:,[1,4,5]));
+            self.store.reserve(res);
         end
+        
     end
     
     % i/o
     methods
         
         function s=serialise(self,file)
-            s.version = '0.2';
-            s.node = dk.mapfun( @(n) n.serialise(), self.node, false );
-            s.last = self.last;
-            s.bsize = self.bsize;
+            s.version = '0.1';
+            s.store = self.store.serialise();
             if nargin > 1, save(file,'-v7','-struct','s'); end
         end
         
         function self=unserialise(self,s)
         if ischar(s), s=load(s); end
-        self.node = dk.mapfun( @(n) dk.obj.Node(n), s.node, false );
-        self.node = [self.node{:}];
         switch s.version
             case '0.1'
-                self.last = numel(self.node);
-                self.bsize = 100;
-            case '0.2'
-                self.last = s.last;
-                self.bsize = s.bsize;
+                self.store = dk.obj.DataArray().unserialise( s.store );
             otherwise
                 error('Unknown version: %s',s.version);
         end
@@ -71,342 +99,238 @@ classdef Tree < handle
         
     end
     
-    % setup
+    % tree methods
     methods
         
-        function self = Tree(varargin)
-            self.reset(varargin{:});
+        % node properties
+        function k = indices(self)
+            k = self.store.find();
         end
         
-        function self=reset(self,varargin)
-            % initialise storage
-            self.node = [];
-            self.bsize = 100;
-            self.alloc(self.bsize);
-            
-            % set root node
-            self.node = dk.obj.Node(1,1,varargin{:});
-            self.last = 1;
+        function y = isleaf(self,k)
+            y = self.nchildren(k) > 0;
+        end
+        function y = isvalid(self,k)
+            y = self.store.used(k);
         end
         
-        % allocate storage for additional nodes
-        % NOTE: this relies on dk.obj.Node() to be invalid by default
-        function alloc(self,n)
-            assert( n > 0, 'Allocation size should be positive.' );
-            if isempty(self.node)
-                self.node = repmat( dk.obj.Node(), 1, n );
-            else
-                self.node(end+n) = dk.obj.Node();
+        function p = parent(self,k)
+            p = self.store.dget(k,1);
+        end
+        function [p,k] = parents(self)
+            p = self.store.col('parent');
+            if nargout > 1
+                k = self.indices(); 
             end
         end
         
-        % remove deleted nodes and re-index the tree
-        function self=cleanup(self)
-            
-            depth = [self.node.depth];
-            valid = depth > 0;
-            
-            % check gaps in depth (this should not happen)
-            count = accumarray( 1+depth(:), 1 );
-            assert( all(count(2:end) > 0), 'Bug during removal.' );
-            
-            % remap valid indices, and sort by depth
-            [~,order] = sort(depth(valid));
-            old2new = zeros(size(self.node));
-            old2new(valid) = order;
-            
-            self.node = self.node(valid);
-            n = numel(self.node);
+        function s = siblings(self,k,unwrap)
+            if nargin < 3, unwrap=true; end
+            s = self.children(self.parent(k),false);
+            n = numel(s);
             for i = 1:n
-                self.node(i).remap( old2new );
+                s{i} = s{i}( s{i} ~= k(i) );
             end
-            self.last = n;
+            if unwrap && n == 1
+                s = s{1};
+            end
+        end
+        
+        function d = depth(self,k) 
+            if nargin > 1
+                d = self.store.dget(k,2);
+            else
+                % return tree-depth if called without index
+                d = max(self.store.col('depth'));
+            end
+        end
+        function [d,k] = depths(self)
+            d = self.store.col('depth');
+            if nargout > 1
+                k = self.indices(); 
+            end
+        end
+        
+        function n = nchildren(self,k)
+            n = self.store.dget(k,3);
+        end
+        function [n,k] = nchildrens(self)
+            n = self.store.col('parent');
+            n = accumarray(n(:),1,size(n));
+            if nargout > 1
+                k = self.indices(); 
+            end
+        end
+        
+        function c = children(self,k,unwrap)
+            if nargin < 3, unwrap=true; end
             
+            n = numel(k);
+            if n > log(1+self.nn)
+                c = self.childrens();
+                c = c(k);
+            else
+                c = cell(1,n);
+                for i = 1:n
+                    c{i} = find(self.store.used & (self.store.data(:,1) == k(i)));
+                end
+            end
+            if unwrap && n==1
+                c = c{1};
+            end
+        end
+        function [C,k] = childrens(self)
+            [p,k] = self.parents();
+            C = dk.util.grouplabels(p,numel(k));
+            C = dk.mapfun( @(i) k(i), C, false );
+        end
+        
+        function o = offspring(self,k,unwrap)
+        %
+        % Most efficient given storage, but pretty slow...
+            if nargin < 3, unwrap=true; end
+        
+            n = numel(k);
+            N = self.nchildren(k);
+            d = self.depth();
+            o = cell(1,n);
+            t = cell(1,d);
+            
+            if all(N == 0), return; end
+            C = self.childrens();
+            
+            for i = 1:n
+                j = 1;
+                t{1} = horzcat(C{ki});
+                while ~isempty(t{j})
+                    t{j+1} = horzcat(C{t{j}});
+                    j = j+1;
+                end
+                o{i} = horzcat(t{:});
+            end
+            if unwrap && n == 1
+                o = o{1};
+            end
+        end
+        
+        
+        % tree properties
+        function [depth,width] = shape(self)
+            depth = self.store.col('depth');    % depth of each node
+            width = accumarray( depth(:), 1 );  % width at each depth
+            depth = max(depth);                 % depth of the tree
+        end
+        
+        function L = levels(self)
+            [d,k] = self.depths();
+            L = dk.util.grouplabels(d);
+            L = dk.mapfun( @(i) k(i), L, false );
+        end
+        
+        
+        % node access
+        function [n,m] = root(self,varargin)
+            [n,m] = self.get_node(1,varargin{:});
+        end
+        
+        function [n,p] = get_node(self,k,with_children) % works with k vector
+            if nargin < 3, with_children=false; end
+            
+            if nargout > 1
+                [d,p] = self.store.both(k);
+            else
+                d = self.store.row(k);
+            end
+            n = cell2struct( num2cell(d), {'p','d','nc'}, 2 );
+            
+            if with_children
+                [n.c] = deal(self.children(k,false));
+            end
+        end
+        
+        function p = get_props(self,k)
+            p = self.store.mget(k);
+        end
+        function set_props(self,k,varargin)
+            self.store.assign(k,varargin{:});
+        end
+        function rem_props(self,varargin)
+            self.store.rmfield(varargin{:});
+        end
+        
+        function k = add_node(self,p,varargin) % works with p vector
+            n = numel(p);
+            x = [p(:), self.depth(p)+1, zeros(n,1)];
+            k = self.store.add( x, varargin{:} );
+            self.store.data(p,3) = self.store.data(p,3) + 1; % add to parent count
+        end
+        function r = rem_node(self,k)
+            k = k(:)';
+            assert( all(k > 1), 'The root (index 1) cannot be removed.' );
+            
+            p = self.parent(k);
+            o = self.offspring(k,false);
+            r = [horzcat(o{:}), k];
+            if isempty(k), return; end
+            
+            self.store.rem(r);
+            self.store.data(p,3) = self.store.data(p,3) - 1; % subtract from parent count
         end
         
     end
     
-    % main
+    % traversal methods
     methods
         
-        % shape of the tree
-        function [depth,width] = shape(self)
-            depth = nonzeros([self.node.depth]);
-            width = accumarray( depth(:), 1 );
-            depth = max(depth);
-        end
-        
-        % add/remove single node
-        function k=add_node(self,p,varargin)
-            assert( self.node(p).is_valid, 'Invalid parent' );
-            
-            k = self.last+1;
-            d = self.node(p).depth+1;
-            if k > numel(self.node)
-                self.alloc(self.bsize);
-            end
-            
-            self.node(k) = dk.obj.Node(d,p,varargin{:});
-            self.node(p).add_child(k);
-            self.last = k;
-        end
-        function self=rem_node(self,k)
-            assert( isscalar(k), 'This method removes one node at a time, use rem_nodes instead.' );
-            assert( k > 1, 'Cannot remove the root, use reset() instead.' );
-            
-            % cannot remove node from array without screwing up indices
-            % to free up memory, use cleanup
-            self.parent(k).rem_child(k);
-            c = self.node(k).children;
-            for i = 1:length(c)
-                self.rem_node(c(i));
-            end
-            self.node(k).clear();
-        end
-        
-        % add n children to node p, and return their indices
-        function k=add_nodes(self,p,n)
-            k = zeros(1,n);
-            e = self.last + n;
-            while e > numel(self.node)
-                self.alloc(self.bsize);
-            end
-            for i = 1:n
-                k(i) = self.add_node(p);
-            end
-            self.last = k(end);
-        end
-        
-        % remove nodes by index
-        function rem_nodes(self,k)
-            for i = 1:numel(k)
-                self.rem_node(k(i));
-            end
-        end
-        
-        % set/get node property
-        % val should either be iterable or scalar
-        % returns indices of valid nodes
-        function k = set_prop(self,name,val)
-            k = find(self.valid());
-            n = numel(k);
-            if n > 1 && isscalar(val)
-                val = dk.mapfun( @(x) val, 1:n, false ); % make a cell
-            end
-            for i = 1:n
-                self.node(k(i)).data.(name) = dk.getelem(val,i); 
-            end
-        end
-        function [val,idx] = get_prop(self,name,unif)
-            if nargin < 3, unif=false; end
-            idx = find(self.valid());
-            val = dk.mapfun( @(k) self.node(k).data.(name), idx, unif );
-        end
-        
-        % proxy for node properties
-        function N=root(self)
-            N=self.node(1);
-        end
-        function p=parent(self,k)
-            p=self.node( self.node(k).parent );
-        end
-        function N=children(self,k)
-            N=self.node( self.node(k).children );
-        end
-        
-        function [L,N] = levels(self)
-        % 
-        % [L,N] = levels(self)
-        %
-        % Group nodes by level, and return a cell with indices for each level.
-        % If second output is collected, it contains a cell of node-arrays.
-        % 
-        % JH
-        
-            depth = [self.node.depth];
-            valid = find([self.node.is_valid]);
-            
-            [depth,order] = sort(depth(valid),'ascend');
-            valid = valid(order);
-            stride = [find(diff(depth)==1), numel(depth)];
-            
-            n = numel(stride);
-            L = cell(1,n);
-            e = 0;
-            for i = 1:n
-                b = e+1;
-                e = stride(i);
-                L{i} = valid(b:e);
-            end
-            
-            if nargout > 1
-                N = dk.mapfun( @(ind) self.node(ind), L, false );
-            end
-        end
-        
-        function N = level(self,D)
-        %
-        % N = level(self,D)
-        %
-        % Get a struct-array of nodes at a given depth.
-        %
-        % JH
-        
-            N = self.node( [self.node.depth] == D );
-        end
-        
-        function [C,N] = descent(self,k)
-        %
-        % C = descent(self,k)
-        %
-        % List of node indices for all nodes descending from node k.
-        % If second output is requested, then the function returns a vector
-        % with the corresponding nodes.
-        %
-        % JH
-        
-            C = {};
-            t = self.node(k).children;
-            
-            while ~isempty(t)
-                C{end+1} = t; %#ok
-                t = [ self.node(t).children ];
-            end
-            
-            C = [C{:}];
-            if nargout > 1
-                N = self.node(C);
-            end
-
-        end
-        
-        % iteration on valid nodes
-        function [out,idx] = iter(self,callback)
-        %
-        % [out,idx] = iter(callback)
-        %
-        % Iterate on valid nodes, and call callback function with arguments (index,node).
-        % Callback needs not return anything if output is not collected.
-        % Otherwise, cell of outputs is collected.
-        % Second output corresponds to node indices.
-        %
-        % JH
-            
-            idx = find(self.valid());
+        function [out,id] = iter(self,callback)
+            id = self.indices();
             if nargout == 0
-                dk.mapfun( @(k) callback(k, self.node(k)), idx );
+                dk.mapfun( @(k) callback(k, self.get_node(k), self.get_props(k)), id );
             else
-                out = dk.mapfun( @(k) callback(k, self.node(k)), idx, false );
+                out = dk.mapfun( @(k) callback(k, self.get_node(k), self.get_props(k)), id, false );
             end
+        end
+        
+        % see: https://stackoverflow.com/a/51124171/472610
+        
+        function bfs(self,callback,start)
+            if nargin < 3, start=1; end
             
-        end
-        
-        
-        % traversal methods
-        function bfs(self,callback,cur)
-        %
-        % bfs(self,callback)
-        %
-        % Breadth-first traversal methods.
-        % Note that the order of traversal is not guaranteed.
-        % The callback function is called as follows:
-        %
-        %   callback( node_index, node )
-        %
-        
-            if nargin < 3, cur = 1; end
-            next = cell(size(cur));
-            for i = 1:length(cur)
-                curnode = self.node(cur(i));
-                callback(cur(i), curnode);
-                next{i} = curnode.children;
-            end
-            next = unique(horzcat( next{:} ));
-            if ~isempty(next)
-                self.bfs( callback, next );
-            end
-        end
-        function dfs(self,callback,cur)
-        %
-        % dfs(self,callback)
-        %
-        % Depth-first traversal methods.
-        % Note that the order of traversal is not guaranteed.
-        % The callback function is called as follows:
-        %
-        %   callback( node_index, node )
-        %
-        
-            if nargin < 3, cur=1; end
-            assert( isscalar(cur), 'Expected a single node.' );
-            curnode = self.node(cur);
-            callback(cur, curnode);
-            next = curnode.children;
-            for i = 1:length(next)
-                self.dfs( callback, next(i) );
+            C = self.childrens();
+            N = self.nn;
+            S = zeros(1,N);
+            
+            S(1) = start;
+            cur = 1;
+            last = 1;
+            while cur <= last
+                id = S(cur);
+                callback( id, self.get_node(id), self.get_props(id) );
+                
+                n = numel(C{id});
+                S( last + (1:n) ) = C{id};
+                last = last + n;
+                cur = cur + 1;
             end
         end
         
-        function print(self,fid)
-        %
-        % print(self,fid)
-        %
-        % Print to file (or console by default).
-        % Each line has one of the two following format:
-        %
-        %   ParentID>NodeID [Depth] : NChildren children, NFields data-fields
-        %   #NodeID [Depth] : DELETED
-        % 
-        %JH
-        
-            if nargin < 2, fid=1; end
-            N = self.n_nodes;
-            for i = 1:N 
-                Ni = self.node(i);
-                if Ni.is_valid
-                    fprintf( fid, '%d>%d [%d] : %d children, %d data-fields\n', ...
-                        Ni.parent, i, Ni.depth, numel(Ni.children), numel(Ni.fields) );
-                else
-                    fprintf( fid, '#%d [%d] : DELETED\n', i, Ni.depth );
-                end
+        function dfs(self,callback,start)
+            if nargin < 3, start=1; end
+            
+            C = self.childrens();
+            N = self.nn;
+            S = zeros(1,N);
+            
+            S(1) = start;
+            cur = 1;
+            while cur > 0
+                id = S(cur);
+                callback( id, self.get_node(id), self.get_props(id) );
+                
+                n = numel(C{id});
+                S( cur-1 + (1:n) ) = fliplr(C{id});
+                cur = cur-1 + n;
             end
-        end
-        
-        function gobj = plot_tree(self,varargin)
-        %
-        % gobj = plot( varargin )
-        %
-        % Draw the tree.
-        %
-        % Options:
-        %
-        %      Newfig  Open new figure to draw.
-        %             >Default: true
-        %        Link  Link options (cf Line properties)
-        %             >Default: {} (none)
-        %      Height  Function of width and depth giving the height of links.
-        %              Should generally be a decreasing function of depth.
-        %              Can also be scalar or array.
-        %             >Default: @(w,d) w(1) ./ sqrt(1:d)
-        %      Sepfun  Function of the depth adding width to separate branches
-        %             >Default: @(x)x/10 or @(x)zeros(size(x))
-        %     Balance  Balancing flag (children reordering)
-        %             >Default: true
-        %    NodeSize  RELATIVE size of the node (between 0 and 1)
-        %             >Default: 0.5
-        %   NodeColor  Face-color of the node
-        %             >Default: hsv colormap
-        %    NodeEdge  Colour of the edges
-        %             >Default: 'k'
-        %     ToolTip  Function handle to be called by datacursormode
-        %             >Default: shows "id: NodeID"
-        %      Radial  Flag to draw the tree with radial geometry
-        %             >Default: false
-        %
-        % JH
-        
-            gobj = dk.priv.plot_tree(self,varargin{:});
-        
         end
         
     end

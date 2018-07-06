@@ -2,6 +2,12 @@ function c = rwb2( n, signed )
 %
 % c = rwb2( n=64, signed=false )
 %
+% Prettier version of the red-white-blue colormap.
+% Default number of colors is 64, from white to red.
+%
+% In the unsigned case, the values go from white to red.
+% In the signed case, the negative part is from blue to red.
+%
 
     if nargin < 1, n = 64; end
     if nargin < 2, signed = false; end

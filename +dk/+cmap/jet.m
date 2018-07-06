@@ -2,7 +2,7 @@ function c = jet( n, signed )
 %
 % c = jet( n=64, signed=false )
 %
-% Blue-white/black-red colormap.
+% Replicate the jet colormap with brighter colors.
 %   n is the desired number of colors (default: 64).
 %   signed can be set to true if caxis is symmetric & centered at 0.
 %   

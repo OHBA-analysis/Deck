@@ -8,7 +8,7 @@ function [imfs,status] = huang_transform( data, varargin )
 % OPTIONS
 %
 %    sd_thresh  Stop decomposition if std goes below this threshold.
-%      max_img  Maximum number of IMFs
+%      max_imf  Maximum number of IMFs
 %   min_energy  Stop decomposition if energy goes below this threshold.
 %
 % JH

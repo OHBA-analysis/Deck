@@ -1,4 +1,31 @@
 function y = exist( name, kind )
+%
+% y = dk.fs.exist( name, kind=any )
+% 
+% Enhanced exist function.
+%
+% kind:
+%   any
+%       anything
+%   file
+%       fs file, not a folder
+%   link, symlink
+%       fs symlink
+%   dir, folder
+%       fs folder
+%   var, variable
+%       env variable
+%   function, fun
+%       env function
+%   builtin
+%       env builtin function
+%   mfile, mscript
+%       fs matlab script on the path
+%   mex, mexfile
+%       fs mex script on the path
+%   class
+%       env class
+%
 
     if nargin < 2, kind='any'; end
     

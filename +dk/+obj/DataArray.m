@@ -117,6 +117,12 @@ classdef DataArray < dk.priv.GrowingContainer
             end
         end
         
+        % remove metadata fields
+        function rmfield(self,varargin)
+            assert( iscellstr(varargin), 'Expected list of fieldnames.' );
+            self.meta = rmfield(self.meta,varargin);
+        end
+        
         % add entries
         function k = add(self,x,varargin)
             assert( ismatrix(x) && size(x,2) == self.ncols, 'Bad number of columns.' );
