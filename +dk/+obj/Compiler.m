@@ -12,8 +12,8 @@ classdef Compiler < handle
 %      out_dir  -outdir out_dir
 %     opt_file  -f opt_file
 %    use_cpp0x  CXXFLAGS="$CXXFLAGS -std=c++0x"
-% use_64b_size ¬-compatibleArrayDims / -largeArrayDims
-%     mex_file ¬-c
+% use_64b_size  -compatibleArrayDims / -largeArrayDims
+%     mex_file  -c
 %      dry_run  -n
 %     optimize  -O
 %        debug  -g
@@ -35,7 +35,6 @@ classdef Compiler < handle
 %   run build() to update the internal state
 %   run print() to show the command built
 %   run compile() to do it
-%   
 %
 % JH
 
