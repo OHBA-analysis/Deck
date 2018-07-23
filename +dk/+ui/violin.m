@@ -49,7 +49,7 @@ function dist = violin( data, varargin )
     % parse options
     opt_width = opt.get('width',0.7);
     opt_label = opt.get('label',1:nd);
-    opt_theme = opt.get('theme','orange');
+    opt_theme = opt.get('theme','jh');
     opt_range = opt.get('range',[]);
     opt_kern  = opt.get('kernel','normal');
     opt_supp  = opt.get('support',[]);
@@ -64,11 +64,16 @@ function dist = violin( data, varargin )
     assert( numel(opt_label) == nd, 'There should be one label per column.' );
     
     % colors used for drawing
+    colors = dk.clr.jh();
     switch lower(opt_theme)
         case 'orange'
             theme.box = hsv2rgb([30/360 1 0.9]); % orange
             theme.med = hsv2rgb([30/360 1 0.1]); % black
             theme.avg = hsv2rgb([200/360 1 0.9]/100); % blue
+        case 'jh'
+            theme.box = colors.tang; % orange
+            theme.med = colors.dark; % black
+            theme.avg = colors.sky; % blue
     end
 
     % process ksdensity options

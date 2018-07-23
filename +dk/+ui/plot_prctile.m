@@ -1,5 +1,6 @@
-function [ph,fh] = plot_prctile( x, y, lo, hi, popts, fopts )
+function [ph,fh] = plot_prctile( x, y, lo, hi, varargin )
 %
+% [ph,fh] = plot_prctile( x, y, lo, hi, theme ) 
 % [ph,fh] = plot_prctile( x, y, lo, hi, popts, fopts )
 %
 % Percentile plot.
@@ -21,16 +22,7 @@ function [ph,fh] = plot_prctile( x, y, lo, hi, popts, fopts )
 %
 % JH
 
-
-    color_blue = lab2rgb([60 -5 -30]);
-    color_red  = lab2rgb([60 45  20]);
-    
-    if nargin < 5
-        popts = {'LineWidth',1.5,'Color',color_blue};
-    end
-    if nargin < 6
-        fopts = {'LineWidth',1,'EdgeColor',color_red,'FaceAlpha',.7};
-    end
+    [popt,fopt,fcol] = dk.priv.linefill_options(varargin{:});
     
     [y,x] = dk.ts.format(y,x,'vert');
     assert( isscalar(lo) && isscalar(hi), 'Lower/higher percentiles should integers between 0 and 100.' );
@@ -41,8 +33,8 @@ function [ph,fh] = plot_prctile( x, y, lo, hi, popts, fopts )
     if n >= 3
         y_lo = prctile( y, lo, 2 );
         y_hi = prctile( y, hi, 2 );
-        fh = fill( vertcat(x,flipud(x)), vertcat(y_hi,flipud(y_lo)), color_red, fopts{:} ); hold on;
+        fh = fill( vertcat(x,flipud(x)), vertcat(y_hi,flipud(y_lo)), fcol, fopt{:} ); hold on;
     end
-    ph = plot( x, y_md, popts{:} ); hold off;
+    ph = plot( x, y_md, popt{:} ); hold off;
 
 end

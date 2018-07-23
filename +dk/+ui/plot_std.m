@@ -1,5 +1,7 @@
-function [ph,fh] = plot_std( x, y, yd, popts, fopts )
-% [ph,fh] = plot_std( x, y, yd, popts, fopts )
+function [ph,fh] = plot_std( x, y, yd, varargin )
+%
+% [ph,fh] = plot_std( x, y, yd, theme )
+% [ph,fh] = plot_std( x, y, yd, popt, fopt )
 %
 % Mean-deviation plot.
 % Plot the curve (x,y) on top of a background area spanning (y-yd,y+yd).
@@ -22,15 +24,7 @@ function [ph,fh] = plot_std( x, y, yd, popts, fopts )
 %
 % JH
 
-    if nargin < 4, popts=[]; end
-    if nargin < 5, fopts=[]; end
-
-    color_blue = lab2rgb([60 -5 -30]);
-    color_red  = lab2rgb([60 45  20]);
-    
-    % default options (plot and fill)
-    popts = set_options( popts, 'Color', 'LineWidth', 1.5, 'Color', color_blue );
-    fopts = set_options( fopts, 'EdgeColor', 'LineWidth', 1, 'EdgeColor', color_red, 'FaceAlpha', 0.6 );
+    [popt,fopt,fcol] = dk.priv.linefill_options(varargin{:});
     
     % dimensions and formatting
     n = numel(x);
@@ -55,39 +49,7 @@ function [ph,fh] = plot_std( x, y, yd, popts, fopts )
     end
     
     % plot it
-    fcol  = fopts.EdgeColor;
-    fopts = dk.struct.to_cell(fopts);
-    popts = dk.struct.to_cell(popts);
-    
-    fh = fill( [x; flipud(x)], [yd(:,1); flipud(yd(:,2))], fcol, fopts{:} ); hold on;
-    ph = plot( x, y, popts{:} ); hold off;
+    fh = fill( [x; flipud(x)], [yd(:,1); flipud(yd(:,2))], fcol, fopt{:} ); hold on;
+    ph = plot( x, y, popt{:} ); hold off;
 
-end
-
-function out = set_options( in, cname, varargin )
-%
-% empty   : defaults are set
-% 1x3 vec : interpreted as color
-% struct  : converted to a cell
-% K/V cell: ok
-%
-
-    % convert defaults to structure
-    def = struct(varargin{:});
-    
-    if isempty(in)
-        out = def; % set defaults
-    elseif isvector(in) 
-        assert( numel(in)==3, 'Expected 1x3 color vector.' );
-        def.(cname) = in; % interpret as color vector
-        out = def;
-    else 
-        out = in;
-    end
-    
-    if iscell(out)
-        out = struct(out{:});
-    end
-    assert( isstruct(out), 'Bad options type.' );
-    
 end
