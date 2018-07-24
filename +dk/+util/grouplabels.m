@@ -12,7 +12,7 @@ function G = grouplabels(L,n)
 %
 % Complexity is m log(m), where m=length(L).
 % In theory, could be improved to linear complexity using integer sort.
-% This version is already ~10-20x faster than using splitapply.
+% This version is already ~10-20x faster than using Matlab's splitapply.
 %
 % Example: group elements by rounded value
 %

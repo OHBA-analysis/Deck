@@ -119,21 +119,16 @@ function nodes = compute_widths(T,sepfun)
 %
 % JH
 
-    depth  = [T.node.depth];
-    valid  = [T.node.is_valid];
-    leaf   = [T.node.is_leaf];
-    degree = [T.node.n_children];
-
-    n = sum(valid);
-    d = depth(valid);
-    g = degree(valid);
+    d = T.depths();     % depth
+    g = T.nchildrens(); % degree
+    n = numel(d);
     maxd = max(d);
     inc = sepfun(fliplr(0:maxd-1));
 
     % initialise width
     k = find(valid);
     w = zeros(1,n);
-    w(leaf(valid)) = 1; % set all leaves to 1
+    w(g == 0) = 1; % set all leaves to 1
 
     % propagate width level by level, starting from the bottom
     for h = maxd:-1:2
@@ -165,6 +160,7 @@ function gobj = vertical_draw(T,nodes,balance,linkopt)
     D = nodes.d;
     W = nodes.width;
     H = nodes.height;
+    C = T.childrens();
 
     % axis coordinate and offset for each node
     coord = zeros(1,N);
@@ -192,10 +188,10 @@ function gobj = vertical_draw(T,nodes,balance,linkopt)
             % skip if there are no children
             pj = p(j);
             kj = nodes.map(pj);
-            if T.node(pj).is_leaf, continue; end
+            if T.isleaf(pj), continue; end
 
             % reorder children to balance the tree
-            cj = T.node(pj).children;
+            cj = C{pj};
             wj = W(nodes.map(cj));
             nc = numel(cj);
             if balance
@@ -239,6 +235,7 @@ end
 % draw tree with radial layout
 function gobj = radial_draw(T,nodes,balance,linkopt)
 
+    C = T.childrens();
     N = nodes.n;
     D = nodes.d;
     R = nodes.height / (2*pi);
@@ -276,10 +273,10 @@ function gobj = radial_draw(T,nodes,balance,linkopt)
             pj = p(j);
             kj = nodes.map(pj);
             aj = angle(kj);
-            if T.node(pj).is_leaf, continue; end
+            if T.isleaf(pj), continue; end
 
             % reorder children to balance the tree
-            cj = T.node(pj).children;
+            cj = C{pj};
             wj = W(nodes.map(cj));
             nc = numel(cj);
             if balance

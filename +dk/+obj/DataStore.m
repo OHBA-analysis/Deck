@@ -1,10 +1,10 @@
-classdef Datastore < handle
+classdef DataStore < handle
 %
-% dk.obj.Datastore()
+% dk.obj.DataStore()
 %
 % Bind to a folder on the file-system, and load/save from it, find patterns, etc.
 % You can get more information about particular functions by typing:
-%   help dk.obj.Datastore.NAME_OF_FUNCTION
+%   help dk.obj.DataStore.NAME_OF_FUNCTION
 % 
 % Construction:
 %   assign, clear
@@ -23,7 +23,7 @@ classdef Datastore < handle
     
     methods
         
-        function self = Datastore(varargin)
+        function self = DataStore(varargin)
             self.clear();
             if nargin > 0
                 self.assign(varargin{:});

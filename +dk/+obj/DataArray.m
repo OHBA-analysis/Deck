@@ -3,7 +3,6 @@ classdef DataArray < dk.priv.GrowingContainer
 % DataArray objects store matrix data with fixed number of columns, optionally accessible by name,
 % as well as a struct-array to store data-fields associated with each row.
 %
-%
 % ------------------------------
 % ## Construction
 %

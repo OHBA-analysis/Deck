@@ -14,6 +14,55 @@ classdef Tree < handle
 %
 % Traversal methods are non-recursive.
 %
+% ----------------------------------------------------------------------
+%
+% Construction
+%
+%   T = dk.obj.Tree()                           default root node
+%   T = dk.obj.Tree( bsize, Name/Value )        setting the root props
+%   T = dk.obj.Tree( serialised_path )          unserialise file
+%
+% Data-structure
+%
+%   T.serialise( output_file )
+%   T.compress( reserve )
+%
+% Tree logic
+%
+%   indices
+%   shape
+%   levels
+%
+%   parent(id)      node props (efficient)
+%   depth(id)       accept multiple ids
+%   nchildren(id)   return vec
+%
+%   depth()         tree depth           (scalar)   
+%   depths()        all node depths      (vec)      
+%   nchildrens()    all node #children   (vec)      
+%   parents()       all node parents     (cell)     
+%
+%   offspring ( id, unwrap=false )       inefficient ops O( n log n )
+%   children  ( id, unwrap=false )       accept multiple ids
+%   siblings  ( id, unwrap=false )       return cell
+%   childrens ()
+%
+% Node logic
+%
+%   [node,prop] = get_node( id, children=false )   return struct-arrays
+%   id = add_node( parent, Name/Value )            
+%   removed = rem_node( id )                       remove offspring too
+%
+%   p = get_props( id )                            struct with all props
+%   set_props( id, Name/Value )                    merge with existing
+%   rem_props( Names... )                          from all nodes
+%
+% Traversal
+%
+%   iter( callback )    
+%   dfs ( callback )     with callback( id, node, props )
+%   bfs ( callback )
+%
 % JH
 
     properties (SetAccess = private, Hidden)
@@ -47,8 +96,8 @@ classdef Tree < handle
         
         function reset(self,bsize,varargin)
             if nargin < 2, bsize=100; end
-            self.store = dk.obj.DataArray( {'parent','depth','nchildren','child','sibling'}, bsize );
-            self.store.add( [0,1,0,0,0], varargin{:} );
+            self.store = dk.obj.DataArray( {'parent','depth','nchildren'}, bsize );
+            self.store.add( [0,1,0], varargin{:} );
         end
         
         % dependent properties
@@ -68,8 +117,21 @@ classdef Tree < handle
             if nargin < 2, res = self.store.bsize; end
             remap = self.store.compress();
             remap = [0; remap(:)];
-            self.store.data(:,[1,4,5]) = remap(1+self.store.data(:,[1,4,5]));
+            self.store.data(:,1) = remap(1+self.store.data(:,1));
             self.store.reserve(res);
+        end
+        
+        function gobj = plot(self,varargin)
+        %
+        % Plot tree;
+        %   - classic and radial available
+        %   - customise nodes and edges
+        %   - customise data-tip
+        %   - many other options
+        % 
+        % See help dk.priv.plot_tree for details.
+        
+            gobj = dk.priv.plot_tree( self, varargin{:} );
         end
         
     end
@@ -126,10 +188,10 @@ classdef Tree < handle
         
         function s = siblings(self,k,unwrap)
             if nargin < 3, unwrap=true; end
-            s = self.children(self.parent(k),false);
+            s = self.children(self.parent(k),false); % list children of parents
             n = numel(s);
             for i = 1:n
-                s{i} = s{i}( s{i} ~= k(i) );
+                s{i} = s{i}( s{i} ~= k(i) ); % remove self
             end
             if unwrap && n == 1
                 s = s{1};
@@ -172,6 +234,7 @@ classdef Tree < handle
             else
                 c = cell(1,n);
                 for i = 1:n
+                    % valid nodes whose parent is k(i)
                     c{i} = find(self.store.used & (self.store.data(:,1) == k(i)));
                 end
             end
@@ -194,17 +257,16 @@ classdef Tree < handle
             N = self.nchildren(k);
             d = self.depth();
             o = cell(1,n);
-            t = cell(1,d);
             
             if all(N == 0), return; end
             C = self.childrens();
             
             for i = 1:n
-                j = 1;
-                t{1} = horzcat(C{ki});
-                while ~isempty(t{j})
-                    t{j+1} = horzcat(C{t{j}});
-                    j = j+1;
+                t = cell(1,d);
+                t{1} = C{k(i)};
+                for j = 2:d
+                    t{j} = horzcat(C{t{j-1}});
+                    if isempty(t{j}), break; end
                 end
                 o{i} = horzcat(t{:});
             end
@@ -233,6 +295,7 @@ classdef Tree < handle
             [n,m] = self.get_node(1,varargin{:});
         end
         
+        % struct-array nodes (p:parent, d:depth, nc:#children)
         function [n,p] = get_node(self,k,with_children) % works with k vector
             if nargin < 3, with_children=false; end
             
