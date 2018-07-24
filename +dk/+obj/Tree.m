@@ -14,7 +14,9 @@ classdef Tree < handle
 %
 % Traversal methods are non-recursive.
 %
+%
 % ----------------------------------------------------------------------
+% ## Usage
 %
 % Construction
 %

@@ -35,9 +35,11 @@ function G = grouplabels(L,n)
     t = 1 + cumsum([0; c]);
     
     % define groups
+    s = s(:)';
+    t = t(:)';
     G = cell(1,n);
     for i = 1:n
-        G{i} = s( t(i):(t(i+1)-1) )';
+        G{i} = s( t(i):(t(i+1)-1) );
     end
 
 end

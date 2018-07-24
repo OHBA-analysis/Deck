@@ -3,12 +3,47 @@ classdef DataArray < dk.priv.GrowingContainer
 % DataArray objects store matrix data with fixed number of columns, optionally accessible by name,
 % as well as a struct-array to store data-fields associated with each row.
 %
-% ------------------------------
-% ## Construction
 %
-%   Constructor arguments are forwarded to:
-%       reset( ncols, bsize=100 )
-%       reset( colnames, bsize=100 )
+% ------------------------------
+% ## Usage
+%
+% Construction
+%   
+%   D = dk.obj.DataArray(varargin)
+%       -> reset( ncols, bsize=100 )
+%       -> reset( colnames, bsize=100 )
+%       -> unserialise( filename )
+%
+% Adding/removing points
+%
+%   k = D.add( x, Field/Value )     possible to add multiple points
+%                                   with values either vec or cell
+%
+%   D.rem(k)                        possible to remove multiple points
+%   remap = D.compress()            compress storage, newidx = remap(oldidx)
+%
+% Easy-access
+%
+%       dget    Get data value(s) manually
+%       dset    Set data value(s) manually
+%       row     Get one or several data rows
+%       col     Get one or several data columns for all used rows
+%       mget    Get meta-data for a set of rows
+%       mfield  Get meta-data field for all used rows
+%
+%   Note that these methods are provided mainly for consistency (and they can resolve a column name) 
+%   but you should access the properties directly for performance.
+%
+% Column names
+%   
+%   D.setnames( names )             correct number of names expected
+%   c = D.colnum( name )            invalid names cause key error
+%
+% Metadata
+%
+%   D.assign( k, Field/Value )      possible to set multiple indices
+%                                   with values either cell or vec
+%   D.rmfield( names )              remove fields for all points
 %
 %
 % ------------------------------
@@ -28,20 +63,7 @@ classdef DataArray < dk.priv.GrowingContainer
 %       allocate the desired number of rows in advance with obj.reserve(n)
 %
 %
-% ------------------------------
-% ## Usage
-%
-%   The following methods are provided for easy access:
-%       dget    Get data value(s) manually
-%       dset    Set data value(s) manually
-%       row     Get one or several data rows
-%       col     Get one or several data columns for all used rows
-%       mget    Get meta-data for a set of rows
-%       mfield  Get meta-data field for all used rows
-%
-%   Note that these methods are provided mainly for consistency (and they can resolve a column name) 
-%   but you should access the properties directly for performance.
-%
+% See also: dk.priv.GrowingContainer
 %
 % JH
 

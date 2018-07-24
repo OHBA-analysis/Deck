@@ -117,8 +117,10 @@ classdef kwArgs < handle
             end
             
             % either a cell of key-values or a structure
-            if iscell(args)
+            if isempty(args)
+                return;
                 
+            elseif iscell(args)
                 n = numel(args); % we know n >= 2
                 
                 % allow parse( true, varargin ) to set case-sensitive
@@ -144,9 +146,6 @@ classdef kwArgs < handle
                 
             elseif isa(args,'dk.obj.kwArgs')
                 self.copy(args);
-                
-            elseif isempty(args) % empty input
-                return; 
                 
             else
                 error('Inputs should be either a cell of key-values or a structure.');

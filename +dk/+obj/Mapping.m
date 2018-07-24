@@ -34,8 +34,8 @@ classdef Mapping < dk.priv.GrowingContainer
 %   access individual properties directly.
 %
 %   Properties can be accessed anytime for reading.
-%   Particular rows/fields can be edited manually, but DO NOT overwrite the properties themselves. 
-%   Indices are preserved when removing points, BUT NOT when using compress().
+%   Particular rows/fields can be edited manually, but DO NOT overwrite fieldnames or the meta
+%   member itself. 
 %
 %   New data-points can be added one by one using the method: 
 %       add( x, y, 'Field1',Value1, 'Field2',...)
@@ -44,6 +44,14 @@ classdef Mapping < dk.priv.GrowingContainer
 %   any data-point will cause every other data-point to have a field with the same name.
 %   New field names can be set dynamically during usage.
 %   When adding a data-point as above, omitted fields are assigned the value [] by default.
+%
+%   Existing data points can be removed using:
+%       rem( k )
+%   where k can be a vector of indices.
+%   This simply marks those points as unused and does not actually remove them from storage.
+%   Indices are preserved when removing points, BUT NOT when using compress().
+%   Method compress() actually removes unused points, and re-indexes the points.
+%   Use the method find() in order to get all indices currently in use.
 %   
 %   Multiple entries can be added at once using the method addn() instead, but in
 %   that case, only x and y can be assigned (i.e. no metadata). The metadata should
