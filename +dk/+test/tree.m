@@ -1,10 +1,13 @@
 
+rng(12346);
+sep = @() disp('==========================');
+
 T = dk.test.tree_rand(4);
 
 % plot tree and shape
 T.plot('Name','First plot');
-[d,w] = T.shape();
-fprintf('Width[%d]: %s\n',d,sprintf('%d ',w));
+T.print();
+sep()
 
 % remove node and redraw
 n = T.n_nodes;
@@ -13,16 +16,18 @@ T.rem_node(r);
 T.plot('Name','After removing');
 dk.println('After removing node %d / %d',r,n);
 T.print();
+sep()
 
 % cleanup and redraw
-T.cleanup();
-T.plot('Name','After cleanup');
+T.compress();
+T.plot('Name','After cleanup','Radial',true);
 disp('After cleanup:');
 T.print();
+sep()
 
 % traversal
 disp('Depth-first search:');
-T.dfs( @(k,n) fprintf('%d ',k) ); fprintf('\n');
+T.dfs( @(k,n,p) fprintf('%d ',k) ); fprintf('\n');
 
 disp('Breadth-first search:');
-T.bfs( @(k,n) fprintf('%d ',k) ); fprintf('\n');
+T.bfs( @(k,n,p) fprintf('%d ',k) ); fprintf('\n');

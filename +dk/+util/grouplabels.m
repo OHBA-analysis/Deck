@@ -22,23 +22,22 @@ function G = grouplabels(L,n)
 %
 % JH
 
-    L = L(:)'; % make a row
+    L = L(:); % make a col
     if nargin < 2, n = max(L); end
     
     % count each label
-    c = accumarray( L(:), 1 ); % this will fail if L is not proper
-    c = c(:)';
+    c = accumarray( L, 1, [n,1] ); % this will fail if L is not proper
     
     % sort labels
     [~,s] = sort(L,'ascend');
     
     % define strides in sorted version
-    t = 1 + cumsum([0,c]);
+    t = 1 + cumsum([0; c]);
     
     % define groups
     G = cell(1,n);
     for i = 1:n
-        G{i} = s(t(i):(t(i+1)-1));
+        G{i} = s( t(i):(t(i+1)-1) )';
     end
 
 end

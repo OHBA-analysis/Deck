@@ -92,7 +92,7 @@ classdef GrowingContainer < handle
         
         % remove elements by marking them as unused to preserve indexing
         function rem(self,k)
-            assert( k <= self.last, 'Index out of bounds.' );
+            dk.assert( k <= self.last, 'Index out of bounds.' );
             self.used(k) = false;
             dk.wreject( self.sparsity > 0.9, 'Storage is very sparse, you should run compress().' );
         end

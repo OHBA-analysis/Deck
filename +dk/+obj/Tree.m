@@ -80,12 +80,10 @@ classdef Tree < handle
         
         function self = Tree(varargin)
             self.clear();
-            if nargin > 0
-                if ischar(varargin{1})
-                    self.unserialise(varargin{1});
-                else
-                    self.reset(varargin{:});
-                end
+            if nargin > 0 && ischar(varargin{1})
+                self.unserialise(varargin{1});
+            else
+                self.reset(varargin{:});
             end
                 
         end
@@ -134,6 +132,21 @@ classdef Tree < handle
             gobj = dk.priv.plot_tree( self, varargin{:} );
         end
         
+        function print(self,fh)
+            if nargin < 2, fh=1; end % default to stdout
+            
+            [d,w] = self.shape();
+            fprintf( fh, 'Tree properties:\n' );
+            fprintf( fh, '	 depth: %d\n', d );
+            fprintf( fh, '	 width: %s\n', dk.util.vec2str(w) );
+            fprintf( fh, '---------\n' );
+            fprintf( fh, '%d node(s):\n', self.nn );
+            function printfun(k,n,p)
+                fprintf( fh, '	 [%d] %d>%d: %d children\n', n.d, n.p, k, n.nc );
+            end
+            self.bfs( @printfun );
+        end
+        
     end
     
     % i/o
@@ -165,14 +178,17 @@ classdef Tree < handle
     methods
         
         % node properties
-        function k = indices(self)
+        function [k,r] = indices(self) 
             k = self.store.find();
+            if nargout > 1
+                r(k) = 1:numel(k); % return reverse mapping too
+            end
         end
         
-        function y = isleaf(self,k)
-            y = self.nchildren(k) > 0;
+        function y = is_leaf(self,k)
+            y = self.nchildren(k) == 0;
         end
-        function y = isvalid(self,k)
+        function y = is_valid(self,k)
             y = self.store.used(k);
         end
         
@@ -181,9 +197,7 @@ classdef Tree < handle
         end
         function [p,k] = parents(self)
             p = self.store.col('parent');
-            if nargout > 1
-                k = self.indices(); 
-            end
+            k = self.indices(); 
         end
         
         function s = siblings(self,k,unwrap)
@@ -208,20 +222,16 @@ classdef Tree < handle
         end
         function [d,k] = depths(self)
             d = self.store.col('depth');
-            if nargout > 1
-                k = self.indices(); 
-            end
+            k = self.indices(); 
         end
         
         function n = nchildren(self,k)
             n = self.store.dget(k,3);
         end
         function [n,k] = nchildrens(self)
-            n = self.store.col('parent');
-            n = accumarray(n(:),1,size(n));
-            if nargout > 1
-                k = self.indices(); 
-            end
+            [n,k] = self.parents();
+            n = accumarray( n(2:end), 1, [max(k),1] ); % root has no parent
+            n = n(k);
         end
         
         function c = children(self,k,unwrap)
@@ -244,8 +254,8 @@ classdef Tree < handle
         end
         function [C,k] = childrens(self)
             [p,k] = self.parents();
-            C = dk.util.grouplabels(p,numel(k));
-            C = dk.mapfun( @(i) k(i), C, false );
+            C = dk.util.grouplabels( p(2:end), max(k) ); % root has no parent
+            C = dk.mapfun( @(i) k(i+1)', C(k), false ); % remap indices, i+1 because excluded root
         end
         
         function o = offspring(self,k,unwrap)
@@ -362,6 +372,7 @@ classdef Tree < handle
             C = self.childrens();
             N = self.nn;
             S = zeros(1,N);
+            [~,r] = self.indices();
             
             S(1) = start;
             cur = 1;
@@ -369,9 +380,8 @@ classdef Tree < handle
             while cur <= last
                 id = S(cur);
                 callback( id, self.get_node(id), self.get_props(id) );
-                
-                n = numel(C{id});
-                S( last + (1:n) ) = C{id};
+                n = numel(C{r(id)});
+                S( last + (1:n) ) = C{r(id)};
                 last = last + n;
                 cur = cur + 1;
             end
@@ -383,15 +393,15 @@ classdef Tree < handle
             C = self.childrens();
             N = self.nn;
             S = zeros(1,N);
+            [~,r] = self.indices();
             
             S(1) = start;
             cur = 1;
             while cur > 0
                 id = S(cur);
                 callback( id, self.get_node(id), self.get_props(id) );
-                
-                n = numel(C{id});
-                S( cur-1 + (1:n) ) = fliplr(C{id});
+                n = numel(C{r(id)});
+                S( cur-1 + (1:n) ) = fliplr(C{r(id)});
                 cur = cur-1 + n;
             end
         end

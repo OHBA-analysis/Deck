@@ -8,6 +8,8 @@ function gobj = plot_tree(T,varargin)
 %
 %      Newfig  Open new figure to draw.
 %             >Default: true
+%        Name  Set name of figure being drawn.
+%             >Default: '[dk] Tree plot'
 %        Link  Link options (cf Line properties)
 %             >Default: {} (none)
 %      Height  Function of width and depth giving the height of links.
@@ -63,7 +65,9 @@ function gobj = plot_tree(T,varargin)
 
     height = cumsum(height(:));
     height = height - height(1); % root at 0
-    if ~radial
+    if radial
+        height = 2*height; 
+    else
         height = -height; 
     end
     nodes.height = height;
@@ -79,8 +83,9 @@ function gobj = plot_tree(T,varargin)
 
     % draw the tree
     if opt.get('Newfig',true)
-        figure('Color','w','Name','[dk] Tree plot');
+        figure('Color','w');
     end
+    set( gcf, 'name', opt.get('Name','[dk] Tree plot') );
     if radial
         gobj = radial_draw(T,nodes,balance,linkopt);
     else
@@ -108,48 +113,52 @@ function nodes = compute_widths(T,sepfun)
 % parent, is the separation increment.
 %
 % The output is a structure with fields:
-%   n  Total number of nodes
-%   d  Maximum depth
-%   width  Vector of width for each node
-%   depth  Vector of depth for each node
-%   index  Tree index of each node
-%   lw     Level width (total width at each depth)
-%   map    Reverse mapping between the ordering of these vectors,
-%          and indices of nodes in the tree.
+%   n       Total number of nodes
+%   d       Maximum depth
+%   width   Vector of width for each node
+%   depth   Vector of depth for each node
+%   index   Tree index of each node
+%   lw      Level width (total width at each depth)
+%   map     Reverse mapping between the ordering of these vectors,
+%           and indices of nodes in the tree.
 %
 % JH
 
-    d = T.depths();     % depth
-    g = T.nchildrens(); % degree
-    n = numel(d);
-    maxd = max(d);
-    inc = sepfun(fliplr(0:maxd-1));
+    D = T.depths();     % depth
+    G = T.nchildrens(); % degree
+    P = T.parents();    % parent
+    [I,R] = T.indices();
+    n = numel(D);
+    
+    maxd = max(D);
+    inc = sepfun(fliplr(0:maxd-1));  % level spacings
 
     % initialise width
-    k = find(valid);
-    w = zeros(1,n);
-    w(g == 0) = 1; % set all leaves to 1
+    w = zeros(n,1);
+    w(G == 0) = 1; % set all leaves to 1
 
     % propagate width level by level, starting from the bottom
     for h = maxd:-1:2
-        c = k( d == h );
-        p = [T.node(c).parent];
-        m = numel(c);
+        c = find(D == h);
+        p = R(P(c));
+        m = numel(p);
+        
+        assert( all(p <= n), 'Bad index' );
 
-        for i = 1:m
+        % needs to be done with a for loop
+        for i = 1:m 
             w(c(i)) = w(c(i)) + inc(h);
             w(p(i)) = w(p(i)) + w(c(i));
         end
     end
 
     % compute total width for each level
-    Lwidth = accumarray( d(:), w(:), [maxd,1] ); % width of each level
-    Lsize  = accumarray( d(:), 1, [maxd,1] ); % number of nodes at each level
+    Lwidth = accumarray( D(:), w(:), [maxd,1] ); % width of each level
+    Lsize  = accumarray( D(:), 1, [maxd,1] ); % number of nodes at each level
 
     % pack all this information
-    map(k) = 1:n; 
-    nodes = struct( 'n', n, 'd', max(depth), 'lw', Lwidth, 'ls', Lsize, ...
-        'width', w, 'depth', d, 'index', k, 'deg', g, 'map', map );
+    nodes = struct( 'n', n, 'd', maxd, 'lw', Lwidth, 'ls', Lsize, ...
+        'width', w, 'depth', D, 'idx', I, 'deg', G, 'rev', R );
 
 end
 
@@ -179,7 +188,7 @@ function gobj = vertical_draw(T,nodes,balance,linkopt)
     for d = 1:D-1
 
         % find nodes at that level, and their children
-        p = nodes.index( nodes.depth == d );
+        p = nodes.idx( nodes.depth == d );
 
         % draw the children of each parent
         np = numel(p);
@@ -187,12 +196,12 @@ function gobj = vertical_draw(T,nodes,balance,linkopt)
 
             % skip if there are no children
             pj = p(j);
-            kj = nodes.map(pj);
-            if T.isleaf(pj), continue; end
+            kj = nodes.rev(pj);
+            if T.is_leaf(pj), continue; end
 
             % reorder children to balance the tree
-            cj = C{pj};
-            wj = W(nodes.map(cj));
+            cj = C{kj};
+            wj = W(nodes.rev(cj));
             nc = numel(cj);
             if balance
                 cj = reorder_children( cj, wj );
@@ -203,7 +212,7 @@ function gobj = vertical_draw(T,nodes,balance,linkopt)
             x0 = x0 + (W(kj) - sum(wj))/2; % add separation increment
             for i = 1:nc
                 cji = cj(i); 
-                kji = nodes.map(cji);
+                kji = nodes.rev(cji);
 
                 % save position of current node
                 offset(kji) = x0;
@@ -260,7 +269,7 @@ function gobj = radial_draw(T,nodes,balance,linkopt)
     for d = 1:D-1
 
         % find nodes at that level, and their children
-        p = nodes.index( nodes.depth == d );
+        p = nodes.idx( nodes.depth == d );
 
         % draw the children of each parent
         rc = R(d+1);
@@ -271,13 +280,13 @@ function gobj = radial_draw(T,nodes,balance,linkopt)
 
             % skip if there are no children
             pj = p(j);
-            kj = nodes.map(pj);
+            kj = nodes.rev(pj);
             aj = angle(kj);
-            if T.isleaf(pj), continue; end
+            if T.is_leaf(pj), continue; end
 
             % reorder children to balance the tree
-            cj = C{pj};
-            wj = W(nodes.map(cj));
+            cj = C{kj};
+            wj = W(nodes.rev(cj));
             nc = numel(cj);
             if balance
                 cj = reorder_children( cj, wj );
@@ -288,7 +297,7 @@ function gobj = radial_draw(T,nodes,balance,linkopt)
             x0 = x0 + (W(kj) - sum(wj))/2;
             for i = 1:nc
                 cji = cj(i); 
-                kji = nodes.map(cji);
+                kji = nodes.rev(cji);
 
                 % save position of current node
                 offset(kji) = x0;
