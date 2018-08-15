@@ -6,15 +6,16 @@ function h = errbar( x, y, L, t, varargin )
 %  and with specified length and tick-width.
 %
 %   -------    ^
-%      |       |
-%      * (x,y) | Ylength
-%      |       |
-%   -------    v
+%      |       | Ylength
+%      * (x,y) v 
+%      |       
+%   -------    
 %   <----->
 %      Xwidth
 %
 % o If x, y and Ylength are vectors, then multiple bars are plotted.
-% o If Ylength is 2xN, then row1=LOWER bnd and row2=UPPER bound.
+% o If Ylength is 2xN, then row1=LOWER diff and row2=UPPER diff.
+%   This means that LoBound= y-L(1,:), and UpBound= y+L(2,:)
 % o Xwidth should be SCALAR and is replicated for each bar.
 % o If omitted or empty, Xwidth defaults to mean(diff(sort(x)))/4.
 % o Additional inputs are forwarded to plot.
@@ -47,9 +48,9 @@ function h = errbar( x, y, L, t, varargin )
     % make bars with ticks
     %
     %   1--3--2  ^
-    %      |     |
-    %      |     | L
-    %      |     |
+    %      |     | L(2,:)
+    %      |     X 
+    %      |     | L(1,:)
     %   6--4--5  v
     %   <----->
     %      t

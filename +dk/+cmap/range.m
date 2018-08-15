@@ -3,9 +3,20 @@ function [crange,ctype] = range( x, ctype, crange )
 % [crange,ctype] = dk.cmap.range( x, ctype='auto', crange=[] )
 %
 % Infer color range from input data.
+%
+% Range types:
+%
+%   pos     Map interval [a,b] from left to right.
+%   neg     Map interval [a,b] from right to left.
+%   bisym   Split interval [a,b] into neg:[a,m] pos:[m,b], where m=(a+b)/2
+%
 % Output:
+%
+%    ctype  If input is not 'auto', then output=input.
+%           Otherwise output is one of: bisym, pos, neg
+%
 %   crange  1x2 array with lower/upper bounds
-%    ctype  If input as 'auto', output is one of: bisym, pos, neg
+%           Default is 1-99th percentile
 %
 % JH
 
@@ -22,6 +33,8 @@ function [crange,ctype] = range( x, ctype, crange )
     % color range
     if isempty(crange)
         crange = prctile( dk.util.filtnum(x), [1 99] );
+    else
+        ctype = 'manual';
     end
     
     % truncate to 2 significant digits
@@ -59,15 +72,19 @@ function [crange,ctype] = range( x, ctype, crange )
     switch lower(ctype)
         case {'none','manual'}
             % nothing to do
+            ctype = 'manual';
         case {'pos','positive'}
+            ctype = 'pos';
             if lo < hi/4
                 crange = crange .* [0 1]; % force lo to 0
             end
         case {'neg','negative','revneg'}
+            ctype = 'neg';
             if hi > lo/4
                 crange = crange .* [1 0]; % force hi to 0
             end
         case {'bisym','sym','symmetric','revsym'}
+            ctype  = 'bisym';
             crange = mg * [-1 1]; % symmetric
     end
     

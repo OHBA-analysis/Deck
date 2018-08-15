@@ -2,7 +2,47 @@ function [h,crange] = image( img, varargin )
 %
 % [h,crange] = dk.ui.image( img, varargin )
 %
-% TODO: document this function
+% Display an image, with many options.
+%
+% Input img should be either a matrix, or a cell {x,y,img}.
+% In the second case, the image is automatically resampled, if x or y is not arithmetic.
+%
+%
+% Color options:
+%
+%   crange          Manually specify the color-range
+%                   1x2 vector [lower,upper]
+%
+%   ctype           Specify range-type (see dk.cmap.range)
+%                   One of: pos, neg, bisym, manual
+%
+%   cmap            Specify colormap, either:
+%                       - as name (see dk.cmap.*)
+%                       - as Nx3 RGB matrix
+%
+%   grid            If specified, the border of the pixels is shown.
+%                   Should be a cell of properties forwarded to plot.
+%
+% Axes options:
+%   
+%   subplot         Show image in subplot of current figure.
+%                   Expects a 1x3 CELL array.
+%
+%   title           Set title and labels for image.
+%   xlabel          clabel is for the colorbar.
+%   ylabel
+%   clabel
+%
+%   rmticks         Remove ticks or colorbar.
+%   rmbar           Default: no ticks if xlabel & ylabel are empty.
+%
+% Density options:
+%   
+%   maxwidth        Maximum width or height allowed for image display.
+%   maxheight       Any excess causes image to be resampled (bicubic).
+%   
+%
+% See also: dk.cmap.range, dk.math.imresample
 %
 % JH
     
@@ -11,6 +51,8 @@ function [h,crange] = image( img, varargin )
     
     crange     = opt.get('crange',     [] );
     ctype      = opt.get('ctype',      '' );
+    cmap_raw   = opt.get('cmap',       'bgr' );
+    gridopt    = opt.get('grid',       {} );
     
     title_str  = opt.get('title',      '' );
     label_x    = opt.get('xlabel',     '' );
@@ -18,8 +60,6 @@ function [h,crange] = image( img, varargin )
     label_c    = opt.get('clabel',     '' );
     rm_ticks   = opt.get('rmticks',    isempty(label_x) && isempty(label_y) );
     rm_bar     = opt.get('rmbar',      false );
-    
-    cmap_raw   = opt.get('cmap',       'bgr' );
     subpos     = opt.get('subplot',    {} );
     
     maxwidth   = opt.get('maxwidth',   50000 );
@@ -68,15 +108,29 @@ function [h,crange] = image( img, varargin )
         h = imagesc(x,y,img); set(gca,'YDir','normal');
         
         % round values for display
-        %x = dk.math.round( x(get(gca,'xtick')), 1 );
-        %y = dk.math.round( y(get(gca,'ytick')), 1 );
+        %x = dk.math.trunc( x(get(gca,'xtick')), 3 );
+        %y = dk.math.trunc( y(get(gca,'ytick')), 3 );
         
-        %set( gca, 'xticklabel', arrayfun(@num2str,x,'UniformOutput',false) );
-        %set( gca, 'yticklabel', arrayfun(@num2str,y,'UniformOutput',false) );
+        %set( gca, 'xticklabel', dk.mapfun(@num2str,x,false) );
+        %set( gca, 'yticklabel', dk.mapfun(@num2str,y,false) );
         
     else
         img = check_size( img, maxsize );
+        [x,y] = size(img);
+        x = 1:x;
+        y = 1:y;
         h = imagesc(img); 
+    end
+    
+    % draw grid
+    if ~isempty(gridopt)
+        if islogical(gridopt)
+            gridopt = 'k-';
+        end
+        if ~iscell(gridopt)
+            gridopt = {gridopt};
+        end
+        drawgrid(x,y,gridopt{:});
     end
     
     % remove ticks
@@ -132,4 +186,35 @@ function img = check_size(img,maxsize)
         img = imresize( img, maxsize, 'bicubic' );
     end
     
+end
+
+function drawgrid(x,y,varargin)
+
+    % number of lines
+    nx = numel(x)+1;
+    ny = numel(y)+1;
+    
+    % grid step
+    dx = mean(diff(x));
+    dy = mean(diff(y));
+    
+    % adjust to start
+    x = x - dx/2;
+    y = y - dy/2;
+    
+    % bounds
+    bx = x(1) + [0, nx*dx];
+    by = y(1) + [0, ny*dy];
+    
+    hold on;
+    
+    % draw lines
+    for i = 1:nx
+        plot( x(i)*[1,1], by, varargin{:} );
+    end
+    for i = 1:ny
+        plot( bx, y(i)*[1,1], varargin{:} );
+    end
+    
+    hold off;
 end
