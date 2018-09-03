@@ -19,11 +19,9 @@ function [imfs,status] = huang_transform( data, varargin )
         opt_sd_thresh  = opt.get( 'sd_thresh', 0.25 );
         opt_max_imf    = opt.get( 'max_imf', 50 );
         opt_min_energy = opt.get( 'min_energy', 1e-6 );
-        %opt_taper      = opt.get( 'taper', 0.25 );
     
     % allocate memory
     data = data(:);
-    %data = data .* tukeywin(numel(data),opt_taper); % bohanwin or chebwin could be alternatives
     imfs = cell(1,opt_max_imf);
     iter = 0;
     
@@ -54,7 +52,7 @@ function [imfs,status] = huang_transform( data, varargin )
         % energy check
         data = data - h1;
         if sum(data.^2) <= opt_min_energy
-            status.msg = 'Residue energy is below threshold.';
+            status.msg = 'Residual energy is below threshold.';
             break;
         end
         
@@ -68,7 +66,7 @@ function [imfs,status] = huang_transform( data, varargin )
     
 end
 
-function [lmin,lmax] = local_extrema( x )
+function [lmin,lmax] = local_extrema_old( x )
 
     dx = diff(x,1,1); % x(t+1)-x(t)
     zc = [dx(1:end-1) .* dx(2:end) <= 0; 1]; % zero-crossings (add 1 to include last point)
@@ -76,6 +74,29 @@ function [lmin,lmax] = local_extrema( x )
     
     lmin = find( le < 0 );
     lmax = find( le > 0 );
+
+end
+
+function [lmin,lmax] = local_extrema_sym(x)
+
+    dx = diff([ x(2); x; x(end-1) ],1,1); % symmetric replication
+    zc = dx(1:end-1) .* dx(2:end) <= 0; % zero-crossing
+    le = zc .* dx(1:end-1); % backward-derivative at zero-crossing
+    
+    lmin = find( le < 0 );
+    lmax = find( le > 0 );
+
+end
+
+function [lmin,lmax] = local_extrema(x)
+
+    % exclude first and last point
+    dx = diff(x,1,1);
+    zc = dx(1:end-1) .* dx(2:end) <= 0; % zero-crossing
+    le = zc .* dx(1:end-1); % backward-derivative at zero-crossing
+    
+    lmin = 1+find( le < 0 );
+    lmax = 1+find( le > 0 );
 
 end
 
@@ -103,6 +124,10 @@ function h = do_sift( x )
         h = x;
         return;
     end
+    
+    % add first and last point manually for "stable" interpolation
+    lmin = [1; lmin; n];
+    lmax = [1; lmax; n];
     
     % min and max envelopes (cubic interpolation)
     emin = interp1( lmin, x(lmin), t, 'pchip' );

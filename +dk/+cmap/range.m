@@ -13,7 +13,7 @@ function [crange,ctype] = range( x, ctype, crange )
 % Output:
 %
 %    ctype  If input is not 'auto', then output=input.
-%           Otherwise output is one of: bisym, pos, neg
+%           Otherwise output is one of: bool, bisym, pos, neg
 %
 %   crange  1x2 array with lower/upper bounds
 %           Default is 1-99th percentile
@@ -32,6 +32,7 @@ function [crange,ctype] = range( x, ctype, crange )
     
     % color range
     if isempty(crange)
+        assert( ~isempty(x), 'Color range cannot be determined without data.' );
         crange = prctile( dk.util.filtnum(x), [1 99] );
     else
         ctype = 'manual';
