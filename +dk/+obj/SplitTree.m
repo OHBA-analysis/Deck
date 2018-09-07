@@ -1,16 +1,15 @@
-classdef Tree < handle
+classdef SplitTree < dk.obj.Tree
 %
-% Tree implementation, using a dk.obj.DataArray as extensible storage.
+% Tree implementation similar to dk.obj.Tree, but taking advantage of the
+% split-context to improve performance. Specifically, the split tree is
+% designed for cases where the children of a node are specified together
+% at once; no additional children can be created later on.
+%
 % The columns of the storage are:
 %   parent
 %   depth
+%   eldest
 %   nchildren
-%
-% Most operations are as efficient as expected, except:
-%   list children       O(n)
-%   list offspring      O(n log(n))
-%   remove node         O(n log(n))
-% where n is the total number of nodes.
 %
 % Traversal methods are non-recursive.
 %
@@ -67,95 +66,46 @@ classdef Tree < handle
 %
 % JH
 
-    properties (SetAccess=protected, Hidden)
-        store
-    end
-
-    properties (Transient, Dependent)
-        n_nodes, nn
-        n_leaves, nl
-        n_parents, np
-        sparsity
-    end
-
     methods
 
-        function self = Tree(varargin)
+        function self = SplitTree(varargin)
             self.clear();
             if nargin > 0 && ischar(varargin{1})
                 self.unserialise(varargin{1});
             else
                 self.reset(varargin{:});
             end
-
-        end
-
-        function clear(self)
-            self.store = dk.obj.DataArray();
         end
 
         function reset(self,bsize,varargin)
             if nargin < 2, bsize=100; end
-            self.store = dk.obj.DataArray( {'parent','depth','nchildren'}, bsize );
-            self.store.add( [0,1,0], varargin{:} );
+            self.store = dk.obj.DataArray( {'parent','depth','eldest','nchildren'}, bsize );
+            self.store.add( [0,1,0,0], varargin{:} );
         end
-
-        % dependent properties
-        function n = get.nn(self), n = self.store.nelm; end
-        function n = get.np(self), n = nnz(self.store.col('nchildren')); end
-        function n = get.nl(self), n = self.nn - self.np; end
-
-        function n = get.n_nodes(self), n = self.nn; end
-        function n = get.n_leaves(self), n = self.nl; end
-        function n = get.n_parents(self), n = self.np; end
-
-        function s = get.sparsity(self), s = self.store.sparsity; end
-        function r = ready(self), r = self.nn > 0; end
 
         % compress storage and reindex the tree
         function remap = compress(self,res)
             if nargin < 2, res = self.store.bsize; end
             remap = self.store.compress();
-            remap = [0; remap(:)];
+            remap = [0; remap(:)]; % allow parent/eldest to be 0
             self.store.data(:,1) = remap(1+self.store.data(:,1));
+            self.store.data(:,3) = remap(1+self.store.data(:,3));
             self.store.reserve(res);
         end
 
-        function gobj = plot(self,varargin)
-        %
-        % Plot tree;
-        %   - classic and radial available
-        %   - customise nodes and edges
-        %   - customise data-tip
-        %   - many other options
-        %
-        % See also: dk.priv.draw_tree
+        function print(self,fh)
+            if nargin < 2, fh=1; end % default to stdout
 
-            gobj = dk.priv.draw_tree( self, varargin{:} );
-        end
-
-        % function print(self,fh)
-        %     if nargin < 2, fh=1; end % default to stdout
-
-        %     [d,w] = self.shape();
-        %     fprintf( fh, 'Tree properties:\n' );
-        %     fprintf( fh, '	 depth: %d\n', d );
-        %     fprintf( fh, '	 width: %s\n', dk.util.vec2str(w) );
-        %     fprintf( fh, '---------\n' );
-        %     fprintf( fh, '%d node(s):\n', self.nn );
-        %     function printfun(k,n,p)
-        %         fprintf( fh, '	 [%d] %d>%d: %d children\n', n.d, n.p, k, n.nc );
-        %     end
-        %     self.bfs( @printfun );
-        % end
-
-        function disp(self,varargin)
-        %
-        % Display tree in console, or write to file.
-        %
-        % See also: dk.priv.disp_tree
-
-            dk.priv.disp_tree( self, varargin{:} );
+            [d,w] = self.shape();
+            fprintf( fh, 'Tree properties:\n' );
+            fprintf( fh, '	 depth: %d\n', d );
+            fprintf( fh, '	 width: %s\n', dk.util.vec2str(w) );
+            fprintf( fh, '---------\n' );
+            fprintf( fh, '%d node(s):\n', self.nn );
+            function printfun(k,n,p)
+                fprintf( fh, '	 [%d] %d>%d: %d children\n', n.d, n.p, k, n.nc );
+            end
+            self.bfs( @printfun );
         end
 
     end
@@ -188,49 +138,25 @@ classdef Tree < handle
     % tree methods
     methods
 
-        % node properties
-        function [k,r] = indices(self)
-            k = self.store.find();
-            if nargout > 1, r(k) = 1:numel(k); end % reverse mapping
-        end
-
-        function y = is_leaf(self,k)
-            y = self.nchildren(k) == 0;
-        end
-        function y = is_valid(self,k)
-            y = self.store.used(k);
-        end
-
-        function p = parent(self,k)
-            p = self.store.dget(k,1);
-        end
-        function [p,k] = parents(self)
-            p = self.store.col('parent');
-            if nargout > 1, k = self.indices(); end
-        end
-
-        function d = depth(self,k)
-            if nargin > 1
-                d = self.store.dget(k,2);
-            else
-                % return tree-depth if called without index
-                d = max(self.store.col('depth'));
+        function s = siblings(self,k,unwrap)
+            if nargin < 3, unwrap=true; end
+            s = self.children(self.parent(k),false); % list children of parents
+            n = numel(s);
+            for i = 1:n
+                s{i} = s{i}( s{i} ~= k(i) ); % remove self
             end
-        end
-        function [d,k] = depths(self)
-            d = self.store.col('depth');
-            if nargout > 1, k = self.indices(); end
+            if unwrap && n == 1
+                s = s{1};
+            end
         end
 
         function n = nchildren(self,k)
-            n = self.store.dget(k,3);
+            n = self.store.dget(k,4);
         end
         function [n,k] = nchildrens(self)
-            n = self.store.col('nchildren');
-            if nargout > 1, k = self.indices(); end
-            %[n,k] = self.parents();
-            %n = accumarray( n(2:end), 1, [max(k),1] ); % root has no parent
-            %n = n(k);
+            [n,k] = self.parents();
+            n = accumarray( n(2:end), 1, [max(k),1] ); % root has no parent
+            n = n(k);
         end
 
         function c = children(self,k,unwrap)
@@ -255,18 +181,6 @@ classdef Tree < handle
             [p,k] = self.parents();
             C = dk.util.grouplabels( p(2:end), max(k) ); % root has no parent
             C = dk.mapfun( @(i) k(i+1)', C(k), false ); % remap indices, i+1 because excluded root
-        end
-
-        function s = siblings(self,k,unwrap)
-            if nargin < 3, unwrap=true; end
-            s = self.children(self.parent(k),false); % list children of parents
-            n = numel(s);
-            for i = 1:n
-                s{i} = s{i}( s{i} ~= k(i) ); % remove self
-            end
-            if unwrap && n == 1
-                s = s{1};
-            end
         end
 
         function o = offspring(self,k,unwrap)
@@ -296,40 +210,15 @@ classdef Tree < handle
             end
         end
 
-
-        % tree properties
-        function [depth,width] = shape(self)
-            depth = self.store.col('depth');    % depth of each node
-            width = accumarray( depth(:), 1 );  % width at each depth
-            depth = max(depth);                 % depth of the tree
-        end
-
-        function L = levels(self)
-            [d,k] = self.depths();
-            L = dk.util.grouplabels(d);
-            L = dk.mapfun( @(i) k(i), L, false );
-        end
-
-
-        % node access
-        function [n,m] = root(self,varargin)
-            [n,m] = self.get_node(1,varargin{:});
-        end
-
-        % struct-array nodes (p:parent, d:depth, nc:#children)
-        function [n,p] = get_node(self,k,with_children) % works with k vector
-            if nargin < 3, with_children=false; end
-
+        % struct-array nodes (p:parent, d:depth, c:children, nc:#children)
+        function [n,p] = get_node(self,k) % works with k vector
             if nargout > 1
                 [d,p] = self.store.both(k);
             else
                 d = self.store.row(k);
             end
             n = cell2struct( num2cell(d), {'p','d','nc'}, 2 );
-
-            if with_children
-                [n.c] = deal(self.children(k,false));
-            end
+            [n.c] = deal(self.children(k,false));
         end
 
         function p = get_props(self,k)
@@ -343,10 +232,9 @@ classdef Tree < handle
         end
 
         function k = add_node(self,p,varargin) % works with p vector
-            n = numel(p);
-            x = [p(:), self.depth(p)+1, zeros(n,1)];
-            k = self.store.add( x, varargin{:} );
-            self.store.data(p,3) = self.store.data(p,3) + 1; % add to parent count
+            error('not available')
+        end
+        function k = split_node(self,p,varargin)
         end
         function r = rem_node(self,k)
             k = k(:)';

@@ -6,7 +6,7 @@ T = dk.test.tree_rand(4);
 
 % plot tree and shape
 T.plot('Name','First plot');
-T.print();
+disp(T);
 sep()
 
 % remove node and redraw
@@ -15,14 +15,14 @@ r = randi(fix(n/2));
 T.rem_node(r);
 T.plot('Name','After removing');
 dk.println('After removing node %d / %d',r,n);
-T.print();
+disp(T);
 sep()
 
 % cleanup and redraw
 T.compress();
 T.plot('Name','After cleanup','Radial',true);
 disp('After cleanup:');
-T.print();
+disp(T);
 sep()
 
 % traversal

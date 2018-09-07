@@ -1,6 +1,6 @@
-function gobj = plot_tree(T,varargin)
+function gobj = draw_tree(T,varargin)
 %
-% gobj = plot_tree(T,varargin)
+% gobj = dk.priv.draw_tree(T,varargin)
 %
 % Draw the tree.
 %
@@ -66,9 +66,9 @@ function gobj = plot_tree(T,varargin)
     height = cumsum(height(:));
     height = height - height(1); % root at 0
     if radial
-        height = 2*height; 
+        height = 2*height;
     else
-        height = -height; 
+        height = -height;
     end
     nodes.height = height;
 
@@ -103,13 +103,13 @@ function nodes = compute_widths(T,sepfun)
 % Compute the width required for displaying each node and its children.
 % The leaf nodes have a width of 1, which is equivalent to right and left margins of 1/2.
 %
-% The width of leaf nodes is propagated to their parents (summing for all children), then 
-% to their grandparents, etc. Until we reach the root. 
+% The width of leaf nodes is propagated to their parents (summing for all children), then
+% to their grandparents, etc. Until we reach the root.
 % Note that this _needs_ to be done level by level.
 %
-% Sepfun is used to insert a space between different families at each level. 
+% Sepfun is used to insert a space between different families at each level.
 % This is done indirectly by adding width to nodes that are closer to the root. Then when
-% we draw the nodes, the discrepancy between the width of the children, and that of the 
+% we draw the nodes, the discrepancy between the width of the children, and that of the
 % parent, is the separation increment.
 %
 % The output is a structure with fields:
@@ -129,7 +129,7 @@ function nodes = compute_widths(T,sepfun)
     P = T.parents();    % parent
     [I,R] = T.indices();
     n = numel(D);
-    
+
     maxd = max(D);
     inc = sepfun(fliplr(0:maxd-1));  % level spacings
 
@@ -142,11 +142,11 @@ function nodes = compute_widths(T,sepfun)
         c = find(D == h);
         p = R(P(c));
         m = numel(p);
-        
+
         assert( all(p <= n), 'Bad index' );
 
         % needs to be done with a for loop
-        for i = 1:m 
+        for i = 1:m
             w(c(i)) = w(c(i)) + inc(h);
             w(p(i)) = w(p(i)) + w(c(i));
         end
@@ -211,7 +211,7 @@ function gobj = vertical_draw(T,nodes,balance,linkopt)
             x0 = offset(kj); % offset of the parent
             x0 = x0 + (W(kj) - sum(wj))/2; % add separation increment
             for i = 1:nc
-                cji = cj(i); 
+                cji = cj(i);
                 kji = nodes.rev(cji);
 
                 % save position of current node
@@ -296,7 +296,7 @@ function gobj = radial_draw(T,nodes,balance,linkopt)
             x0 = offset(kj); % offset of the parent
             x0 = x0 + (W(kj) - sum(wj))/2;
             for i = 1:nc
-                cji = cj(i); 
+                cji = cj(i);
                 kji = nodes.rev(cji);
 
                 % save position of current node
@@ -375,14 +375,14 @@ function nodes = add_prop(nodes,sz,fc,ec)
     if numel(sz) < n, sz = sz*ones(n,1); end
     assert( numel(sz)==n, 'Bad input size.' );
     assert( all(sz >= 0 & sz <= 1), 'Sizes should be between 0 and 1.' );
-    
+
     % face and edge color
     fc = check_numrows(fc,n);
     ec = check_numrows(ec,n);
-    
+
     % normalisation factor for the size
     w = min(nonzeros( nodes.width ./ nodes.deg ))/2;
-    
+
     prop = dk.struct.repeat( {'size','face','edge'}, 1, n );
     for i = 1:n
         prop(i).size = sz(i)*w;
@@ -390,19 +390,19 @@ function nodes = add_prop(nodes,sz,fc,ec)
         prop(i).edge = ec(i,:);
     end
     nodes.prop = prop;
-    
+
 end
 
 
 function c = reorder_children( c, w )
 %
-% Simple balancing technique which distributes weights in decreasing order, 
+% Simple balancing technique which distributes weights in decreasing order,
 % starting at the centre and alternating right and left.
 %
 
     n = numel(c);
     if n == 1, return; end
-    
+
     [~,o] = sort(w,'descend');
     r = zeros(1,n);
     p = ceil(n/2);
@@ -415,5 +415,5 @@ function c = reorder_children( c, w )
         end
     end
     c = r;
-    
+
 end
