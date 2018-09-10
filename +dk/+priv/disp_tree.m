@@ -11,8 +11,8 @@ function disp_tree(T,fh)
 
     [~,remap] = T.indices();
     obj.remap = remap;
-    obj.depth = T.depths();
-    obj.children = T.childrens();
+    obj.depth = T.allDepths();
+    obj.children = T.allChildren();
     obj.print = @(fmt,varargin) fprintf( fh, [fmt '\n'], varargin{:} );
 
     recurse( obj, 1, '', false, true );
@@ -39,7 +39,7 @@ function recurse(obj,id,padding,isLast,isFirst)
     children = obj.children{k};
     nchildren = numel(children);
 
-    obj.print( '%s:%d +%d %d', [tmp leg], depth, nchildren, id );
+    obj.print( '%s%d :%d +%d', [tmp leg], id, depth, nchildren );
 
     if ~isFirst
         padding = [padding pad.tab];

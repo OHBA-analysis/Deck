@@ -78,26 +78,24 @@ classdef Tree < handle
         sparsity
     end
 
+    properties (Abstract,Constant)
+        type;
+    end
+
+    methods (Abstract)
+
+        % varargin forwarded to self.store.add
+        reset(self,bsize,varargin);
+
+        % re-index the tree to remove unused nodes
+        remap = compress(self,res);
+
+    end
+
     methods
-
-        function self = Tree(varargin)
-            self.clear();
-            if nargin > 0 && ischar(varargin{1})
-                self.unserialise(varargin{1});
-            else
-                self.reset(varargin{:});
-            end
-
-        end
 
         function clear(self)
             self.store = dk.obj.DataArray();
-        end
-
-        function reset(self,bsize,varargin)
-            if nargin < 2, bsize=100; end
-            self.store = dk.obj.DataArray( {'parent','depth','nchildren'}, bsize );
-            self.store.add( [0,1,0], varargin{:} );
         end
 
         % dependent properties
@@ -111,15 +109,6 @@ classdef Tree < handle
 
         function s = get.sparsity(self), s = self.store.sparsity; end
         function r = ready(self), r = self.nn > 0; end
-
-        % compress storage and reindex the tree
-        function remap = compress(self,res)
-            if nargin < 2, res = self.store.bsize; end
-            remap = self.store.compress();
-            remap = [0; remap(:)];
-            self.store.data(:,1) = remap(1+self.store.data(:,1));
-            self.store.reserve(res);
-        end
 
         function gobj = plot(self,varargin)
         %
@@ -150,12 +139,14 @@ classdef Tree < handle
 
         function s=serialise(self,file)
             s.version = '0.1';
+            s.type = self.type;
             s.store = self.store.serialise();
             if nargin > 1, save(file,'-v7','-struct','s'); end
         end
 
         function self=unserialise(self,s)
         if ischar(s), s=load(s); end
+        dk.assert( strcmpi(s.type,self.type), 'Type mismatch: %s != %s', s.type, self.type );
         switch s.version
             case '0.1'
                 self.store = dk.obj.DataArray().unserialise( s.store );

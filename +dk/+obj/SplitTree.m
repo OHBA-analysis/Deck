@@ -93,110 +93,84 @@ classdef SplitTree < dk.obj.Tree
             self.store.reserve(res);
         end
 
-        function print(self,fh)
-            if nargin < 2, fh=1; end % default to stdout
-
-            [d,w] = self.shape();
-            fprintf( fh, 'Tree properties:\n' );
-            fprintf( fh, '	 depth: %d\n', d );
-            fprintf( fh, '	 width: %s\n', dk.util.vec2str(w) );
-            fprintf( fh, '---------\n' );
-            fprintf( fh, '%d node(s):\n', self.nn );
-            function printfun(k,n,p)
-                fprintf( fh, '	 [%d] %d>%d: %d children\n', n.d, n.p, k, n.nc );
-            end
-            self.bfs( @printfun );
-        end
-
-    end
-
-    % i/o
-    methods
-
-        function s=serialise(self,file)
-            s.version = '0.1';
-            s.store = self.store.serialise();
-            if nargin > 1, save(file,'-v7','-struct','s'); end
-        end
-
-        function self=unserialise(self,s)
-        if ischar(s), s=load(s); end
-        switch s.version
-            case '0.1'
-                self.store = dk.obj.DataArray().unserialise( s.store );
-            otherwise
-                error('Unknown version: %s',s.version);
-        end
-        end
-
-        function same=compare(self,other)
-            same = dk.compare( self.serialise(), other.serialise() );
-        end
-
     end
 
     % tree methods
     methods
 
+        % special function for split-trees
+        % gives the order of current nodes relative to oldest sibling
+        function [r,p] = order(self,k)
+            p = self.parent(k);
+            r = k(:) - self.eldest(p) + 1;
+        end
+        function [r,k] = allOrders(self)
+            k = self.indices();
+            r = self.order(k);
+        end
+
+        function e = eldest(self,k)
+            e = self.store.dget(k,3);
+        end
+        function [e,k] = allEldests(self)
+            e = self.store.col('eldest');
+            if nargout > 1, k = self.indices(); end
+        end
+
+        function n = nchildren(self,k)
+            n = self.store.dget(k,4);
+        end
+        function [n,k] = allNchildren(self)
+            n = self.store.col('nchildren');
+            if nargout > 1, k = self.indices(); end
+        end
+
+        function c = children(self,k,unwrap)
+            if nargin < 3, unwrap=true; end
+
+            d = self.store.dget(k,3:4);
+            d(:,1) = max( d(:,1), 1 );
+                % this allows us not to worry about eldest=0
+                % because we know that nchildren=0 too then
+
+            n = numel(k);
+            c = dk.mapfun( @(i) d(i,1):d(i,2), 1:n, false );
+            if unwrap && n==1
+                c = c{1};
+            end
+        end
+        function [C,k] = allChildren(self)
+            k = self.indices();
+            C = self.children( k, false );
+        end
+
         function s = siblings(self,k,unwrap)
             if nargin < 3, unwrap=true; end
-            s = self.children(self.parent(k),false); % list children of parents
+            [r,p] = self.order(k);
+            s = self.children(p,false); % list children of parents
             n = numel(s);
+
+            remk = @(x,k) [ x(1:k-1), x(k+1:end) ];
             for i = 1:n
-                s{i} = s{i}( s{i} ~= k(i) ); % remove self
+                s{i} = remk( s{i}, r(i) ); % remove self
             end
             if unwrap && n == 1
                 s = s{1};
             end
         end
 
-        function n = nchildren(self,k)
-            n = self.store.dget(k,4);
-        end
-        function [n,k] = nchildrens(self)
-            [n,k] = self.parents();
-            n = accumarray( n(2:end), 1, [max(k),1] ); % root has no parent
-            n = n(k);
-        end
-
-        function c = children(self,k,unwrap)
-            if nargin < 3, unwrap=true; end
-
-            n = numel(k);
-            if n > log(1+self.nn)
-                c = self.childrens();
-                c = c(k);
-            else
-                c = cell(1,n);
-                for i = 1:n
-                    % valid nodes whose parent is k(i)
-                    c{i} = find(self.store.used & (self.store.data(:,1) == k(i)));
-                end
-            end
-            if unwrap && n==1
-                c = c{1};
-            end
-        end
-        function [C,k] = childrens(self)
-            [p,k] = self.parents();
-            C = dk.util.grouplabels( p(2:end), max(k) ); % root has no parent
-            C = dk.mapfun( @(i) k(i+1)', C(k), false ); % remap indices, i+1 because excluded root
-        end
-
         function o = offspring(self,k,unwrap)
-        %
-        % Most efficient given storage, but pretty slow...
             if nargin < 3, unwrap=true; end
 
+            E = self.eldest
             n = numel(k);
-            N = self.nchildren(k);
-            d = self.depth();
             o = cell(1,n);
 
-            if all(N == 0), return; end
-            C = self.childrens();
-
             for i = 1:n
+
+                % relative depth
+                d = 0;
+
                 t = cell(1,d);
                 t{1} = C{k(i)};
                 for j = 2:d
@@ -231,22 +205,14 @@ classdef SplitTree < dk.obj.Tree
             self.store.rmfield(varargin{:});
         end
 
-        function k = add_node(self,p,varargin) % works with p vector
+        function add_node(~,varargin) % works with p vector
             error('not available')
         end
-        function k = split_node(self,p,varargin)
-        end
         function r = rem_node(self,k)
-            k = k(:)';
-            assert( all(k > 1), 'The root (index 1) cannot be removed.' );
+            error('not available')
+        end
 
-            p = self.parent(k);
-            o = self.offspring(k,false);
-            r = [horzcat(o{:}), k];
-            if isempty(k), return; end
-
-            self.store.rem(r);
-            self.store.data(p,3) = self.store.data(p,3) - 1; % subtract from parent count
+        function k = split_node(self,p,varargin)
         end
 
     end

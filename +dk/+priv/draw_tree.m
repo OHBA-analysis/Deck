@@ -124,9 +124,9 @@ function nodes = compute_widths(T,sepfun)
 %
 % JH
 
-    D = T.depths();     % depth
-    G = T.nchildrens(); % degree
-    P = T.parents();    % parent
+    D = T.allDepths();     % depth
+    G = T.allNchildren();  % degree
+    P = T.allParents();    % parent
     [I,R] = T.indices();
     n = numel(D);
 
@@ -169,7 +169,7 @@ function gobj = vertical_draw(T,nodes,balance,linkopt)
     D = nodes.d;
     W = nodes.width;
     H = nodes.height;
-    C = T.childrens();
+    C = T.allChildren();
 
     % axis coordinate and offset for each node
     coord = zeros(1,N);
@@ -244,7 +244,7 @@ end
 % draw tree with radial layout
 function gobj = radial_draw(T,nodes,balance,linkopt)
 
-    C = T.childrens();
+    C = T.allChildren();
     N = nodes.n;
     D = nodes.d;
     R = nodes.height / (2*pi);
