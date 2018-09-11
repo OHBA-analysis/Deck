@@ -1,8 +1,8 @@
-function T = tree_rand(depth,sel,deg)
+function T = stree_rand(depth,sel,deg)
 %
-% tree_rand(depth,deg,sel)
+% stree_rand(depth,deg,sel)
 %
-% Create random Tree instance of specified depth and average degree.
+% Create random SplitTree instance of specified depth and average degree.
 %
 % JH
 
@@ -10,7 +10,7 @@ function T = tree_rand(depth,sel,deg)
     if nargin < 2, sel=0.4; end
     if nargin < 1, depth=5; end
 
-    T = dk.obj.Tree();
+    T = dk.obj.SplitTree();
     k = 1;
     for d = 1:depth
 
@@ -35,11 +35,7 @@ function T = tree_rand(depth,sel,deg)
         for i = 1:n
             ki = k(i);
             gi = g(i);
-            ci = zeros(1,gi);
-            for j = 1:gi
-                ci(j) = T.add_node(ki);
-            end
-            c{i} = ci;
+            c{i} = T.split(ki,gi);
         end
         k = [c{:}];
 

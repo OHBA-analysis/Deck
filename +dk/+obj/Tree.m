@@ -1,6 +1,9 @@
-classdef Tree < handle
+classdef Tree < dk.priv.TreeBase
 %
-% Tree implementation, using a dk.obj.DataArray as extensible storage.
+% Tree implementation deriving from dk.priv.TreeBase. This is a fairly
+% generic implementation, with few assumptions; nodes can be added or
+% removed in any order, and the storage+indexing can be compacted.
+%
 % The columns of the storage are:
 %   parent
 %   depth
@@ -10,10 +13,10 @@ classdef Tree < handle
 %   list children       O(n)
 %   list offspring      O(n log(n))
 %   remove node         O(n log(n))
-% where n is the total number of nodes.
+% where there operations are for a single node, and n is the total
+% number of nodes.
 %
 % Traversal methods are non-recursive.
-%
 %
 % ----------------------------------------------------------------------
 % ## Usage
@@ -24,30 +27,25 @@ classdef Tree < handle
 %   T = dk.obj.Tree( bsize, Name/Value )        setting the root props
 %   T = dk.obj.Tree( serialised_path )          unserialise file
 %
-% Data-structure
-%
-%   T.serialise( output_file )
-%   T.compress( reserve )
-%
 % Tree logic
 %
-%   indices
-%   shape
-%   levels
+%   indices()       valid node IDs              (vec)
+%   depth()         tree depth                  (scalar)
+%   shape()         width at each level         (vec)
+%   levels()        group node IDs by level     (cell)
 %
-%   parent(id)      node props (efficient)
-%   depth(id)       accept multiple ids
-%   nchildren(id)   return vec
+%   parent(id)      if of parent node
+%   depth(id)       depth of current node (>= 1)
+%   nchildren(id)   number of children
 %
-%   depth()         tree depth           (scalar)
-%   depths()        all node depths      (vec)
-%   nchildrens()    all node #children   (vec)
-%   parents()       all node parents     (cell)
+%   children  ( id, unwrap=false )     | accept multiple ids
+%   offspring ( id, unwrap=false )     | inefficient ops O( n log n )
+%   siblings  ( id, unwrap=false )     | return cell
 %
-%   offspring ( id, unwrap=false )       inefficient ops O( n log n )
-%   children  ( id, unwrap=false )       accept multiple ids
-%   siblings  ( id, unwrap=false )       return cell
-%   childrens ()
+%   all_parents()   all node parents     (cell)
+%   all_depths()    all node depths      (vec)
+%   all_children()  all node children    (cell)
+%   all_nchildren() all node #children   (vec)
 %
 % Node logic
 %
@@ -59,23 +57,14 @@ classdef Tree < handle
 %   set_props( id, Name/Value )                    merge with existing
 %   rem_props( Names... )                          from all nodes
 %
-% Traversal
 %
-%   iter( callback )
-%   dfs ( callback )     with callback( id, node, props )
-%   bfs ( callback )
+% ----------------------------------------------------------------------
+% See also: dk.priv.TreeBase
 %
 % JH
 
-    properties (SetAccess=protected, Hidden)
-        store
-    end
-
-    properties (Transient, Dependent)
-        n_nodes, nn
-        n_leaves, nl
-        n_parents, np
-        sparsity
+    properties (Constant)
+        type = 'tree';
     end
 
     methods
@@ -90,27 +79,11 @@ classdef Tree < handle
 
         end
 
-        function clear(self)
-            self.store = dk.obj.DataArray();
-        end
-
         function reset(self,bsize,varargin)
             if nargin < 2, bsize=100; end
             self.store = dk.obj.DataArray( {'parent','depth','nchildren'}, bsize );
             self.store.add( [0,1,0], varargin{:} );
         end
-
-        % dependent properties
-        function n = get.nn(self), n = self.store.nelm; end
-        function n = get.np(self), n = nnz(self.store.col('nchildren')); end
-        function n = get.nl(self), n = self.nn - self.np; end
-
-        function n = get.n_nodes(self), n = self.nn; end
-        function n = get.n_leaves(self), n = self.nl; end
-        function n = get.n_parents(self), n = self.np; end
-
-        function s = get.sparsity(self), s = self.store.sparsity; end
-        function r = ready(self), r = self.nn > 0; end
 
         % compress storage and reindex the tree
         function remap = compress(self,res)
@@ -121,96 +94,10 @@ classdef Tree < handle
             self.store.reserve(res);
         end
 
-        function gobj = plot(self,varargin)
-        %
-        % Plot tree;
-        %   - classic and radial available
-        %   - customise nodes and edges
-        %   - customise data-tip
-        %   - many other options
-        %
-        % See also: dk.priv.draw_tree
-
-            gobj = dk.priv.draw_tree( self, varargin{:} );
-        end
-
-        function disp(self,varargin)
-        %
-        % Display tree in console, or write to file.
-        %
-        % See also: dk.priv.disp_tree
-
-            dk.priv.disp_tree( self, varargin{:} );
-        end
-
-    end
-
-    % i/o
-    methods
-
-        function s=serialise(self,file)
-            s.version = '0.1';
-            s.store = self.store.serialise();
-            if nargin > 1, save(file,'-v7','-struct','s'); end
-        end
-
-        function self=unserialise(self,s)
-        if ischar(s), s=load(s); end
-        switch s.version
-            case '0.1'
-                self.store = dk.obj.DataArray().unserialise( s.store );
-            otherwise
-                error('Unknown version: %s',s.version);
-        end
-        end
-
-        function same=compare(self,other)
-            same = dk.compare( self.serialise(), other.serialise() );
-        end
-
-    end
-
-    % tree methods
-    methods
-
-        % node properties
-        function [k,r] = indices(self)
-            k = self.store.find();
-            if nargout > 1, r(k) = 1:numel(k); end % reverse mapping
-        end
-
-        function y = is_leaf(self,k)
-            y = self.nchildren(k) == 0;
-        end
-        function y = is_valid(self,k)
-            y = self.store.used(k);
-        end
-
-        function p = parent(self,k)
-            p = self.store.dget(k,1);
-        end
-        function [p,k] = allParents(self)
-            p = self.store.col('parent');
-            if nargout > 1, k = self.indices(); end
-        end
-
-        function d = depth(self,k)
-            if nargin > 1
-                d = self.store.dget(k,2);
-            else
-                % return tree-depth if called without index
-                d = max(self.store.col('depth'));
-            end
-        end
-        function [d,k] = allDepths(self)
-            d = self.store.col('depth');
-            if nargout > 1, k = self.indices(); end
-        end
-
         function n = nchildren(self,k)
             n = self.store.dget(k,3);
         end
-        function [n,k] = allNchildren(self)
+        function [n,k] = all_nchildren(self)
             n = self.store.col('nchildren');
             if nargout > 1, k = self.indices(); end
             %[n,k] = self.parents();
@@ -223,7 +110,7 @@ classdef Tree < handle
 
             n = numel(k);
             if n > log(1+self.nn)
-                c = self.allChildren();
+                c = self.all_children();
                 c = c(k);
             else
                 c = cell(1,n);
@@ -236,18 +123,20 @@ classdef Tree < handle
                 c = c{1};
             end
         end
-        function [C,k] = allChildren(self)
-            [p,k] = self.allParents();
-            C = dk.util.grouplabels( p(2:end), max(k) ); % root has no parent
-            C = dk.mapfun( @(i) k(i+1)', C(k), false ); % remap indices, i+1 because excluded root
+        function [c,k] = all_children(self)
+            [p,k] = self.all_parents();
+            c = dk.util.grouplabels( p(2:end), max(k) ); % root has no parent
+            c = dk.mapfun( @(i) k(i+1)', c(k), false ); % remap indices, i+1 because excluded root
         end
 
         function s = siblings(self,k,unwrap)
             if nargin < 3, unwrap=true; end
             s = self.children(self.parent(k),false); % list children of parents
             n = numel(s);
+
+            rems = @(x,y) x( x ~= y );
             for i = 1:n
-                s{i} = s{i}( s{i} ~= k(i) ); % remove self
+                s{i} = rems( s{i}, k(i) ); % remove self
             end
             if unwrap && n == 1
                 s = s{1};
@@ -265,7 +154,7 @@ classdef Tree < handle
             o = cell(1,n);
 
             if all(N == 0), return; end
-            C = self.allChildren();
+            C = self.all_children();
 
             for i = 1:n
                 t = cell(1,d);
@@ -281,30 +170,9 @@ classdef Tree < handle
             end
         end
 
-
-        % tree properties
-        function [depth,width] = shape(self)
-            depth = self.store.col('depth');    % depth of each node
-            width = accumarray( depth(:), 1 );  % width at each depth
-            depth = max(depth);                 % depth of the tree
-        end
-
-        function L = levels(self)
-            [d,k] = self.allDepths();
-            L = dk.util.grouplabels(d);
-            L = dk.mapfun( @(i) k(i), L, false );
-        end
-
-
-        % node access
-        function [n,m] = root(self,varargin)
-            [n,m] = self.get_node(1,varargin{:});
-        end
-
         % struct-array nodes (p:parent, d:depth, nc:#children)
         function [n,p] = get_node(self,k,with_children) % works with k vector
             if nargin < 3, with_children=false; end
-
             if nargout > 1
                 [d,p] = self.store.both(k);
             else
@@ -317,25 +185,21 @@ classdef Tree < handle
             end
         end
 
-        function p = get_props(self,k)
-            p = self.store.mget(k);
-        end
-        function set_props(self,k,varargin)
-            self.store.assign(k,varargin{:});
-        end
-        function rem_props(self,varargin)
-            self.store.rmfield(varargin{:});
-        end
-
         function k = add_node(self,p,varargin) % works with p vector
             n = numel(p);
+            [u,~,c] = unique(p(:));
+            c = accumarray(c,1);
+            assert( all(self.is_valid(p)), 'Invalid parent node.' );
+
             x = [p(:), self.depth(p)+1, zeros(n,1)];
             k = self.store.add( x, varargin{:} );
-            self.store.data(p,3) = self.store.data(p,3) + 1; % add to parent count
+            self.store.data(u,3) = self.store.data(u,3) + c; % add to parent count
         end
+
         function r = rem_node(self,k)
             k = k(:)';
             assert( all(k > 1), 'The root (index 1) cannot be removed.' );
+            assert( all(self.is_valid(k)), 'Invalid node index.' );
 
             p = self.parent(k);
             o = self.offspring(k,false);
@@ -344,62 +208,6 @@ classdef Tree < handle
 
             self.store.rem(r);
             self.store.data(p,3) = self.store.data(p,3) - 1; % subtract from parent count
-        end
-
-    end
-
-    % traversal methods
-    methods
-
-        function [out,id] = iter(self,callback)
-            id = self.indices();
-            if nargout == 0
-                dk.mapfun( @(k) callback(k, self.get_node(k), self.get_props(k)), id );
-            else
-                out = dk.mapfun( @(k) callback(k, self.get_node(k), self.get_props(k)), id, false );
-            end
-        end
-
-        % see: https://stackoverflow.com/a/51124171/472610
-
-        function bfs(self,callback,start)
-            if nargin < 3, start=1; end
-
-            C = self.allChildren();
-            N = self.nn;
-            S = zeros(1,N);
-            [~,r] = self.indices();
-
-            S(1) = start;
-            cur = 1;
-            last = 1;
-            while cur <= last
-                id = S(cur);
-                callback( id, self.get_node(id), self.get_props(id) );
-                n = numel(C{r(id)});
-                S( last + (1:n) ) = C{r(id)};
-                last = last + n;
-                cur = cur + 1;
-            end
-        end
-
-        function dfs(self,callback,start)
-            if nargin < 3, start=1; end
-
-            C = self.allChildren();
-            N = self.nn;
-            S = zeros(1,N);
-            [~,r] = self.indices();
-
-            S(1) = start;
-            cur = 1;
-            while cur > 0
-                id = S(cur);
-                callback( id, self.get_node(id), self.get_props(id) );
-                n = numel(C{r(id)});
-                S( cur-1 + (1:n) ) = fliplr(C{r(id)});
-                cur = cur-1 + n;
-            end
         end
 
     end

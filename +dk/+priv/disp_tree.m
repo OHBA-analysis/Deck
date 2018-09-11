@@ -1,18 +1,24 @@
 function disp_tree(T,fh)
 %
+% dk.priv.disp_tree(T, fh=1)
+%
 % Display a tree in the console, or write to a file.
 %
-% OPTIONS:
+% NOTICE
+% If you experience ENCODING ISSUES in the console (weird symbols), type:
+%   slCharacterEncoding('UTF-8');
 %
+% OPTIONS:
 %   fh  File-handle for printing
 %
+% JH
 
     if nargin < 2, fh=1; end
 
     [~,remap] = T.indices();
     obj.remap = remap;
-    obj.depth = T.allDepths();
-    obj.children = T.allChildren();
+    obj.depth = T.all_depths();
+    obj.children = T.all_children();
     obj.print = @(fmt,varargin) fprintf( fh, [fmt '\n'], varargin{:} );
 
     recurse( obj, 1, '', false, true );
@@ -21,10 +27,7 @@ end
 
 function recurse(obj,id,padding,isLast,isFirst)
 
-    %u2n = @(x) native2unicode( x, 'UTF-8' );
-    %pad = struct( 'leg', u2n('├── '), 'end', u2n('└── '), 'tab', '   ' );
     pad = struct( 'leg', '├── ', 'end', '└── ', 'tab', '   ' );
-
     tmp = padding(1:end-1);
     if isFirst
         leg = '';

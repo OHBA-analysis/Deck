@@ -9,6 +9,13 @@ T.plot('Name','First plot');
 disp(T);
 sep()
 
+% traversal
+disp('Depth-first search:');
+T.dfs( @(k,n,p) fprintf('%d ',k) ); fprintf('\n');
+
+disp('Breadth-first search:');
+T.bfs( @(k,n,p) fprintf('%d ',k) ); fprintf('\n');
+
 % remove node and redraw
 n = T.n_nodes;
 r = randi(fix(n/2));

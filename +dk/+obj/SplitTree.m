@@ -1,9 +1,10 @@
-classdef SplitTree < dk.obj.Tree
+classdef SplitTree < dk.priv.TreeBase
 %
 % Tree implementation similar to dk.obj.Tree, but taking advantage of the
 % split-context to improve performance. Specifically, the split tree is
 % designed for cases where the children of a node are specified together
-% at once; no additional children can be created later on.
+% at once; no additional children can be created later on, and no node
+% can be deleted.
 %
 % The columns of the storage are:
 %   parent
@@ -13,40 +14,35 @@ classdef SplitTree < dk.obj.Tree
 %
 % Traversal methods are non-recursive.
 %
-%
 % ----------------------------------------------------------------------
 % ## Usage
 %
 % Construction
 %
-%   T = dk.obj.Tree()                           default root node
-%   T = dk.obj.Tree( bsize, Name/Value )        setting the root props
-%   T = dk.obj.Tree( serialised_path )          unserialise file
-%
-% Data-structure
-%
-%   T.serialise( output_file )
-%   T.compress( reserve )
+%   T = dk.obj.SplitTree()                         default root node
+%   T = dk.obj.SplitTree( bsize, Name/Value )      setting the root props
+%   T = dk.obj.SplitTree( serialised_path )        unserialise file
 %
 % Tree logic
 %
-%   indices
-%   shape
-%   levels
+%   indices()       valid node IDs              (vec)
+%   depth()         tree depth                  (scalar)
+%   shape()         width at each level         (vec)
+%   levels()        group node IDs by level     (cell)
 %
-%   parent(id)      node props (efficient)
-%   depth(id)       accept multiple ids
-%   nchildren(id)   return vec
+%   parent(id)      if of parent node
+%   depth(id)       depth of current node (>= 1)
+%   eldest(id)      id of the oldest child (or 0)
+%   nchildren(id)   number of children
 %
-%   depth()         tree depth           (scalar)
-%   depths()        all node depths      (vec)
-%   nchildrens()    all node #children   (vec)
-%   parents()       all node parents     (cell)
-%
-%   offspring ( id, unwrap=false )       inefficient ops O( n log n )
 %   children  ( id, unwrap=false )       accept multiple ids
+%   offspring ( id, unwrap=false )       inefficient ops O( n log n )
 %   siblings  ( id, unwrap=false )       return cell
-%   childrens ()
+%
+%   all_parents()   all node parents     (cell)
+%   all_depths()    all node depths      (vec)
+%   all_children()  all node children    (cell)
+%   all_nchildren() all node #children   (vec)
 %
 % Node logic
 %
@@ -64,7 +60,14 @@ classdef SplitTree < dk.obj.Tree
 %   dfs ( callback )     with callback( id, node, props )
 %   bfs ( callback )
 %
+% ----------------------------------------------------------------------
+% See also: dk.priv.TreeBase
+%
 % JH
+
+    properties (Constant)
+        type = 'splitTree';
+    end
 
     methods
 
@@ -93,18 +96,16 @@ classdef SplitTree < dk.obj.Tree
             self.store.reserve(res);
         end
 
-    end
-
-    % tree methods
-    methods
-
         % special function for split-trees
         % gives the order of current nodes relative to oldest sibling
+        % accept root
         function [r,p] = order(self,k)
             p = self.parent(k);
-            r = k(:) - self.eldest(p) + 1;
+            m = p > 0;
+            r = 0 + ~m;
+            r(m) = k(m) - self.eldest(p(m)) + 1;
         end
-        function [r,k] = allOrders(self)
+        function [r,k] = all_orders(self)
             k = self.indices();
             r = self.order(k);
         end
@@ -112,7 +113,7 @@ classdef SplitTree < dk.obj.Tree
         function e = eldest(self,k)
             e = self.store.dget(k,3);
         end
-        function [e,k] = allEldests(self)
+        function [e,k] = all_eldests(self)
             e = self.store.col('eldest');
             if nargout > 1, k = self.indices(); end
         end
@@ -120,39 +121,51 @@ classdef SplitTree < dk.obj.Tree
         function n = nchildren(self,k)
             n = self.store.dget(k,4);
         end
-        function [n,k] = allNchildren(self)
+        function [n,k] = all_nchildren(self)
             n = self.store.col('nchildren');
+            if nargout > 1, k = self.indices(); end
+        end
+
+        % child socket = (first, last)
+        % accept k <= 0
+        function r = crange(self,k)
+            n = numel(k);
+            m = k(:) > 0;
+            r = zeros(n,2);
+            r(m,:) = self.store.dget(k(m),3:4);
+            r = [ r(:,1), r(:,1) + r(:,2) - 1 ];
+        end
+        function [r,k] = all_crange(self)
+            r = self.store.col(3:4);
+            r = [ r(:,1), r(:,1) + r(:,2) - 1 ];
             if nargout > 1, k = self.indices(); end
         end
 
         function c = children(self,k,unwrap)
             if nargin < 3, unwrap=true; end
 
-            d = self.store.dget(k,3:4);
-            d(:,1) = max( d(:,1), 1 );
-                % this allows us not to worry about eldest=0
-                % because we know that nchildren=0 too then
-
+            d = self.crange(k);
             n = numel(k);
             c = dk.mapfun( @(i) d(i,1):d(i,2), 1:n, false );
             if unwrap && n==1
                 c = c{1};
             end
         end
-        function [C,k] = allChildren(self)
+        function [c,k] = all_children(self)
             k = self.indices();
-            C = self.children( k, false );
+            c = self.children( k, false );
         end
 
         function s = siblings(self,k,unwrap)
             if nargin < 3, unwrap=true; end
             [r,p] = self.order(k);
-            s = self.children(p,false); % list children of parents
-            n = numel(s);
+            c = self.crange(p); % list children of parents
+            n = numel(k);
+            s = cell(1,k);
 
-            remk = @(x,k) [ x(1:k-1), x(k+1:end) ];
+            notb = @(a,b) (a(1)-1) + [ 1:b-1, b+1:(a(2)-a(1)+1) ];
             for i = 1:n
-                s{i} = remk( s{i}, r(i) ); % remove self
+                s{i} = notb( c(i,:), r(i) );
             end
             if unwrap && n == 1
                 s = s{1};
@@ -162,57 +175,67 @@ classdef SplitTree < dk.obj.Tree
         function o = offspring(self,k,unwrap)
             if nargin < 3, unwrap=true; end
 
-            E = self.eldest
             n = numel(k);
+            d = self.depth();
             o = cell(1,n);
+            x = cell(1,d);
+            C = self.children(k);
 
             for i = 1:n
-
-                % relative depth
-                d = 0;
-
-                t = cell(1,d);
-                t{1} = C{k(i)};
-                for j = 2:d
-                    t{j} = horzcat(C{t{j-1}});
-                    if isempty(t{j}), break; end
+                ci = C(i,:);
+                di = 0;
+                while ~isempty(ci)
+                    di = di+1;
+                    x{di} = ci;
+                    ci = self.children(x{di});
+                    ci = [ci{:}];
                 end
-                o{i} = horzcat(t{:});
+                o{i} = [x{1:di}];
             end
+
             if unwrap && n == 1
                 o = o{1};
             end
         end
 
         % struct-array nodes (p:parent, d:depth, c:children, nc:#children)
-        function [n,p] = get_node(self,k) % works with k vector
+        function [n,p] = get_node(self,k,with_children) % works with k vector
+            if nargin < 3, with_children=false; end
             if nargout > 1
                 [d,p] = self.store.both(k);
             else
                 d = self.store.row(k);
             end
-            n = cell2struct( num2cell(d), {'p','d','nc'}, 2 );
-            [n.c] = deal(self.children(k,false));
+            n = cell2struct( num2cell(d(:,[1,2,4])), {'p','d','nc'}, 2 );
+
+            if with_children
+                [n.c] = deal(self.children(k,false));
+            end
         end
 
-        function p = get_props(self,k)
-            p = self.store.mget(k);
-        end
-        function set_props(self,k,varargin)
-            self.store.assign(k,varargin{:});
-        end
-        function rem_props(self,varargin)
-            self.store.rmfield(varargin{:});
-        end
+        % split multiple nodes
+        function k = split(self,p,n,varargin)
+            p = p(:);
+            n = n(:);
+            m = numel(p);
+            u = unique(p);
 
-        function add_node(~,varargin) % works with p vector
-            error('not available')
-        end
-        function r = rem_node(self,k)
-            error('not available')
-        end
+            assert( all(n > 0), 'Number of children should be positive.' );
+            assert( all(numel(u) == m), 'Doublons not allowed.' );
+            assert( all(self.is_valid(p)), 'Invalid parent node.' );
+            assert( all(self.is_leaf(p)), 'Nodes can only be split once.' );
 
-        function k = split_node(self,p,varargin)
+            % repeat parents according to n
+            t = 1 + cumsum([ 0; n ]);
+            L(t) = 1;
+            L = cumsum(L(1:end-1));
+
+            x = p(L);
+            x = [x(:), self.depth(x)+1, zeros(sum(n),2)];
+            k = self.store.add( x, varargin{:} );
+
+            self.store.data(p,3) = k(t(1:end-1));
+            self.store.data(p,4) = n;
         end
 
     end
@@ -220,24 +243,15 @@ classdef SplitTree < dk.obj.Tree
     % traversal methods
     methods
 
-        function [out,id] = iter(self,callback)
-            id = self.indices();
-            if nargout == 0
-                dk.mapfun( @(k) callback(k, self.get_node(k), self.get_props(k)), id );
-            else
-                out = dk.mapfun( @(k) callback(k, self.get_node(k), self.get_props(k)), id, false );
-            end
-        end
-
         % see: https://stackoverflow.com/a/51124171/472610
+        %
+        % More efficient implementation, given storage.
 
         function bfs(self,callback,start)
             if nargin < 3, start=1; end
 
-            C = self.childrens();
             N = self.nn;
             S = zeros(1,N);
-            [~,r] = self.indices();
 
             S(1) = start;
             cur = 1;
@@ -245,8 +259,9 @@ classdef SplitTree < dk.obj.Tree
             while cur <= last
                 id = S(cur);
                 callback( id, self.get_node(id), self.get_props(id) );
-                n = numel(C{r(id)});
-                S( last + (1:n) ) = C{r(id)};
+                c = self.crange(id);
+                n = c(2)-c(1)+1;
+                S( last + (1:n) ) = c(1):c(2);
                 last = last + n;
                 cur = cur + 1;
             end
@@ -255,18 +270,17 @@ classdef SplitTree < dk.obj.Tree
         function dfs(self,callback,start)
             if nargin < 3, start=1; end
 
-            C = self.childrens();
             N = self.nn;
             S = zeros(1,N);
-            [~,r] = self.indices();
 
             S(1) = start;
             cur = 1;
             while cur > 0
                 id = S(cur);
                 callback( id, self.get_node(id), self.get_props(id) );
-                n = numel(C{r(id)});
-                S( cur-1 + (1:n) ) = fliplr(C{r(id)});
+                c = self.crange(id);
+                n = c(2)-c(1)+1;
+                S( cur-1 + (1:n) ) = fliplr(c(1):c(2));
                 cur = cur-1 + n;
             end
         end
