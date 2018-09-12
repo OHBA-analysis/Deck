@@ -109,7 +109,7 @@ classdef TreeBase < handle
             gobj = dk.priv.draw_tree( self, varargin{:} );
         end
 
-        function disp(self,varargin)
+        function print(self,varargin)
         %
         % Display tree in console, or write to file.
         %

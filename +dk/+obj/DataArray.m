@@ -8,7 +8,7 @@ classdef DataArray < dk.priv.GrowingContainer
 % ## Usage
 %
 % Construction
-%   
+%
 %   D = dk.obj.DataArray(varargin)
 %       -> reset( ncols, bsize=100 )
 %       -> reset( colnames, bsize=100 )
@@ -31,11 +31,11 @@ classdef DataArray < dk.priv.GrowingContainer
 %       mget    Get meta-data for a set of rows
 %       mfield  Get meta-data field for all used rows
 %
-%   Note that these methods are provided mainly for consistency (and they can resolve a column name) 
+%   Note that these methods are provided mainly for convenience (and they can resolve a column name)
 %   but you should access the properties directly for performance.
 %
 % Column names
-%   
+%
 %   D.setnames( names )             correct number of names expected
 %   c = D.colnum( name )            invalid names cause key error
 %
@@ -54,7 +54,7 @@ classdef DataArray < dk.priv.GrowingContainer
 %
 %   By default, rows are allocated by block as needed.
 %   For example, if more memory is needed is order to push rows, a new block of size bsize is allocated.
-%   
+%
 %   If the number of rows needed is unknown, set a generous block-size (typically in the range 100-1000).
 %   The default is 100.
 %
@@ -72,33 +72,33 @@ classdef DataArray < dk.priv.GrowingContainer
         meta
         name
     end
-    
+
     properties (Transient,Dependent)
         nrows
         ncols
         numel
     end
-    
+
     methods
-        
+
         function self = DataArray(varargin)
             self.clear();
             if nargin > 0
                 self.reset(varargin{:});
             end
         end
-        
+
         function n = get.nrows(self), n = self.nelm; end
         function n = get.ncols(self), n = size(self.data,2); end
-        function n = get.numel(self), n = self.nrows * self.ncols; end 
-        
+        function n = get.numel(self), n = self.nrows * self.ncols; end
+
         function clear(self)
             self.gcClear();
             self.data = [];
             self.meta = structcol(0);
             self.name = containers.Map();
         end
-        
+
         function reset(self,c,b)
             if nargin < 3, b=100; end
             self.gcInit(b);
@@ -114,7 +114,7 @@ classdef DataArray < dk.priv.GrowingContainer
                 self.add(c);
             end
         end
-        
+
         function setnames(self,varargin)
             if nargin == 2 && iscellstr(varargin{1})
                 names = varargin{1};
@@ -124,11 +124,11 @@ classdef DataArray < dk.priv.GrowingContainer
             assert( iscellstr(names) && numel(names) == self.ncols, 'Bad input.' );
             self.name = containers.Map( names, 1:self.ncols );
         end
-        
+
         function c = colnum(self,name)
             c = self.name(name);
         end
-        
+
         % bulk assign of metadata field by copying the value
         function self = assign(self,k,varargin)
             n = nargin-2;
@@ -137,13 +137,13 @@ classdef DataArray < dk.priv.GrowingContainer
                 [self.meta(k).(varargin{i})] = deal(varargin{i+1});
             end
         end
-        
+
         % remove metadata fields
         function rmfield(self,varargin)
             assert( iscellstr(varargin), 'Expected list of fieldnames.' );
             self.meta = rmfield(self.meta,varargin);
         end
-        
+
         % add entries
         function k = add(self,x,varargin)
             assert( ismatrix(x) && size(x,2) == self.ncols, 'Bad number of columns.' );
@@ -152,32 +152,32 @@ classdef DataArray < dk.priv.GrowingContainer
             self.data(k,:) = x;
             self.assign(k,varargin{:});
         end
-        
+
         % get data (row and meta) associated with a (set of) row(s)
         function [d,m] = both(self,k)
             d = self.row(k);
             m = self.mget(k);
         end
-        
+
     end
-    
+
     methods (Hidden)
-        
+
         function childAlloc(self,n)
             self.data = vertcat(self.data, nan(n,self.ncols));
             self.meta(self.nmax) = dk.struct.make(fieldnames(self.meta));
         end
-        
+
         function childCompress(self,id,remap)
             self.data = self.data(id,:);
             self.meta = self.meta(id);
         end
-        
+
     end
-    
+
     % i/o
     methods
-        
+
         function s = serialise(self,file)
             s = self.gcToStruct();
             s.data = self.data;
@@ -186,7 +186,7 @@ classdef DataArray < dk.priv.GrowingContainer
             s.version = '0.1';
             if nargin > 1, save(file,'-v7','-struct','s'); end
         end
-        
+
         function self = unseriaise(self,s)
         if ischar(s), s=load(s); end
         switch s.version
@@ -200,27 +200,27 @@ classdef DataArray < dk.priv.GrowingContainer
                 error('Unknown version: %s',s.version);
         end
         end
-        
+
         function c = compare(self,other)
             c = dk.compare( self.serialise(), other.serialise() );
         end
     end
-    
+
     % access
     methods
-        
+
         % NOTE:
         % For all methods below, both scalar and vector indices work.
         % However, name resolution requires single name only.
-        
-        
+
+
         % get element(s) by index (single column by name ok)
         function x = dget(self,r,c)
             if ischar(c), c=self.name(c); end
             assert( all(self.used(r)), 'Invalid row indices' );
             x = self.data(r,c);
         end
-        
+
         % set element(s) by index (single column by name ok)
         function dset(self,r,c,x)
             if ischar(c), c=self.name(c); end
@@ -228,32 +228,32 @@ classdef DataArray < dk.priv.GrowingContainer
             assert( all(c < self.ncols), 'Column index out of bounds.' );
             self.data(r,c) = x;
         end
-        
+
         % get row(s) by index
         function x = row(self,k)
             assert( all(self.used(k)), 'Invalid row indices' );
             x = self.data(k,:);
         end
-        
+
         % get column(s) by index or name
         function x = col(self,k)
             if ischar(k), k=self.name(k); end
             x = self.data(self.used,k);
         end
-        
+
         % get meta-data for a given (set of) row(s)
         function x = mget(self,k)
             assert( all(self.used(k)), 'Invalid row indices' );
             x = self.meta(k);
         end
-        
+
         % get field by name
         function x = mfield(self,n)
             x = {self.meta(self.used).(n)};
         end
-        
+
     end
-    
+
 end
 
 % Create a nx1 empty struct-array.
