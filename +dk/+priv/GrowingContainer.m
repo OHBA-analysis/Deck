@@ -11,6 +11,30 @@ classdef GrowingContainer < handle
 %   THE METHOD compress() INVALIDATES ANY PREVIOUS INDEXING!
 %
 % ------------------------------
+% ## Derived implementations
+%
+%   The only two methods that need implementing are:
+%       childAlloc()        Given a number of elements to allocate, extend storage
+%                           -> called in alloc()
+%       childCompress()     Given a set of IDs to keep, compress storage
+%                           -> called in compress()
+%
+%   Several methods from this parent class are available in derived classes:
+%       gcClear             cleanup parent properties
+%       gcInit              initialise parent properties
+%       gcAdd               calls alloc() if needed
+%       gcToStruct          convert to/from struct for serialisation
+%       gcFromStruct
+%
+%   However, the set of methods is quite basic with just this.
+%   In most cases, you will also want to implement methods such as:
+%       k = add(x)      where x is consistent with the storage type,
+%                       and k is a vector of indices to added points.
+%
+%       getters/setters             for particular elements
+%       serialise/unserialise       for i/o
+%
+% ------------------------------
 % ## Memory management
 %
 %   The memory allocation is managed dynamically, and evolves with the instance.

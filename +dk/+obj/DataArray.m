@@ -131,10 +131,14 @@ classdef DataArray < dk.priv.GrowingContainer
 
         % bulk assign of metadata field by copying the value
         function self = assign(self,k,varargin)
-            n = nargin-2;
-            assert( dk.is.even(n) && iscellstr(varargin(1:2:end)), 'Bad assignment.' );
-            for i = 1:2:n
-                [self.meta(k).(varargin{i})] = deal(varargin{i+1});
+            if nargin == 3
+                [self.meta(k)] = deal(varargin{1});
+            else
+                n = nargin-2;
+                assert( dk.is.even(n) && iscellstr(varargin(1:2:end)), 'Bad assignment.' );
+                for i = 1:2:n
+                    [self.meta(k).(varargin{i})] = deal(varargin{i+1});
+                end
             end
         end
 
@@ -151,6 +155,11 @@ classdef DataArray < dk.priv.GrowingContainer
             k = self.gcAdd(n);
             self.data(k,:) = x;
             self.assign(k,varargin{:});
+        end
+
+        % book entries without assignment (return indices)
+        function k = book(self,n)
+            k = self.gcAdd(n);
         end
 
         % get data (row and meta) associated with a (set of) row(s)
