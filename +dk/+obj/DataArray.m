@@ -98,6 +98,10 @@ classdef DataArray < dk.priv.GrowingContainer
             self.meta = structcol(0,{});
             self.name = containers.Map();
         end
+        
+        function y = isempty(self)
+            y = self.numel() == 0;
+        end
 
         function reset(self,c,m,b)
         %

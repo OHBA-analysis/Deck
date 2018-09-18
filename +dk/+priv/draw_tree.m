@@ -95,7 +95,12 @@ function gobj = draw_tree(T,varargin)
     % set data tip
     tooltip = opt.get( 'ToolTip', @datatip );
     set( datacursormode(gcf), 'updatefcn', tooltip );
-
+    
+    % set user data
+    f = gcf;
+    f.UserData.tree = nodes;
+    f.UserData.gobj = gobj;
+    
 end
 
 function nodes = compute_widths(T,sepfun)
