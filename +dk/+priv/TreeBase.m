@@ -50,20 +50,25 @@ classdef TreeBase < handle
     end
 
     properties (Transient, Dependent)
-        n_nodes, nn
-        n_leaves, nl
-        n_parents, np
+        n_nodes
+        n_leaves
+        n_parents
         sparsity
+    end
+    properties (Transient, Dependent, Hidden)
+        nn, nl, np
     end
 
     properties (Abstract,Constant)
-        type;
+        type
     end
 
     methods (Abstract)
 
-        % varargin forwarded to self.store.add
-        reset(self,bsize,varargin);
+        % rootprops is either:
+        %   a cell of property names, or 
+        %   a struct of properties
+        reset(self,rootprops,bsize);
 
         % re-index the tree to remove unused nodes
         remap = compress(self,res);

@@ -95,14 +95,28 @@ classdef DataArray < dk.priv.GrowingContainer
         function clear(self)
             self.gcClear();
             self.data = [];
-            self.meta = structcol(0);
+            self.meta = structcol(0,{});
             self.name = containers.Map();
         end
 
-        function reset(self,c,b)
-            if nargin < 3, b=100; end
+        function reset(self,c,m,b)
+        %
+        % reset( matrix, metafields, bsize )
+        % reset( numcols, metafields, bsize )
+        % reset( colnames, metafields, bsize )
+        %
+        % defaults:
+        %   metafields = {}
+        %   bsize = 100
+        % 
+        
+            if nargin < 3, m={}; end
+            if nargin < 4, b=100; end
+            
+            assert( iscellstr(m), 'Expected a cell of property names.' );
+            
             self.gcInit(b);
-            self.meta = structcol(b);
+            self.meta = structcol(b,m);
             if iscellstr(c)
                 self.data = nan(b,numel(c));
                 self.setnames(c);
@@ -113,6 +127,7 @@ classdef DataArray < dk.priv.GrowingContainer
                 self.data = nan(b,size(c,2));
                 self.add(c);
             end
+            
         end
 
         function setnames(self,varargin)
@@ -131,21 +146,29 @@ classdef DataArray < dk.priv.GrowingContainer
 
         % bulk assign of metadata field by copying the value
         function self = assign(self,k,varargin)
-            if nargin == 3
-                [self.meta(k)] = deal(varargin{1});
-            else
-                n = nargin-2;
-                assert( dk.is.even(n) && iscellstr(varargin(1:2:end)), 'Bad assignment.' );
-                for i = 1:2:n
-                    [self.meta(k).(varargin{i})] = deal(varargin{i+1});
+            if nargin > 2 && ~isempty(k)
+                v = struct(varargin{:});
+                if isscalar(v)
+                    v = repmat(v,size(k));
+                end
+                
+                f = fieldnames(v);
+                n = numel(f);
+                for i = 1:n
+                    [self.meta(k).(f{i})] = deal(v.(f{i}));
                 end
             end
         end
-
+        
         % remove metadata fields
         function rmfield(self,varargin)
-            assert( iscellstr(varargin), 'Expected list of fieldnames.' );
-            self.meta = rmfield(self.meta,varargin);
+            if iscellstr(varargin{1})
+                fields = varargin{1};
+            else
+                fields = varargin;
+            end
+            assert( iscellstr(fields), 'Expected list of fieldnames.' );
+            self.meta = rmfield(self.meta, fields);
         end
 
         % add entries
@@ -266,6 +289,6 @@ classdef DataArray < dk.priv.GrowingContainer
 end
 
 % Create a nx1 empty struct-array.
-function s = structcol(n)
-    s = repmat( struct(), n, 1 );
+function s = structcol(n,fields)
+    s = repmat( dk.struct.make(fields), n, 1 );
 end

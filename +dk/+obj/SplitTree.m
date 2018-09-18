@@ -79,11 +79,22 @@ classdef SplitTree < dk.priv.TreeBase
                 self.reset(varargin{:});
             end
         end
-
-        function reset(self,bsize,varargin)
-            if nargin < 2, bsize=100; end
-            self.store = dk.obj.DataArray( {'parent','depth','eldest','nchildren'}, bsize );
-            self.store.add( [0,1,0,0], varargin{:} );
+        
+        function reset(self,props,bsize)
+        %
+        % reset( props={}, bsize=100 )
+        %
+            if nargin < 2, props={}; end
+            if nargin < 3, bsize=100; end
+            colnames = {'parent','depth','eldest','nchildren'};
+            
+            if isstruct(props)
+                self.store = dk.obj.DataArray( colnames, fieldnames(props), bsize );
+                self.store.add( [0,1,0,0], props );
+            else
+                self.store = dk.obj.DataArray( colnames, props, bsize );
+                self.store.add( [0,1,0,0] );
+            end
         end
 
         % compress storage and reindex the tree

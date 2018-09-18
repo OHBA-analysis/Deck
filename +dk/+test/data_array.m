@@ -4,7 +4,7 @@ function A = data_array()
     nc = numel(names);
     nb = 5;
     
-    A = dk.obj.DataArray( names, nb );
+    A = dk.obj.DataArray( names, {}, nb );
     D = rand(nb+1,nc);
     
     assert( A.ncols == nc );
