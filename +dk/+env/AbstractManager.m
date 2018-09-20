@@ -36,6 +36,11 @@ classdef AbstractManager < handle
             yes = ismember(self.list,l);
         end
         
+        % Keep only those paths in l that are not already in the list
+        function l = filter(self,l)
+            l = setdiff(l,self.list);
+        end
+        
         % Sanitise directory names
         function l = sanitise(self,l)
             
