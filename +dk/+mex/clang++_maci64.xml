@@ -34,7 +34,7 @@
         DEFINES="$MATLABMEX"
         MATLABMEX="-DMATLAB_MEX_FILE "
         MACOSX_DEPLOYMENT_TARGET="10.9"
-        CXXFLAGS="-fno-common -arch x86_64 -mmacosx-version-min=$SDKVER -fexceptions -isysroot $ISYSROOT -fobjc-arc -stdlib=libc++ -std=c++11 -Wno-undefined-var-template"
+        CXXFLAGS="-fno-common -arch x86_64 -mmacosx-version-min=$SDKVER -fexceptions -isysroot $ISYSROOT -fobjc-arc -stdlib=libc++ -std=c++11 -Wno-undefined-var-template -Wno-format-security -Wno-delete-non-virtual-dtor"
         INCLUDE="-I&quot;$MATLABROOT/extern/include&quot; -I&quot;$MATLABROOT/simulink/include&quot;"
         CXXOPTIMFLAGS="-O3 -fwrapv -DNDEBUG"
         CXXDEBUGFLAGS="-g"
@@ -130,7 +130,10 @@
                     <dirExists name="$$/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk" />
                     <dirExists name="$$/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk" />
 					<dirExists name="$$/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk" />
-					<dirExists name="$$/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk" />
+					<dirExists 
+                    name="$$/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk" />
+                    <dirExists name="$$/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.13.sdk" />
+                    <dirExists name="$$/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk" />
                     <cmdReturns name="find $$ -name MacOSX10.9.sdk" />
                     <cmdReturns name="find $$ -name MacOSX10.10.sdk" />
 					<cmdReturns name="find $$ -name MacOSX10.11.sdk" />
@@ -147,6 +150,8 @@
                         <dirExists name="$$/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk" />
 						<dirExists name="$$/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk" />
 						<dirExists name="$$/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.12.sdk" />
+                        <dirExists name="$$/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.13.sdk" />
+                        <dirExists name="$$/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk" />
                         <cmdReturns name="find $$ -name MacOSX10.9.sdk" />
                         <cmdReturns name="find $$ -name MacOSX10.10.sdk" />
 						<cmdReturns name="find $$ -name MacOSX10.11.sdk" />

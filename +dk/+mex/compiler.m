@@ -18,6 +18,22 @@ function C = compiler( verbose, debug )
     here = fileparts(mfilename('fullpath'));
     if myear >= 2016
         if ismac()
+            % NOTE:
+            %
+            % If you get an error about no supported compiler found, run:
+            %   xcrun --show-sdk-path
+            %   
+            % If the version number MacOSX10.xx.sdk does not appear in the XML file:
+            %   dk.path('+mex','clang++_maci64.xml')
+            % specifically under
+            %   blocks <ISYSROOT> and <SDKVER>, subblock <dirExists>
+            % 
+            % Then it is possible to add entries of <dirExists> blocks manually, with 
+            % newer SDK versions. See: 
+            %
+            % https://uk.mathworks.com/matlabcentral/answers
+            %      /243868-mex-can-t-find-compiler-after-xcode-7-update-r2015b#answer_192936
+            %
             C.opt_file = fullfile( here, 'clang++_maci64.xml' );
         else
             C.opt_file = fullfile( here, 'g++_glnxa64.xml' );

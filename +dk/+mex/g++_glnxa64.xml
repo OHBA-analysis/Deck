@@ -35,6 +35,7 @@
           CXXOPTIMFLAGS="-O3 -DNDEBUG"
           CXXDEBUGFLAGS="-g"
 
+          LD="$CC"
           LDXX="$CXX"
           LDFLAGS="-pthread -Wl,--no-undefined "
 		  LDTYPE="-shared"
