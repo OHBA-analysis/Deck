@@ -15,7 +15,7 @@ function p = filtpath( varargin )
 
     % list of folders to filter
     folders = varargin;
-    assert( iscellstr(folders), 'Input folders should be a strings.' );
+    assert( iscellstr(folders), 'Input folders should be strings.' );
     folders = horzcat( matlabroot, folders );
     folders = horzcat( folders, dk.mapfun( @dk.fs.realpath, folders, false ) );
     folders = unique( folders );
