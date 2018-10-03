@@ -137,17 +137,17 @@ classdef Compiler < handle
             % Specify custom option file
             if ~isempty(self.opt_file)
                 self.command.append('-f');
-                self.command.append(self.opt_file);
+                self.command.append(addquotes(self.opt_file));
             end
             
             % Add out dir/name
             if ~isempty(self.out_dir)
                 self.command.append('-outdir');
-                self.command.append(self.out_dir);
+                self.command.append(addquotes(self.out_dir));
             end
             if ~isempty(self.out_name)
                 self.command.append('-output');
-                self.command.append(self.out_name);
+                self.command.append(addquotes(self.out_name));
             end
             
             % Remove duplicates
@@ -181,7 +181,7 @@ classdef Compiler < handle
             
             % Add libraries
             for i = 1:self.lpath.len
-                self.command.append(['-L' self.lpath.list{i}]);
+                self.command.append(['-L' addquotes(self.lpath.list{i})]);
             end
             for i = 1:self.lib.len
                 self.command.append(['-l' self.lib.list{i}]);
@@ -189,12 +189,12 @@ classdef Compiler < handle
             
             % Add includes
             for i = 1:self.ipath.len
-                self.command.append(['-I' self.ipath.list{i}]);
+                self.command.append(['-I' addquotes(self.ipath.list{i})]);
             end
             
             % Add files
             for i = 1:self.files.len
-                self.command.append(self.files.list{i});
+                self.command.append(addquotes( self.files.list{i} ));
             end
             
         end
@@ -267,4 +267,11 @@ classdef Compiler < handle
         
     end
     
+end
+
+function x = addquotes(x)
+    x = strtrim(x);
+    if ~isempty(x) && x(1) ~= '"'
+        x = ['"' x '"'];
+    end
 end
