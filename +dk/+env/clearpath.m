@@ -4,7 +4,7 @@ function p = clearpath( varargin )
 %
 % Remove all existing entries in the path which start with specified folders.
 %
-% If NO output is collected, then the Matlab path is updated.
+% If NO output is collected, then the Matlab path is updated, with a notice.
 % If an output is collected, the the path is not affected.
 %
 % JH
@@ -15,11 +15,17 @@ function p = clearpath( varargin )
     
     % current path
     p = strsplit( path, pathsep );
-    p = p(~contains( folders, p ));
+    c = contains( folders, p );
+    r = p(c);
+    p = p(~c);
     
     % modify path if not output
     if nargout == 0
         path(strjoin( p, pathsep ));
+        if ~isempty(r)
+            disp('Removed the following paths:');
+            fprintf( '\t%s\n', r{:} );
+        end
     end
 
 end
