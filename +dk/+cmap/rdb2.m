@@ -8,8 +8,8 @@ function c = rdb2( n, signed )
     
     method = 'linear';
     w = [0.5,0.2,0.5,0.9];
-    r = dk.clr.palette(hsv2rgb([0,.9,.8]),w);
-    b = dk.clr.palette(hsv2rgb([.6,.9,.8]),w);
+    r = dk.color.palette(hsv2rgb([0,.9,.8]),w);
+    b = dk.color.palette(hsv2rgb([.6,.9,.8]),w);
     g = 0.1*[1 1 1];
     t = [0,.15,.45,.65,1];
     

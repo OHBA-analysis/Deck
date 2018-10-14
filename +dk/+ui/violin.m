@@ -64,7 +64,7 @@ function dist = violin( data, varargin )
     assert( numel(opt_label) == nd, 'There should be one label per column.' );
     
     % colors used for drawing
-    colors = dk.clr.jh();
+    colors = dk.color.jh();
     switch lower(opt_theme)
         case 'orange'
             theme.box = hsv2rgb([30/360 1 0.9]); % orange

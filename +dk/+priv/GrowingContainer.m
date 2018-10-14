@@ -114,6 +114,11 @@ classdef GrowingContainer < handle
             k = find(self.used);
         end
 
+        % reserve the next n entries (possibly causing allocation),
+        % marking them as used, and return their indices
+        function k = book(self,n)
+            k = self.gcAdd(n);
+        end
         % remove elements by marking them as unused to preserve indexing
         function rem(self,k)
             dk.assert( k <= self.last, 'Index out of bounds.' );

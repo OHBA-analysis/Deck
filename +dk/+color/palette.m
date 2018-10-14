@@ -8,16 +8,16 @@ function p = palette( c, w )
 % JH
     
     if isscalar(c), c=hsv2rgb([c 1 1]); end
-    if ischar(c), c=dk.clr.hex2rgb(c); end
+    if ischar(c), c=dk.color.hex2rgb(c); end
     assert( dk.is.rgb(c), 'Expected RGB color or hue in input.' );
     
     if nargin < 2, w=[0.2,0.2,0.2,0.8]; end
     
-    p.darkest = dk.clr.shade(c,w(1));
-    p.darker = dk.clr.tone(c,w(2));
+    p.darkest = dk.color.shade(c,w(1));
+    p.darker = dk.color.tone(c,w(2));
     p.normal = c;
-    p.lighter = dk.clr.tint(c,w(3));
-    p.lightest = dk.clr.tint(c,w(4));
+    p.lighter = dk.color.tint(c,w(3));
+    p.lightest = dk.color.tint(c,w(4));
     
     
     if nargout == 0

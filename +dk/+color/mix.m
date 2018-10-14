@@ -1,6 +1,6 @@
 function c = mix( c1, c2, w )
 %
-% c = dk.clr.mix( c1, c2, w=0.5 )
+% c = dk.color.mix( c1, c2, w=0.5 )
 %
 % Mix input colors with weight w.
 %

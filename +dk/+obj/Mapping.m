@@ -199,10 +199,19 @@ classdef Mapping < dk.priv.GrowingContainer
         
         % bulk assign of metadata field by copying the value
         function self = assign(self,k,varargin)
-            n = nargin-2;
-            assert( dk.is.even(n) && iscellstr(varargin(1:2:end)), 'Bad assignment.' );
-            for i = 1:2:n
-                [self.meta(k).(varargin{i})] = deal(varargin{i+1});
+            if nargin > 2 && ~isempty(k)
+                assert( all(k < self.nmax), 'Index out of bounds.' );
+                
+                v = struct(varargin{:});
+                if isscalar(v) && ~isscalar(k)
+                    v = repmat(v,size(k));
+                end
+                
+                f = fieldnames(v);
+                n = numel(f);
+                for i = 1:n
+                    [self.meta(k).(f{i})] = deal(v.(f{i}));
+                end
             end
         end
         

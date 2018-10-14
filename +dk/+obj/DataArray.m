@@ -151,8 +151,10 @@ classdef DataArray < dk.priv.GrowingContainer
         % bulk assign of metadata field by copying the value
         function self = assign(self,k,varargin)
             if nargin > 2 && ~isempty(k)
+                assert( all(k < self.nmax), 'Index out of bounds.' );
+                
                 v = struct(varargin{:});
-                if isscalar(v)
+                if isscalar(v) && ~isscalar(k)
                     v = repmat(v,size(k));
                 end
                 
@@ -182,11 +184,6 @@ classdef DataArray < dk.priv.GrowingContainer
             k = self.gcAdd(n);
             self.data(k,:) = x;
             self.assign(k,varargin{:});
-        end
-
-        % book entries without assignment (return indices)
-        function k = book(self,n)
-            k = self.gcAdd(n);
         end
 
         % get data (row and meta) associated with a (set of) row(s)

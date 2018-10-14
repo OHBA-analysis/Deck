@@ -9,6 +9,10 @@ function dk_startup()
     addpath(fullfile( here, 'gui/layoutdoc' ));
 
     % set console encoding
-    slCharacterEncoding('UTF-8');
+    try
+        slCharacterEncoding('UTF-8');
+    catch 
+        warning('Could not set character encoding; is Simulink installed?');
+    end
 
 end

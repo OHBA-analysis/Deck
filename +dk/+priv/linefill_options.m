@@ -1,6 +1,6 @@
 function [popt,fopt,fface] = linefill_options(varargin)
 
-    colors = dk.clr.jh();
+    colors = dk.color.jh();
 
     popt = {};
     fopt = {};

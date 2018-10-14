@@ -1,6 +1,6 @@
 function out = rgb2hex( in )
 %
-% out = dk.clr.rgb2hex( in )
+% out = dk.color.rgb2hex( in )
 %
 % Converts RGB colors to HEX strings.
 % Accepts Nx3 inputs.

@@ -8,8 +8,8 @@ function c = rwb( n, signed )
     
     method = 'linear';
     w = [0.6,0.2,0.2,0.9];
-    r = dk.clr.palette(0,w);
-    b = dk.clr.palette(0.6,w);
+    r = dk.color.palette(0,w);
+    b = dk.color.palette(0.6,w);
     g = 0.9*[1 1 1];
     
     t = [0,.10,.45,.65,1];

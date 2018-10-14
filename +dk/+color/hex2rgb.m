@@ -1,6 +1,6 @@
 function out = hex2rgb( in )
 %
-% out = dk.clr.hex2rgb( in )
+% out = dk.color.hex2rgb( in )
 %
 % Converts HEX colors to RGB vectors.
 % Accepts cells in input.

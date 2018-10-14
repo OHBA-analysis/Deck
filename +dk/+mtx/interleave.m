@@ -1,21 +1,21 @@
 function out = interleave( arrays, block )
 %
-% out = dk.util.interleave( arrays, block_size=1 )
+% out = dk.mtx.interleave( arrays, block_size=1 )
 %
 % Interleave input arrays.
 %
 % Example:
 % 
-% dk.util.interleave( {1:6, 7:12} )
+% dk.mtx.interleave( {1:6, 7:12} )
 %      1     7     2     8     3     9     4    10     5    11     6    12
 % 
-% dk.util.interleave( {1:6, 7:12}, 2 )
+% dk.mtx.interleave( {1:6, 7:12}, 2 )
 %      1     2     7     8     3     4     9    10     5     6    11    12
 % 
-% dk.util.interleave( {1:6, 7:12}, 3 )
+% dk.mtx.interleave( {1:6, 7:12}, 3 )
 %      1     2     3     7     8     9     4     5     6    10    11    12
 % 
-% dk.util.interleave( {1:6, 7:12}, 6 )
+% dk.mtx.interleave( {1:6, 7:12}, 6 )
 %      1     2     3     4     5     6     7     8     9    10    11    12
 %
 % JH
