@@ -173,7 +173,7 @@ classdef Mapping < dk.priv.GrowingContainer
             self.assign(k,varargin{:});
         end
         function [x,y,m] = data(self,k)
-            assert( k < self.last && self.used(k), 'Index out of bounds or unused.' );
+            assert( self.used(k), 'Bad indices.' );
             x = self.x(k,:);
             y = self.y(k,:);
             m = self.meta(k);
@@ -200,7 +200,7 @@ classdef Mapping < dk.priv.GrowingContainer
         % bulk assign of metadata field by copying the value
         function self = assign(self,k,varargin)
             if nargin > 2 && ~isempty(k)
-                assert( all(k < self.nmax), 'Index out of bounds.' );
+                assert( all(self.used(k)), 'Bad indices.' );
                 
                 v = struct(varargin{:});
                 if isscalar(v) && ~isscalar(k)
@@ -210,7 +210,7 @@ classdef Mapping < dk.priv.GrowingContainer
                 f = fieldnames(v);
                 n = numel(f);
                 for i = 1:n
-                    [self.meta(k).(f{i})] = deal(v.(f{i}));
+                    [self.meta(k).(f{i})] = dk.deal(v.(f{i}));
                 end
             end
         end

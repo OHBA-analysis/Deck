@@ -192,7 +192,7 @@ classdef Tree < dk.priv.TreeBase
             n = cell2struct( num2cell(d), {'p','d','nc'}, 2 );
 
             if with_children
-                [n.c] = deal(self.children(k,false));
+                [n.c] = dk.deal(self.children(k,false));
             end
         end
 

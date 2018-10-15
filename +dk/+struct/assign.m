@@ -25,7 +25,7 @@ function s = assign(s,varargin)
     
     n = numel(arg);
     for i = 1:2:n
-        [s(idx).(arg{i})] = deal(arg{i+1});
+        [s(idx).(arg{i})] = dk.deal(arg{i+1});
     end
     
 end

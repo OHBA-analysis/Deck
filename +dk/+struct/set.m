@@ -10,7 +10,7 @@ function s = set( s, field, value, overwrite )
     if nargin < 4, overwrite=false; end
 
     if ~isfield(s,field) || overwrite
-        [s.(field)] = deal(value);
+        [s.(field)] = dk.deal(value);
     end
 
 end
