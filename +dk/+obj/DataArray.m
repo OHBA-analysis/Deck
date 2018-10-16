@@ -154,9 +154,9 @@ classdef DataArray < dk.priv.GrowingContainer
                 assert( all(self.used(k)), 'Bad indices.' );
                 
                 v = struct(varargin{:});
-                if isscalar(v) && ~isscalar(k)
-                    v = repmat(v,size(k));
-                end
+                %if isscalar(v) && ~isscalar(k)
+                %    v = repmat(v,size(k));
+                %end
                 
                 f = fieldnames(v);
                 n = numel(f);
@@ -291,5 +291,5 @@ end
 
 % Create a nx1 empty struct-array.
 function s = structcol(n,fields)
-    s = repmat( dk.struct.make(fields), n, 1 );
+    s = dk.struct.repeat( fields, n, 1 );
 end

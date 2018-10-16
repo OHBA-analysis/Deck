@@ -203,9 +203,9 @@ classdef Mapping < dk.priv.GrowingContainer
                 assert( all(self.used(k)), 'Bad indices.' );
                 
                 v = struct(varargin{:});
-                if isscalar(v) && ~isscalar(k)
-                    v = repmat(v,size(k));
-                end
+                %if isscalar(v) && ~isscalar(k)
+                %    v = repmat(v,size(k));
+                %end
                 
                 f = fieldnames(v);
                 n = numel(f);

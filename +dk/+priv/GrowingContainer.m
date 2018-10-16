@@ -76,6 +76,7 @@ classdef GrowingContainer < handle
     events
         OnAlloc     % triggered after allocation
         OnCompress  % triggered after compression
+        OnRemove    % triggered after removal
     end
 
     methods (Abstract) % TO BE IMPLEMENTED BY DERIVED CLASSES
@@ -95,6 +96,15 @@ classdef GrowingContainer < handle
     end
 
     methods % main public methods
+        
+        % deal with the release of unused elements (e.g. garbage collection)
+        %
+        % this is called after the elements have been marked as unused, and before 
+        % triggering the OnRemove event
+        function childRemove(self,k)
+            % nothing by default, overload if needed
+        end
+        
 
         % dependent properties
         function n = get.nmax(self), n=numel(self.used); end
@@ -121,8 +131,10 @@ classdef GrowingContainer < handle
         end
         % remove elements by marking them as unused to preserve indexing
         function rem(self,k)
-            dk.assert( k <= self.last, 'Index out of bounds.' );
+            dk.assert( all(k <= self.last), 'Index out of bounds.' );
             self.used(k) = false;
+            self.childRemove(k);
+            self.notify('OnRemove');
             dk.wreject( self.sparsity > 0.9, 'Storage is very sparse, you should run compress().' );
         end
 
