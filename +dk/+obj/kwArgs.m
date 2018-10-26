@@ -111,10 +111,7 @@ classdef kwArgs < handle
             self.reset_accessed();
             
             % unwrap inputs
-            args = varargin;
-            while iscell(args) && numel(args) == 1
-                args = args{1};
-            end
+            args = dk.unwrap(varargin{:});
             
             % either a cell of key-values or a structure
             if isempty(args)
@@ -135,7 +132,7 @@ classdef kwArgs < handle
                     args(1:2:end) = dk.mapfun( @lower, args(1:2:end), false );
                 end
                 
-                % don't do struct(args{:}) to avoid issues with cells and doublons
+                % not struct(args{:}), to avoid issues with cells and duplicate fields
                 for i = 1:2:n
                     self.parsed.(args{i}) = args{i+1};
                 end
@@ -168,6 +165,15 @@ classdef kwArgs < handle
         function yes = has_nonempty(self,name)
             name = self.field(name);
             yes  = isfield(self.parsed,name) && ~isempty(self.parsed.(name));
+        end
+        
+        % restrict possible fields
+        function restrict(self,names)
+            assert( iscellstr(names), 'Expected cell of option names.' );
+            if ~self.CaseSensitive
+                names = dk.mapfun( @lower, names, false );
+            end
+            dk.struct.restrict( self.parsed, names );
         end
         
         % sanitisation methods
@@ -203,6 +209,16 @@ classdef kwArgs < handle
                 self.accessed{end+1} = name;
             else
                 self.parsed.(name) = default;
+            end
+        end
+        
+        % set default explicitly
+        function value = default(self,name,value)
+            name = self.field(name);
+            if isfield(self.parsed,name)
+                value = self.parsed.(name);
+            else
+                self.parsed.(name) = value;
             end
         end
         

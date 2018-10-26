@@ -15,18 +15,18 @@ function s = set( s, field, value, overwrite )
 
 end
 
-
 % OLD VERSION
 %
-%         n = numel(s);
-%         if isscalar(value)
-%             for i = 1:n, s(i).(field) = value; end
-%         elseif numel(value) == n
-%             if iscell(value)
-%                 for i = 1:n, s(i).(field) = value{i}; end
-%             else
-%                 for i = 1:n, s(i).(field) = value(i); end
-%             end
+%     n = numel(s);
+%     if isscalar(value)
+%         for i = 1:n, s(i).(field) = value; end
+%     elseif numel(value) == n
+%         if iscell(value)
+%             for i = 1:n, s(i).(field) = value{i}; end
 %         else
-%             error('Number of value(s) does not match structure size.');
+%             for i = 1:n, s(i).(field) = value(i); end
 %         end
+%     else
+%         error('Number of value(s) does not match structure size.');
+%     end
+%

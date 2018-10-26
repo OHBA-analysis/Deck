@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# find jh library
+if [ -z "$JH_ROOT" ]; then
+    JH_ROOT=~jhadida/.jh
+fi
+[ ! -d "$JH_ROOT" ] && { echo "jh lib not found: $JH_ROOT"; exit 1; }
+source "$JH_INC/bashlib.sh"
+
+# usage
+usage() {
+[ $# -gt 0 ] && echoerr "$*"
+cat <<EOF 
+
+    topic <name> <files...>
+
+Create a folder named "name", and put empty Markdown files in it.
+EOF
+exit 0;
+}
+
+# ------------------------------------------------------------------------
+
+# extract arguments
+[ $# -lt 1 ] && usage 
+Folder=${1%/}
+shift
+
+# create folder
+HERE=$(dirname "${BASH_SOURCE}")
+Folder=$HERE/$Folder
+[ ! -d "$Folder" ] && mkdir -v $Folder
+
+# create files
+for file in "$@"; do
+    file=$Folder/${file%.md}.md
+    [ ! -f "$file" ] && { cp "$HERE/.empty.md" "$file"; echo $file; }
+done

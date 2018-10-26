@@ -102,7 +102,7 @@ classdef SelectBox < handle
             
             % set popup options
             if nargin > 3
-                opt  = struct(varargin{:});
+                opt  = dk.c2s(varargin{:});
                 fopt = fieldnames(opt);
                 for i = 1:numel(fopt)
                     f = fopt{i};

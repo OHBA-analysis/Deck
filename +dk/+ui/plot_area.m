@@ -20,7 +20,7 @@ function h = plot_area( x, y, col, varargin )
 
     % parse options
     opt.EdgeColor = col;
-    opt = dk.struct.merge( opt, struct(varargin{:}) );
+    opt = dk.struct.merge( opt, dk.c2s(varargin{:}) );
     opt = dk.struct.to_cell( opt );
     
     % draw the figure

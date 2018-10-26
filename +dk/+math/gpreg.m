@@ -58,7 +58,7 @@ function [gpr,reg,ph,fh] = gpreg( x, y, q, gopt, popt, fopt )
     gdef.KernelFunction = 'squaredexponential';
     gdef.Alpha          = 0.05;
     
-    if iscell(gopt), gopt=struct(gopt{:}); end
+    if iscell(gopt), gopt=dk.c2s(gopt{:}); end
     gopt = dk.struct.merge( gdef, gopt );
     
     % run gpr

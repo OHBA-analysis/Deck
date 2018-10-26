@@ -202,7 +202,7 @@ classdef Mapping < dk.priv.GrowingContainer
             if nargin > 2 && ~isempty(k)
                 assert( all(self.used(k)), 'Bad indices.' );
                 
-                v = struct(varargin{:});
+                v = dk.c2s(varargin{:});
                 %if isscalar(v) && ~isscalar(k)
                 %    v = repmat(v,size(k));
                 %end

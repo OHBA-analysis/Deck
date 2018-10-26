@@ -124,7 +124,7 @@ classdef DataStore < handle
                 data = varargin{1};
             else
                 % or key/value pairs
-                data = struct( varargin{:} );
+                data = dk.c2s( varargin{:} );
             end
             
             % save data
