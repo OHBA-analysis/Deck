@@ -3,19 +3,13 @@ function s = from_cell( varargin )
 % s = dk.struct.from_cell( key1, val1, ... )
 % s = dk.struct.from_cell( s, key1, val1, ... )
 %
-% Build a structure from the inputs, in a way that is resistant to:
-%   - duplicate fieldnames (last overwrites first)
-%   - cell-values, which normally expand into struct-arrays in Matlab
-%
-% In addition, it can combine an initial structure with additional fields.
-% This is similar, though not equivalent, to merging.
-%
-% Finally, it also plays well with struct-arrays, and is able to add fields
-% to an initial struct-array too.
-%
 % This is basically equivalent to:
 %   struct(varargin{:})
-% but without the hassles regarding duplicate and cell-valued fields.
+% but with many advantages:
+%   - no hassle regarding duplicate and cell-valued fields (the latter
+%     are normally expanded into struct-arrays by Matlab);
+%   - allows to extend an initial struct given as first argument;
+%   - supports struct-arrays as first argument.
 %   
 % JH
 
