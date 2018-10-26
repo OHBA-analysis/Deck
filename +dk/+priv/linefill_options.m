@@ -34,7 +34,7 @@ function [popt,fopt,fface] = linefill_options(varargin)
         assert( numel(popt)==3, 'Color vector should be 1x3.' );
         popt = struct( 'LineWidth', 1.5, 'Color', popt );
     elseif iscell(popt)
-        popt = struct(popt{:});
+        popt = dk.c2s(popt{:});
     end
     assert( isstruct(popt), 'Bad line properties.' );
     
