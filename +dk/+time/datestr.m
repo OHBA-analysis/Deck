@@ -64,7 +64,7 @@ function [d,fmt] = datestr( type )
             fmt = 'dd-mmm-yyyy HH:MM:SS';
             
         otherwise
-            error( 'Unknown type "%s".', type );
+            fmt = type;
             
     end
     
