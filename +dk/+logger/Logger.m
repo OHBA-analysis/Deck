@@ -163,7 +163,27 @@ classdef Logger < handle
                 self.write('c', caller, varargin{:});
             end
         end
-       
+        
+        % conditional variants
+        function debugif(self,cdt,varargin)
+            if all(logical(cdt))
+                self.debug(varargin{:});
+            end
+        end
+        
+        function warnif(self,cdt,varargin)
+            if all(logical(cdt))
+                self.warn(varargin{:});
+            end
+        end
+        
+        function errorif(self,cdt,varargin)
+            if all(logical(cdt))
+                self.error(varargin{:});
+            end
+        end
+        
+        % generic logging function
         function logline = write(self,level,caller,message,varargin)
             
             % determine level
