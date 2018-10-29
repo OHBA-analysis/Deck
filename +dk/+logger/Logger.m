@@ -22,7 +22,9 @@ classdef Logger < handle
     properties 
         fileLevel
         consoleLevel
+        
         nodate
+        lvlchar
     end
     
     properties (SetAccess = private)
@@ -61,6 +63,7 @@ classdef Logger < handle
             self.file = struct('path', arg.get('file',[]), 'id', -1);
             self.datefmt = arg.get('datefmt','yyyy-mm-dd HH:MM:SS.FFF');
             self.nodate = arg.get('nodate',false);
+            self.lvlchar = arg.get('lvlchar',false);
             
             % set log levels
             self.fileLevel = arg.get('flevel','info');
@@ -184,7 +187,7 @@ classdef Logger < handle
         end
         
         % generic logging function
-        function logline = write(self,level,caller,message,varargin)
+        function write(self,level,caller,message,varargin)
             
             % determine level
             switch lower(level)
@@ -208,27 +211,35 @@ classdef Logger < handle
             levelnum = self.LEVEL.(level);
             
             % build log line
-            dstr = datestr( now(), self.datefmt );
-            lstr = upper(level); 
             mstr = sprintf( message, varargin{:} );
-            if self.nodate
-                logline = sprintf( '%-8s [%s] %s\n', lstr, caller, mstr );
+            dstr = datestr( now(), self.datefmt );
+            dstr = sprintf( '%-23s', dstr );
+            
+            lstr = upper(level); 
+            if self.lvlchar
+                lstr = lstr(1);
             else
-                logline = sprintf( '%-25s %-8s [%s] %s\n', dstr, lstr, caller, mstr );
+                lstr = sprintf( '%-8s', lstr );
             end
             
             % write to console
             if self.LEVEL.(self.consoleLevel) <= levelnum
-                if levelnum >= self.LEVEL.error
-                    fprintf( 2, '%s', logline );
+                if self.nodate
+                    logline = sprintf( '%s [%s] %s', lstr, caller, mstr );
                 else
-                    fprintf( '%s', logline );
+                    logline = sprintf( '%s%s [%s] %s', dstr, lstr, caller, mstr );
+                end
+                if levelnum >= self.LEVEL.error
+                    fprintf( 2, '%s\n', logline );
+                else
+                    fprintf( '%s\n', logline );
                 end
             end
             
             % write to file
             if self.isFileOpen() && self.LEVEL.(self.fileLevel) <= levelnum
-                fprintf( self.file.id, '%s', logline );
+                logline = sprintf( '%s%s [%s] %s', dstr, lstr, caller, mstr );
+                fprintf( self.file.id, '%s\n', logline );
             end
             
         end
