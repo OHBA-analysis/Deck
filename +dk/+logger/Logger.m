@@ -97,25 +97,8 @@ classdef Logger < handle
             y = strcmp(self.fileLevel,'off') && strcmp(self.consoleLevel,'off');
         end
         
-        function self = open(self,fpath)
-            if nargin < 2
-                fpath=self.file.path; 
-            end
-            self.close();
-            if isempty(fpath)
-                self.file.path = [];
-                self.file.id = -1;
-            else
-                self.file.path = fpath;
-                self.file.id = fopen(fpath,'a');
-            end
-        end
-        
-        function self = close(self)
-            if self.isFileOpen()
-                fclose(self.file.id);
-                self.file.id = -1;
-            end
+        function self = setFile(self,fpath)
+            self.open(fpath);
         end
         
     end
@@ -189,6 +172,28 @@ classdef Logger < handle
     end
 
     methods (Hidden)
+        
+        % open/close log file
+        function self = open(self,fpath)
+            if nargin < 2
+                fpath=self.file.path; 
+            end
+            self.close();
+            if isempty(fpath)
+                self.file.path = [];
+                self.file.id = -1;
+            else
+                self.file.path = fpath;
+                self.file.id = fopen(fpath,'a');
+            end
+        end
+        
+        function self = close(self)
+            if self.isFileOpen()
+                fclose(self.file.id);
+                self.file.id = -1;
+            end
+        end
         
         % generic logging function
         function write(self,level,caller,message,varargin)

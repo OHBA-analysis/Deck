@@ -8,6 +8,6 @@ function y = integer(varargin)
 %
 
     %y = dk.is.number(x) && (mod(x,1) == 0);
-    y = dk.is.number(varargin{:}) & dk.mapfun( @(x) dk.priv.modeq(x,1,0), varargin, true );
+    y = dk.is.number(varargin{:}) & dk.mapfun( @(x) dk.num.modeq(x,1,0), varargin, true );
     
 end

@@ -7,7 +7,7 @@ function cname = path2name(fpath)
 %
 % Example:
 %
-%   dk.util.path2name( dk.path('+fs/list_dir.m') ) => dk.fs.list_dir
+%   dk.util.path2name( dk.path('+fs/list_dir.m') ) => dk.fs.lsdir
 % 
 % JH
 

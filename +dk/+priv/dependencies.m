@@ -15,8 +15,8 @@ function [extfun,matfun] = dependencies( name, recursive )
     if nargin < 2, recursive = false; end
 
     % If input is a directory, process each file
-    if dk.fs.is_dir( name )
-        files  = dk.fs.list_folders( name );
+    if dk.fs.isdir( name )
+        files  = dk.fs.lsdir( name );
         extfun = struct();
         matfun = struct();
         
@@ -26,7 +26,7 @@ function [extfun,matfun] = dependencies( name, recursive )
             [~,f,e] = fileparts(file);
             file    = fullfile(name,file);
             
-            if ( recursive && dk.fs.is_dir(file) ) || strcmpi(e,'.m')
+            if ( recursive && dk.fs.isdir(file) ) || strcmpi(e,'.m')
                 [extfun.(f),matfun.(f)] = dk.util.dependencies(file);
             end
         end

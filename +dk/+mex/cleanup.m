@@ -10,11 +10,11 @@ function cleanup( folder, type )
             return;
             
         case 'mex'
-            files = dk.fs.list_ext( folder, mexext );
+            files = dk.fs.lsext( folder, mexext );
             print = @(x) dk.info('[dk.mex.cleanup] Removing mex-file "%s"',x);
             
         case 'obj'
-            files = dk.fs.list_ext( folder, 'o' );
+            files = dk.fs.lsext( folder, 'o' );
             print = @(x) dk.info('[dk.mex.cleanup] Removing object-file "%s"',x);
         
         otherwise

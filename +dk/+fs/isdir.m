@@ -1,6 +1,6 @@
 function yes = is_dir( name )
 %
-% y = dk.fs.is_dir( name )
+% y = dk.fs.isdir( name )
 %
 % Check that path is a folder.
 % Note: this is not equivalent to isdir or isfolder.

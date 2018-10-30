@@ -6,5 +6,5 @@ function y = even(varargin)
 % Check if input(s) is/are even integers.
 %
 
-    y = dk.mapfun( @(x) dk.priv.modeq(x,2,0), varargin, true );
+    y = dk.mapfun( @(x) dk.num.modeq(x,2,0), varargin, true );
 end

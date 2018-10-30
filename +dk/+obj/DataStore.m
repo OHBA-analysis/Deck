@@ -47,12 +47,12 @@ classdef DataStore < handle
             if nargin < 3, create=false; end
             
             folder = dk.fs.realpath(folder);
-            if create && ~dk.fs.is_dir(folder)
+            if create && ~dk.fs.isdir(folder)
                 dk.assert( mkdir(folder), '[dk.Datastore] Could not create folder "%s".', folder );
                 dk.info('[dk.Datastore] Created folder "%s".',folder);
             end
             
-            dk.assert( dk.fs.is_dir(folder), '[dk.Datastore] Folder "%s" not found.', folder );
+            dk.assert( dk.fs.isdir(folder), '[dk.Datastore] Folder "%s" not found.', folder );
             self.folder = folder;
         end
         
@@ -71,7 +71,7 @@ classdef DataStore < handle
         
         function y = exists(self,varargin)
         % Check whether relative path exists
-            y = dk.fs.is_file( self.file(varargin{:}) );
+            y = dk.fs.isfile( self.file(varargin{:}) );
         end
         
         function f = find(self,varargin)
@@ -87,7 +87,7 @@ classdef DataStore < handle
             src = self.file(src);
             dst = self.file(dst);
             
-            dk.reject( dk.fs.is_file(dst), 'Destination already exists.' );
+            dk.reject( dk.fs.isfile(dst), 'Destination already exists.' );
             movefile( src, dst );
         end
         
@@ -96,7 +96,7 @@ classdef DataStore < handle
         % Remove file
         
             name = self.file(name);
-            if dk.fs.is_file(name)
+            if dk.fs.isfile(name)
                 delete(name);
             else
                 warning( 'File not found: %s', name );
@@ -116,7 +116,7 @@ classdef DataStore < handle
             
             % set MAT filename
             f = self.matfile(name);
-            dk.wreject( dk.fs.is_file(f), '[dk.Datastore] File "%s" will be overwritten.', f );
+            dk.wreject( dk.fs.isfile(f), '[dk.Datastore] File "%s" will be overwritten.', f );
             
             % parse input to be saved
             if nargin == 3 && isstruct(varargin{1})

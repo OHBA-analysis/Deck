@@ -9,7 +9,7 @@ function [safe,count] = safename( name, quiet )
     safe  = name;
     count = 0;
 
-    while ~dk.fs.is_safename( safe )
+    while ~dk.fs.issafename( safe )
         safe  = [name,'_',num2str(count)];
         count = count + 1;
     end

@@ -5,7 +5,7 @@ function install( bindir )
         bindir = fullfile(dk.env.home,'.local/bin');
         warning( 'No target directory selected, selecting "%s" by default.', bindir );
     end
-    if ~dk.fs.is_dir(bindir)
+    if ~dk.fs.isdir(bindir)
         dk.assert( mkdir(bindir), 'Could not create directory "%s".', bindir );
     end
 

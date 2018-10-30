@@ -13,7 +13,7 @@ function [n,folder] = save( slices, folder, pattern )
     if nargin < 2, folder = fullfile(dk.env.desktop,dk.fs.tempname); end
     if nargin < 3, pattern = 'img_%d.png'; end
 
-    if ~dk.fs.is_dir(folder)
+    if ~dk.fs.isdir(folder)
         dk.assert( mkdir(folder), 'Could not create folder "%s".', folder );
     end
     

@@ -57,9 +57,9 @@ end
 
 function [sub,cls,fun,scr] = list_folder(fol,ind)
 
-    sub = dk.fs.list_folders( fol.full, '^\+.*' );
-    cls = dk.fs.list_folders( fol.full, '^@.*' );
-    fil = dk.fs.list_ext( fol.full, '*.m' );
+    sub = dk.fs.lsdir( fol.full, '^\+.*' );
+    cls = dk.fs.lsdir( fol.full, '^@.*' );
+    fil = dk.fs.lsext( fol.full, '*.m' );
 
     % find which files are scripts, functions and classes
     type = classifile( fol, fil );

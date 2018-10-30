@@ -58,7 +58,7 @@ classdef AbstractManager < handle
             
             ok = true;
             if ischar(l)
-                if ~dk.fs.is_dir(l)
+                if ~dk.fs.isdir(l)
                     warning( '[dk.env] "%s" is not a valid directory, will be ignored.', l );
                     ok = false;
                 end

@@ -41,7 +41,7 @@ function y = exist( name, kind )
             y = ~isempty(y) && isscalar(y) && ~y.isdir;
             
         case {'symlink','link'}
-            y = dk.fs.is_symlink(name);
+            y = dk.fs.islink(name);
             
         case {'folder','dir'}
             y = (e == 7);

@@ -14,12 +14,12 @@ function init( className, tplName, tplOpt, jsonOpt )
     if nargin < 3 || isempty(tplOpt), tplOpt = struct(); end
 
     assert( isempty(strfind(className,' ')) && isempty(strfind(className,pathsep)), 'Invalid class name.' );
-    assert( dk.fs.is_file(fullfile( tplfolder, [tplName '.m'] )), 'Unknown template.' );
+    assert( dk.fs.isfile(fullfile( tplfolder, [tplName '.m'] )), 'Unknown template.' );
 
     % create folder if needed
     fileName = dk.mapred.name2relpath( className );
     [folder,file] = fileparts(fileName);
-    if ~isempty(folder) && ~dk.fs.is_dir(folder)
+    if ~isempty(folder) && ~dk.fs.isdir(folder)
         dk.assert( mkdir(folder), 'Could not create folder "%s".', folder );
         dk.println( 'Created folder "%s".', folder );
     end

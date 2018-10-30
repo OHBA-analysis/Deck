@@ -128,7 +128,7 @@ classdef Abstract < handle
 
             % create folder for storage if it doesn't already exist
             jobfolder = fullfile( config.folders.save, sprintf('job_%d',jobid) );
-            if ~dk.fs.is_dir( jobfolder )
+            if ~dk.fs.isdir( jobfolder )
                 dk.assert( mkdir(jobfolder), 'Could not create folder "%s".', jobfolder );
             end
 
@@ -231,7 +231,7 @@ classdef Abstract < handle
             dk.println('       nworkers : %d',nworkers);
             dk.println('-----------------\n');
 
-            if dk.fs.is_file(outfile)
+            if dk.fs.isfile(outfile)
                 warning( 'Reduce file "%s" already exists, outputs will be merged.', outfile );
                 output = load(outfile);
                 output = output.output;
