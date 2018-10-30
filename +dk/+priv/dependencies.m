@@ -16,7 +16,7 @@ function [extfun,matfun] = dependencies( name, recursive )
 
     % If input is a directory, process each file
     if dk.fs.is_dir( name )
-        files  = dk.fs.list_dir( name );
+        files  = dk.fs.list_folders( name );
         extfun = struct();
         matfun = struct();
         

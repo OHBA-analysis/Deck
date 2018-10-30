@@ -11,7 +11,7 @@ function str = duration2string( duration )
         str = '<undefined>';
     elseif ( d > 0 )
         if d > 365
-            [y,d] = dk.math.quorem(d,365);
+            [y,d] = dk.num.divmod(d,365);
             str = sprintf( '%u years, %u days and %02uh %02umin %02usec', y, d, h, m, s );
         else
             str = sprintf( '%u days and %02uh %02umin %02usec', d, h, m, s );

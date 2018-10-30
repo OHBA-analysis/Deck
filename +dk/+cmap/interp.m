@@ -18,7 +18,7 @@ function col = interp( cmap, val, range, method )
     assert( isnumeric(range) && numel(range)==2, 'Range should be a 1x2 vector.' );
     if ~all( val>=range(1) & val<=range(2) )
         warning( 'Values outside specified range will be clamped.' );
-        val = dk.math.clamp( val, range );
+        val = dk.num.clamp( val, range );
     end
     
     col = linspace( 0, 1, size(cmap,1) );

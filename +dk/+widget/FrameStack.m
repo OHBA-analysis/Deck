@@ -64,7 +64,7 @@ classdef FrameStack < handle
         
         % Set the frames (3d array).
         % The framerate should be specified in Hz and corresponds to the speed at which frames will be played.
-        % The options should be a structure of display options used by dk.ui.image.
+        % The options should be a structure of display options used by ant.img.show.
         function self = set_frames(self,frames,framerate,options)
         
             if nargin < 4, options = struct(); end
@@ -96,7 +96,7 @@ classdef FrameStack < handle
         
         % Select frame by number and update slider and display.
         % If input 'fast' is true, the new frame is displayed by updating the existing image axes CData.
-        % If it is false, then playing is interrupted and dk.ui.image is called with the display options.
+        % If it is false, then playing is interrupted and ant.img.show is called with the display options.
         function self = select_frame(self,num,fast)
             
             if nargin < 3, fast = false; end
@@ -117,7 +117,7 @@ classdef FrameStack < handle
                     % display this image
                     hdl = self.handles.axes;
                     set( ancestor(hdl,'figure'), 'currentaxes', hdl );
-                    self.handles.image = dk.ui.image( self.frames(:,:,num), self.options );
+                    self.handles.image = ant.img.show( self.frames(:,:,num), self.options );
                     
                 end
                 
@@ -199,7 +199,7 @@ classdef FrameStack < handle
         
         % Select image based on textbox value
         function cb_text(self,hobj,varargin)
-            num = dk.math.clamp( round(str2num( hobj.String )), [1,self.n_frames] );
+            num = dk.num.clamp( round(str2num( hobj.String )), [1,self.n_frames] );
             self.select_frame(num);
         end
         

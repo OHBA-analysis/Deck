@@ -2,7 +2,7 @@ function [yes,target] = is_symlink( name )
 %
 % Check whether the input name is an existing symbolic link (UNIX only).
 %
-% Contact: jhadida [at] fmrib.ox.ac.uk
+% JH
     
     % Remove trailing separators for directories
     name = dk.str.rstrip( name, filesep );

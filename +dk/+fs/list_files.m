@@ -13,6 +13,6 @@ function files = list_files( dirname, pattern )
         if dirname, pattern = '.*'; end
     end
 
-    files = dk.fs.list_match( dirname, pattern, @(x)~isdir(x) );
+    files = dk.fs.match( dirname, pattern, @(x) ~x.isdir );
 
 end

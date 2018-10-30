@@ -6,6 +6,6 @@ function y = rgb( c )
 %
 % JH
 
-    y = isnumeric(c) && (numel(c)==3 || size(c,2)==3) && all(dk.math.is_between( c(:), 0, 1 ));
+    y = isnumeric(c) && (numel(c)==3 || size(c,2)==3) && all(dk.num.between( c(:), 0, 1 ));
 
 end

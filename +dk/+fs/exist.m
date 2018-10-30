@@ -26,6 +26,7 @@ function y = exist( name, kind )
 %   class
 %       env class
 %
+% JH
 
     if nargin < 2, kind='any'; end
     
@@ -36,7 +37,8 @@ function y = exist( name, kind )
             y = (e > 0) || ~isempty(which(name)) || ~isempty(dir(name));
         
         case 'file'
-            y = ~isempty(dir(name)) && ~isdir(name);
+            y = dir(name);
+            y = ~isempty(y) && isscalar(y) && ~y.isdir;
             
         case {'symlink','link'}
             y = dk.fs.is_symlink(name);

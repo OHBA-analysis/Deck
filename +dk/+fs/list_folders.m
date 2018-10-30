@@ -13,6 +13,6 @@ function folders = list_folders( dirname, pattern )
         if dirname, pattern = '.*'; end
     end
 
-    folders = dk.fs.list_match( dirname, pattern, @(x)isdir(x) );
+    folders = dk.fs.match( dirname, pattern, @(x) x.isdir );
     
 end

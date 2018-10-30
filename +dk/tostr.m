@@ -13,11 +13,11 @@ function s = tostr( v, fmt )
 % returns a cellstring.
 %
 % If you want more control over the string representation of arrays, cell arrays 
-% and even tables, check out dk.util.array2string.
+% and even tables, check out dk.util.array2str.
 %
 % JH
 
-    if nargin < 2, fmt = '%g'; end
+    if nargin < 2, fmt = []; end
 
     % Input is a string, do nothing
     if ischar(v)
@@ -29,9 +29,13 @@ function s = tostr( v, fmt )
             case 0
                 s = '';
             case 1
-                s = sprintf( fmt, v );
+                if ischar(fmt)
+                    s = sprintf( v, fmt );
+                else
+                    s = num2str( v );
+                end
             otherwise
-                s = dk.util.array2string( v, [], 'num', fmt );
+                s = dk.util.array2str( v, [], 'num', fmt );
         end
         
     % Input is logical
@@ -40,16 +44,26 @@ function s = tostr( v, fmt )
             case 0
                 s = '';
             case 1
-                s = {'false','true'};
-                %s = {'0','1'};
+                switch fmt
+                    case {'yn','ny'}
+                        s = {'yes','no'};
+                    case {'bin','digit','%d'}
+                        s = {'0','1'};
+                    otherwise
+                        s = {'false','true'};
+                end
                 s = s{1+v};
             otherwise
-                s = dk.util.array2string( double(v), [], 'num', '%d' );
+                s = dk.util.array2str( double(v), [], 'num', '%d' );
         end
         
     % Input is a cell, apply to each element (returns a cell of strings)
     elseif iscell(v)
         s = dk.mapfun( @(x) dk.tostr(x,fmt), v, false );
+
+    % Convert tables to string
+    elseif istable(v)
+        s = dk.util.array2str( v, [], 'num', fmt );
         
     % Other unsupported cases
     else

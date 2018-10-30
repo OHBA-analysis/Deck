@@ -24,11 +24,11 @@ function names = list_ext( dirname, ext, hidden, folders )
     end
     
     if folders
-        filter = @(x)true;
+        filter = @(x) true;
     else
-        filter = @(x)~isdir(x);
+        filter = @(x) ~x.isdir;
     end
     
-    names = dk.fs.list_match( dirname, pattern, filter );
+    names = dk.fs.match( dirname, pattern, filter );
     
 end

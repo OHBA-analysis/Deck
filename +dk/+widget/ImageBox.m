@@ -52,7 +52,7 @@ classdef ImageBox < handle
         %   name
         %       Name of the image as will appear in the popup menu.
         %   opt
-        %       Structure of options for dk.ui.image.
+        %       Structure of options for ant.img.show.
         % 
         function self = set_images(self,data)
         
@@ -90,7 +90,7 @@ classdef ImageBox < handle
                 
                 % display this image
                 set( ancestor(hdl,'figure'), 'currentaxes', hdl );
-                dk.ui.image( dat.img, dat.opt );
+                ant.img.show( dat.img, dat.opt );
                 
                 % update the selector
                 self.handles.popup.Value = num;

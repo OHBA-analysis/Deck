@@ -7,10 +7,7 @@ function out = filter(in,varargin)
 %
 % JH
 
-    f = varargin;
-    if iscell(f{1})
-        f = f{1};
-    end
+    f = dk.unwrap(varargin);
     n = numel(f);
     
     assert( iscellstr(f), 'Fieldnames should be strings.' );

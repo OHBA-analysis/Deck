@@ -10,10 +10,12 @@ function [d,fmt] = datestr( type )
 %   convertible to int: longnum, num, shortnum
 %            Time-only: time, longtime
 %   convertible to int: timenum, longtimenum
-%            Date-only: longdate, date, shortdate, datenum
-%                 Full: datetime (default)
+%            Date-only: longdate, date, shortdate, datenum, datestamp
+%                 Full: datetime (default), logger, filestamp
 %
-% Note 1: long formats include milliseconds
+% Notes: 
+%   + Long formats include milliseconds.
+%   + Stamp formats do not contain spaces.
 %
 % JH
 
@@ -62,6 +64,14 @@ function [d,fmt] = datestr( type )
         % Matlab's datetime format
         case {'datetime','default'}
             fmt = 'dd-mmm-yyyy HH:MM:SS';
+        
+        % more formats...
+        case 'logger'
+            fmt = 'yyyy-mm-dd HH:MM:SS.FFF'; % like longstamp, but with spaces
+        case 'datestamp'
+            fmt = 'yyyy-mmm-dd'; % with readable month abbreviation
+        case 'filestamp'
+            fmt = 'yyyy-mmm-dd_HHMMSS'; % readble date and compact time without spaces
             
         otherwise
             fmt = type;

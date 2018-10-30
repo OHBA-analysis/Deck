@@ -11,9 +11,9 @@ function names = list( dirname, hidden )
     if nargin < 2, hidden=false; end
     
     if hidden
-        names = dk.fs.list_match( dirname, '.*' );
+        names = dk.fs.match( dirname, '.*' );
     else
-        names = dk.fs.list_match( dirname, '^[^\.].*' );
+        names = dk.fs.match( dirname, '^[^\.].*' );
     end
 
 end

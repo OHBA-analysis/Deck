@@ -47,7 +47,7 @@ classdef Slider < handle
             assert( self.check_ui(), 'UI not ready.' );
             
             if nargin > 1
-                val = dk.math.clamp( val, [self.handles.slider.Min,self.handles.slider.Max] );
+                val = dk.num.clamp( val, [self.handles.slider.Min,self.handles.slider.Max] );
                 self.handles.slider.Value = val;
             else
                 val = self.get_value();

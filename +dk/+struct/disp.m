@@ -27,7 +27,7 @@ function dispvalue(v)
     assert( ~isstruct(v) && ~iscell(v), 'Unsupported value type.' );
     if isnumeric(v) && ~isscalar(v)
         assert( isvector(v), 'Unsupported array shape.' );
-        v = dk.util.array2string(v);
+        v = dk.util.array2str(v);
     end
     if isnumeric(v), v = num2str(v); end
     if islogical(v), v = dk.util.bool2str(v); end
