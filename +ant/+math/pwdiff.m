@@ -1,10 +1,11 @@
-function D = pairwise_differences( A, B )
-% D = pairwise_differences( A, B )
+function D = pwdiff( A, B )
+%
+% D = ant.math.pwdiff( A, B )
 %
 % Matrix of pairwise differences between elements of A and B (both vectors).
 % Output is antisymmetric.
 %
-% Contact: jhadida [at] fmrib.ox.ac.uk
+% JH
 
     if nargin < 2, B = A; end
 

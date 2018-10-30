@@ -1,6 +1,6 @@
-function rowid = upper_bound( vals, query )
+function rowid = ubound( vals, query )
 %
-% rowid = upper_bound( vals, query )
+% rowid = ant.math.ubound( vals, query )
 %
 % Inputs:
 %   - vals is a NxM matrix with values sorted ascending in each column
@@ -24,9 +24,10 @@ function rowid = upper_bound( vals, query )
 %   m = 7;
 %   v = cumsum(rand(n,m)); v = [zeros(1,m);bsxfun( @rdivide, v, v(end,:) )]
 %   q = rand(1,m)
-%   r = ant.math.upper_bound( v, q )
+%   r = ant.math.ubound( v, q )
 %
 % TODO: extend this to arbitrary dimensions.
+% TODO: implement this in C++
 
     assert( ismatrix(vals) && ismatrix(query), 'Inputs should be matrices.' );
     

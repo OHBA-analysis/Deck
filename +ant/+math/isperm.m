@@ -1,5 +1,6 @@
-function yes = is_permutation(p)
-% yes = is_permutation(p)
+function yes = isperm(p)
+%
+% yes = ant.math.isperm(p)
 %
 % Checks whether input vector p is a permutation.
 %
@@ -7,10 +8,7 @@ function yes = is_permutation(p)
 %   p a permutation vector or matrix
 %	If p has N elements, then p should contain a permutation of 1:N
 %
-% Output:
-%	boolean
-%
-% Contact: jhadida [at] fmrib.ox.ac.uk
+% JH
 
 	len    = numel(p);
 	counts = accumarray( p(:), 1, [len,1] );

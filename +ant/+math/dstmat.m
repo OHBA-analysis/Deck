@@ -1,5 +1,6 @@
-function D = distance_matrix( A, B, metric )
-% D = distance_matrix( A, B, metric )
+function D = dstmat( A, B, metric )
+%
+% D = ant.math.dstmat( A, B, metric )
 %
 % Compute pairwise distances between points A and B with a map/reduce logic.
 % Both A and B should be p x d matrices with one point in each row, ie:
@@ -8,7 +9,7 @@ function D = distance_matrix( A, B, metric )
 %
 % Metric defaults to Euclidean norm, ie metric=struct(map=square, reduce=sqrt).
 %
-% Contact: jhadida [at] fmrib.ox.ac.uk
+% JH
 
     if nargin < 3
         metric.map = @(x)(x.^2);
@@ -28,7 +29,7 @@ function D = distance_matrix( A, B, metric )
     D  = zeros(na,nb);
     
     for d = 1:nd
-        D = D + metric.map(ant.math.pairwise_differences( A(:,d), B(:,d) ));
+        D = D + metric.map(ant.math.pwdiff( A(:,d), B(:,d) ));
     end
     
     D = metric.red(D);

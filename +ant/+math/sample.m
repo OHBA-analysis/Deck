@@ -1,6 +1,6 @@
 function z = sample( x, y, n )
 %
-% z = sample( x, y, n )
+% z = ant.math.sample( x, y, n )
 %
 % Sample n realisations of 1-d distribution y defined at points x.
 %
@@ -21,7 +21,7 @@ function z = sample( x, y, n )
     y = [0; y] / y(end);
     
     u = rand(n,1);
-    k = ant.math.upper_bound( y, u );
+    k = ant.math.ubound( y, u );
     k = k(:);
     
     w = (u - y(k-1)) ./ max( y(k)-y(k-1), eps );
