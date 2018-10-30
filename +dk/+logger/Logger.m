@@ -185,6 +185,10 @@ classdef Logger < handle
                 self.error(varargin{:});
             end
         end
+
+    end
+
+    methods (Hidden)
         
         % generic logging function
         function write(self,level,caller,message,varargin)
