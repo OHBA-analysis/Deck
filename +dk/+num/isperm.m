@@ -1,6 +1,6 @@
 function yes = isperm(p)
 %
-% yes = ant.math.isperm(p)
+% yes = dk.num.isperm(p)
 %
 % Checks whether input vector p is a permutation.
 %

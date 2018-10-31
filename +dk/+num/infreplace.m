@@ -1,6 +1,6 @@
 function x = infreplace( x, val )
 %
-% x = ant.math.infreplace( x, val=nan )
+% x = dk.num.infreplace( x, val=nan )
 %
 % Replace all Inf with specified value.
 %
