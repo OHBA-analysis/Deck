@@ -140,6 +140,7 @@ classdef Logger < handle
             if ~self.ignoreLogging()
                 caller = self.callerInfo();
                 self.write('e', caller, varargin{:});
+                error( 'Logger "%s" triggered an error.', self.name );
             end
         end
 
@@ -147,6 +148,7 @@ classdef Logger < handle
             if ~self.ignoreLogging()
                 caller = self.callerInfo();
                 self.write('c', caller, varargin{:});
+                error( 'Logger "%s" triggered an error.', self.name );
             end
         end
         
