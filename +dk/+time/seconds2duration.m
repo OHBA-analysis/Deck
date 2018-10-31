@@ -4,14 +4,10 @@ function duration = seconds2duration( sec )
 % 
 % Contact: jhadida [at] fmrib.ox.ac.uk
 
-    d  = floor(sec/86400);
-		sec = sec - d*86400;
-	h  = floor(sec/3600);
-		sec = sec - h*3600;
-	m  = floor(sec/60);
-		sec = sec - m*60;
-	s  = floor(sec);
-		sec = sec - s;
+    [d,sec] = dk.num.divmod(sec,86400);
+	[h,sec] = dk.num.divmod(sec,3600);
+	[m,sec] = dk.num.divmod(sec,60);
+	[s,sec] = dk.num.divmod(sec,1);
 	ms = floor(sec*1000);
     
     duration = [ d, h, m, s, ms ];
