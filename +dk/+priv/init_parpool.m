@@ -2,14 +2,10 @@ function clus = init_parpool( nworkers )
 %
 % Initialize Matlab parallel pool with n workers.
 %
-% Contact: jhadida [at] fmrib.ox.ac.uk
-
-	% Get Matlab version
-	mver  = version('-release');
-	myear = str2double( mver(1:4) );
+% JH
 	
 	% Old and new version of cluster management
-	if myear < 2014
+	if dk.util.minver(2014)
 		
 		% Get cluster config
 		cfg  = defaultParallelConfig();
