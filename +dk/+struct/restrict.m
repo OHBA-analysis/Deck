@@ -1,4 +1,4 @@
-function restrict( s, allowed )
+function restrict( s, allowed, required )
 %
 % dk.struct.restrict( s, allowed )
 %
@@ -6,9 +6,18 @@ function restrict( s, allowed )
 %
 % JH
 
-    assert( isstruct(s) && iscellstr(allowed), 'Bad inputs.' );
+    if nargin < 3, required = {}; end
+    if isnumeric(required)
+        required = allowed(required);
+    end
 
-    unknown = setdiff( fieldnames(s), allowed );
+    assert( isstruct(s) && iscellstr(allowed) && iscellstr(required), 'Bad inputs.' );
+
+    fields = fieldnames(s);
+    unknown = setdiff( fields, allowed );
     assert( isempty(unknown), 'Unknown fieldnames:\n%s', strjoin(unknown,newline) );
+    
+    missing = setdiff( required, fields );
+    assert( isempty(missing), 'Missing required fields:\n%s:', strjoin(missing,newline) );
 
 end

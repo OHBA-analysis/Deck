@@ -169,6 +169,9 @@ classdef kwArgs < handle
         
         % restrict possible fields
         function restrict(self,names)
+            if nargin < 2
+                names = self.accessed;
+            end
             assert( iscellstr(names), 'Expected cell of option names.' );
             if ~self.CaseSensitive
                 names = dk.mapfun( @lower, names, false );

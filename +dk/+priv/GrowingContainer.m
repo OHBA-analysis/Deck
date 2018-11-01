@@ -129,6 +129,7 @@ classdef GrowingContainer < handle
         function k = book(self,n)
             k = self.gcAdd(n);
         end
+        
         % remove elements by marking them as unused to preserve indexing
         function rem(self,k)
             dk.assert( all(k <= self.last), 'Index out of bounds.' );
