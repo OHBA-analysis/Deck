@@ -151,8 +151,8 @@ classdef DataArray < dk.priv.GrowingContainer
         % bulk assign of metadata field by copying the value
         function self = assign(self,k,varargin)
             if nargin > 2 && ~isempty(k)
-                assert( all(self.used(k)), 'Bad indices.' );
                 
+                self.chksub(k);
                 v = dk.c2s(varargin{:});
                 %if isscalar(v) && ~isscalar(k)
                 %    v = repmat(v,size(k));
@@ -245,26 +245,30 @@ classdef DataArray < dk.priv.GrowingContainer
         % NOTE:
         % For all methods below, both scalar and vector indices work.
         % However, name resolution requires single name only.
-
+        function chksub(self,r,c)
+            assert( all(self.used(r(:))), 'Invalid row indices' );
+            if nargin > 2
+                assert( all(dk.num.between(c(:),1,self.ncols)), 'Column index out of bounds.' );
+            end
+        end
 
         % get element(s) by index (single column by name ok)
         function x = dget(self,r,c)
             if ischar(c), c=self.name(c); end
-            assert( all(self.used(r)), 'Invalid row indices' );
+            self.chksub(r);
             x = self.data(r,c);
         end
 
         % set element(s) by index (single column by name ok)
         function dset(self,r,c,x)
             if ischar(c), c=self.name(c); end
-            assert( all(self.used(r)), 'Invalid row indices' );
-            assert( all(c < self.ncols), 'Column index out of bounds.' );
+            self.chksub(r,c);
             self.data(r,c) = x;
         end
 
         % get row(s) by index
         function x = row(self,k)
-            assert( all(self.used(k)), 'Invalid row indices' );
+            self.chksub(r);
             x = self.data(k,:);
         end
 
@@ -276,7 +280,7 @@ classdef DataArray < dk.priv.GrowingContainer
 
         % get meta-data for a given (set of) row(s)
         function x = mget(self,k)
-            assert( all(self.used(k)), 'Invalid row indices' );
+            self.chksub(k);
             x = self.meta(k);
         end
 

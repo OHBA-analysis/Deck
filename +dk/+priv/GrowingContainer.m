@@ -105,6 +105,10 @@ classdef GrowingContainer < handle
             % nothing by default, overload if needed
         end
         
+        % check that all input indices correspond to used samples
+        function chkind(self,k)
+            assert( all(self.used(k)), 'Invalid indices.' );
+        end
 
         % dependent properties
         function n = get.nmax(self), n=numel(self.used); end

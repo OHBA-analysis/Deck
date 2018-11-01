@@ -150,12 +150,10 @@ classdef kwArgs < handle
         end
         
         function self = merge(self,varargin)
-            
             if nargin < 2, return; end
             p = self.parsed;
             self.parse(varargin{:});
             self.parsed = dk.struct.merge( p, self.parsed );
-            
         end
         
         % check field existence
@@ -209,18 +207,16 @@ classdef kwArgs < handle
             
             if isfield(self.parsed,name)
                 default = self.parsed.(name);
-                self.accessed{end+1} = name;
             else
                 self.parsed.(name) = default;
             end
+            self.accessed{end+1} = name;
         end
         
         % set default explicitly
-        function value = default(self,name,value)
+        function self = default(self,name,value)
             name = self.field(name);
-            if isfield(self.parsed,name)
-                value = self.parsed.(name);
-            else
+            if ~isfield(self.parsed,name)
                 self.parsed.(name) = value;
             end
         end
@@ -235,8 +231,8 @@ classdef kwArgs < handle
             if isfield(self.parsed,name)
                 default = self.parsed.(name);
                 self.parsed = rmfield(self.parsed,name);
-                self.accessed{end+1} = name;
             end
+            self.accessed{end+1} = name;
         end
         
         % set field value
