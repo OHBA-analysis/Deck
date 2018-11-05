@@ -83,8 +83,17 @@ classdef DataArray < dk.priv.GrowingContainer
 
         function self = DataArray(varargin)
             self.clear();
-            if nargin > 0
-                self.reset(varargin{:});
+            switch nargin
+                case 0 % nothing to do
+                case 1
+                    arg = varargin{1};
+                    if dk.is.string(arg) || dk.is.struct(arg,{'version'})
+                        self.unserialise(arg);
+                    else
+                        self.reset(arg);
+                    end
+                otherwise
+                    self.reset(varargin{:});
             end
         end
 
@@ -268,7 +277,7 @@ classdef DataArray < dk.priv.GrowingContainer
 
         % get row(s) by index
         function x = row(self,k)
-            self.chksub(r);
+            self.chksub(k);
             x = self.data(k,:);
         end
 

@@ -71,12 +71,18 @@ classdef Tree < dk.priv.TreeBase
 
         function self = Tree(varargin)
             self.clear();
-            if nargin > 0 && ischar(varargin{1})
-                self.unserialise(varargin{1});
-            else
-                self.reset(varargin{:});
+            switch nargin
+                case 0 % nothing to do
+                case 1
+                    arg = varargin{1};
+                    if dk.is.string(arg)
+                        self.unserialise(arg);
+                    else
+                        self.reset(arg);
+                    end
+                otherwise
+                    self.reset(varargin{:});
             end
-
         end
 
         function reset(self,props,bsize)

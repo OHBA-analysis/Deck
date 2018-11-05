@@ -31,6 +31,8 @@ classdef Logger < handle
         name
         file
         datefmt
+        
+        backup % backup state to be used with saveState/resetState
     end
     
     methods (Hidden, Static)
@@ -69,6 +71,9 @@ classdef Logger < handle
             self.fileLevel = arg.get('flevel','info');
             self.consoleLevel = arg.get('clevel','info');
             
+            % clear previous backups
+            self.backup = [];
+            
             % open file if any
             self.open();
         end
@@ -83,6 +88,27 @@ classdef Logger < handle
             val = lower(val);
             assert( isfield(self.LEVEL,val), 'Invalid level.' );
             self.consoleLevel = val;
+        end
+        
+        function saveState(self)
+            f = {'fileLevel', 'consoleLevel', 'nodate', 'lvlchar'};
+            n = numel(f);
+            
+            b = struct();
+            for i = 1:n
+                b.(f{i}) = self.(f{i});
+            end
+            self.backup = b;
+        end
+        
+        function resetState(self)
+            f = {'fileLevel', 'consoleLevel', 'nodate', 'lvlchar'};
+            n = numel(f);
+            
+            b = self.backup;
+            for i = 1:n
+                self.(f{i}) = b.(f{i});
+            end
         end
         
         function y = hasFile(self)

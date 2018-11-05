@@ -2,7 +2,8 @@ function out = unwrap(varargin)
 %
 % out = unwrap(varargin)
 %
-% Extract value from input cell.
+% Extract value from input cell, as long as it has a single element.
+% If input is not a cell, then output is the input.
 %
 % JH
 

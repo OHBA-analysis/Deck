@@ -73,10 +73,17 @@ classdef SplitTree < dk.priv.TreeBase
 
         function self = SplitTree(varargin)
             self.clear();
-            if nargin > 0 && ischar(varargin{1})
-                self.unserialise(varargin{1});
-            else
-                self.reset(varargin{:});
+            switch nargin
+                case 0 % nothing to do
+                case 1
+                    arg = varargin{1};
+                    if dk.is.string(arg)
+                        self.unserialise(arg);
+                    else
+                        self.reset(arg);
+                    end
+                otherwise
+                    self.reset(varargin{:});
             end
         end
         
@@ -88,6 +95,7 @@ classdef SplitTree < dk.priv.TreeBase
             if nargin < 3, bsize=100; end
             colnames = {'parent','depth','eldest','nchildren'};
             
+            % insert root (depth 1, no parent)
             if isstruct(props)
                 self.store = dk.obj.DataArray( colnames, fieldnames(props), bsize );
                 self.store.add( [0,1,0,0], props );
@@ -95,6 +103,11 @@ classdef SplitTree < dk.priv.TreeBase
                 self.store = dk.obj.DataArray( colnames, props, bsize );
                 self.store.add( [0,1,0,0] );
             end
+        end
+        
+        % ensure indices are valid
+        function chkind(self,k)
+            assert( self.is_valid(k), 'Invalid node indices.' );
         end
 
         % compress storage and reindex the tree
@@ -225,14 +238,19 @@ classdef SplitTree < dk.priv.TreeBase
         end
 
         % split multiple nodes
-        function k = split(self,p,n,varargin)
+        %   p: parent indices
+        %   n: number of children
+        %   + properties
+        %
+        % output k is the list of children indices
+        function c = split(self,p,n,varargin)
             p = p(:);
             n = n(:);
             m = numel(p);
             u = unique(p);
 
             assert( all(n > 0), 'Number of children should be positive.' );
-            assert( all(numel(u) == m), 'Doublons not allowed.' );
+            assert( all(numel(u) == m), 'Duplicate parents not allowed.' );
             assert( all(self.is_valid(p)), 'Invalid parent node.' );
             assert( all(self.is_leaf(p)), 'Nodes can only be split once.' );
 
@@ -242,11 +260,21 @@ classdef SplitTree < dk.priv.TreeBase
             L = cumsum(L(1:end-1));
 
             x = p(L);
-            x = [x(:), self.depth(x)+1, zeros(sum(n),2)];
+            x = [x(:), self.depth(x)+1, zeros(sum(n),2)]; % parent, depth, 0, 0
             k = self.store.add( x, varargin{:} );
+            
+            % group children indices by parent
+            c = cell(1,m);
+            for i = 1:m
+                c{i} = k(t(i):(t(i+1)-1));
+            end
 
-            self.store.data(p,3) = k(t(1:end-1));
+            % update parents
+            self.store.data(p,3) = cellfun( @(ck) ck(1), c );
             self.store.data(p,4) = n;
+            
+            % unwrap children as a vector if p is scalar
+            c = dk.unwrap(c);
         end
 
     end

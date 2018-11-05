@@ -140,7 +140,7 @@ classdef TreeBase < handle
         dk.assert( strcmpi(s.type,self.type), 'Type mismatch: %s != %s', s.type, self.type );
         switch s.version
             case '0.1'
-                self.store = dk.obj.DataArray().unserialise( s.store );
+                self.store = dk.obj.DataArray(s.store);
             otherwise
                 error('Unknown version: %s',s.version);
         end

@@ -1,12 +1,18 @@
-function G = grouplabels(L,n)
+function G = grouplabels(L,n,t)
 %
 % G = dk.util.grouplabels(L)
 % G = dk.util.grouplabels(L,n)
+% G = dk.util.grouplabels(L,n,t)
 %
 % For each unique label in L, find indices of elements equal to this label.
 % Output G is a 1xn cell:
 %   - if n is not specified, then n=max(L) by default;
 %   - otherwise, if n < max(L), then G only contains the first n groups.
+%
+% If t is specified, then:
+%   - L should be sorted, and 
+%   - t is a 1xn vector, such that t(i) is the index of the first element
+%     in L equal to the i^th label.
 %
 % LABELS SHOULD BE POSITIVE INTEGERS
 %
@@ -25,14 +31,27 @@ function G = grouplabels(L,n)
     L = L(:); % make a col
     if nargin < 2, n = max(L); end
     
-    % count each label
-    c = accumarray( L, 1, [n,1] ); % this will fail if L is not proper
-    
-    % sort labels
-    [~,s] = sort(L,'ascend');
-    
-    % define strides in sorted version
-    t = 1 + cumsum([0; c]);
+    % compute t
+    if nargin < 3
+        
+        % count each label
+        c = accumarray( L, 1, [n,1] ); % this will fail if L is not proper
+
+        % sort labels
+        [~,s] = sort(L,'ascend');
+
+        % define strides in sorted version
+        t = 1 + cumsum([0; c]);
+        
+    else
+        
+        nL = numel(L);
+        assert( isvector(t) && numel(t)==n, 'Bad input t.' );
+        assert( all(dk.num.between( t, 1, nL )), 'Bad indices t.' );
+        s = 1:nL;
+        t(end) = numel(L)+1;
+        
+    end
     
     % define groups
     s = s(:)';
