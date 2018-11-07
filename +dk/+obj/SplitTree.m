@@ -142,14 +142,6 @@ classdef SplitTree < dk.priv.TreeBase
             if nargout > 1, k = self.indices(); end
         end
 
-        function n = nchildren(self,k)
-            n = self.store.dget(k,4);
-        end
-        function [n,k] = all_nchildren(self)
-            n = self.store.col('nchildren');
-            if nargout > 1, k = self.indices(); end
-        end
-
         % child socket = (first, last)
         % accept k <= 0
         function r = crange(self,k)

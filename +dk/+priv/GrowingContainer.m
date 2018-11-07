@@ -68,7 +68,6 @@ classdef GrowingContainer < handle
     properties (Transient,Dependent)
         nmax        % number of elements allocated
         nelm        % number of elements in use
-        ready       % check that object is initialised
         capacity    % number of elements that can be added without reallocation
         sparsity    % sparsity ratio (compress when between 0.2-0.5)
     end
@@ -114,13 +113,22 @@ classdef GrowingContainer < handle
         function n = get.nmax(self), n=numel(self.used); end
         function n = get.nelm(self), n=nnz(self.used); end
         function n = get.capacity(self), n = self.nmax - self.last; end
-        function y = get.ready(self), y = ~isempty(self.used); end
         function s = get.sparsity(self), s = 1 - (self.bsize + self.nelm)/(self.bsize + self.last); end
 
         function set.bsize(self,b)
             b = floor(b);
             assert( b > 0, 'Block-size should be positive.' );
             self.bsize = b;
+        end
+        
+        % check whether the container contains something
+        function y = isempty(self)
+            y = self.nelm == 0;
+        end
+        
+        % check whether container has been initialised
+        function y = isready(self)
+            y = ~isempty(self.used);
         end
 
         % return indices of used elements

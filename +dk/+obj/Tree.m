@@ -111,17 +111,6 @@ classdef Tree < dk.priv.TreeBase
             self.store.reserve(res);
         end
 
-        function n = nchildren(self,k)
-            n = self.store.dget(k,3);
-        end
-        function [n,k] = all_nchildren(self)
-            n = self.store.col('nchildren');
-            if nargout > 1, k = self.indices(); end
-            %[n,k] = self.parents();
-            %n = accumarray( n(2:end), 1, [max(k),1] ); % root has no parent
-            %n = n(k);
-        end
-
         function c = children(self,k,unwrap)
             if nargin < 3, unwrap=true; end
 

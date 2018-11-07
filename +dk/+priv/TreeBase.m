@@ -99,7 +99,7 @@ classdef TreeBase < handle
         function n = get.n_parents(self), n = self.np; end
 
         function s = get.sparsity(self), s = self.store.sparsity; end
-        function r = ready(self), r = self.nn > 0; end
+        function r = isready(self), r = self.nn > 0; end
 
         function gobj = plot(self,varargin)
         %
@@ -169,12 +169,25 @@ classdef TreeBase < handle
         function y = is_valid(self,k)
             y = self.store.used(k);
         end
+        
+        function k = leaves(self)
+            k = self.indices();
+            k = k(self.store.col('nchildren') == 0);
+        end
 
         function p = parent(self,k)
             p = self.store.dget(k,'parent');
         end
         function [p,k] = all_parents(self)
             p = self.store.col('parent');
+            if nargout > 1, k = self.indices(); end
+        end
+        
+        function n = nchildren(self,k)
+            n = self.store.dget(k,'nchildren');
+        end
+        function [n,k] = all_nchildren(self)
+            n = self.store.col('nchildren');
             if nargout > 1, k = self.indices(); end
         end
 
