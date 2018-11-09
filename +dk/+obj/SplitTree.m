@@ -107,7 +107,7 @@ classdef SplitTree < dk.priv.TreeBase
         
         % ensure indices are valid
         function chkind(self,k)
-            assert( self.is_valid(k), 'Invalid node indices.' );
+            assert( all(self.is_valid(k)), 'Invalid node indices.' );
         end
 
         % compress storage and reindex the tree

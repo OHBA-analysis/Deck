@@ -18,7 +18,7 @@ end
 
 function G = do1(L)
     n = numel(L);
-    G = splitapply(@(varargin)varargin,1:n,L);
+    G = splitapply( @(varargin)varargin, 1:n, L );
 end
 
 function G = do2(L)

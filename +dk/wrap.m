@@ -8,5 +8,9 @@ function out = wrap(varargin)
 %
 % JH
 
-    out = {dk.unwrap(varargin{:})};
+    out = varargin;
+    while numel(out)==1 && iscell(out{1})
+        out = out{1};
+    end
+    
 end

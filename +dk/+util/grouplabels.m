@@ -49,7 +49,7 @@ function G = grouplabels(L,n,t)
         assert( isvector(t) && numel(t)==n, 'Bad input t.' );
         assert( all(dk.num.between( t, 1, nL )), 'Bad indices t.' );
         s = 1:nL;
-        t(end) = numel(L)+1;
+        t(end) = nL+1;
         
     end
     

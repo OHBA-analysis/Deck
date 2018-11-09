@@ -3,6 +3,17 @@ classdef Logger < handle
 % Simple logging implementation, heavily inspired by:
 %   https://github.com/optimizers/logging4matlab
 %
+% Logging levels are:
+%   all
+%   trace
+%   debug
+%   info
+%   warning
+%   error
+%   critical
+%   off
+%
+% JH
 
     properties (Constant)
         
