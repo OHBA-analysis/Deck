@@ -35,9 +35,9 @@ classdef SplitTree < dk.priv.TreeBase
 %   eldest(id)      id of the oldest child (or 0)
 %   nchildren(id)   number of children
 %
-%   children  ( id, unwrap=false )       accept multiple ids
-%   offspring ( id, unwrap=false )       inefficient ops O( n log n )
-%   siblings  ( id, unwrap=false )       return cell
+%   children  ( id, unwrap=true )        accept multiple ids
+%   offspring ( id, unwrap=true )        inefficient ops O( n log n )
+%   siblings  ( id, unwrap=true )        return cell
 %
 %   all_parents()   all node parents     (cell)
 %   all_depths()    all node depths      (vec)
@@ -142,7 +142,7 @@ classdef SplitTree < dk.priv.TreeBase
             if nargout > 1, k = self.indices(); end
         end
 
-        % child socket = (first, last)
+        % child range = (first, last)
         % accept k <= 0
         function r = crange(self,k)
             n = numel(k);

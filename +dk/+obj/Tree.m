@@ -38,9 +38,9 @@ classdef Tree < dk.priv.TreeBase
 %   depth(id)       depth of current node (>= 1)
 %   nchildren(id)   number of children
 %
-%   children  ( id, unwrap=false )     | accept multiple ids
-%   offspring ( id, unwrap=false )     | inefficient ops O( n log n )
-%   siblings  ( id, unwrap=false )     | return cell
+%   children  ( id, unwrap=true )        accept multiple ids
+%   offspring ( id, unwrap=true )        inefficient ops O( n log n )
+%   siblings  ( id, unwrap=true )        return cell
 %
 %   all_parents()   all node parents     (cell)
 %   all_depths()    all node depths      (vec)

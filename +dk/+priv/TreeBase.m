@@ -21,9 +21,9 @@ classdef TreeBase < handle
 %   parent(id)      node props (efficient)
 %   depth(id)       accept multiple ids
 %
-%   children  ( id, unwrap=false )       accept multiple ids
-%   offspring ( id, unwrap=false )       inefficient ops O( n log n )
-%   siblings  ( id, unwrap=false )       return cell
+%   children  ( id, unwrap=true )        accept multiple ids
+%   offspring ( id, unwrap=true )        inefficient ops O( n log n )
+%   siblings  ( id, unwrap=true )        return cell
 %
 %   all_parents()   all node parents     (cell)
 %   all_depths()    all node depths      (vec)
@@ -42,6 +42,17 @@ classdef TreeBase < handle
 %   iter( callback )
 %   dfs ( callback )     with callback( id, node, props )
 %   bfs ( callback )
+%
+% ----------------------------------------------------------------------
+% ## Inheritance
+%
+% This implementation requires derived classes to define the following columns:
+%   parent      (cf. parent, all_parents)
+%   depth       (cf. depth, all_depths, shape)
+%   nchildren   (cf. nchildren, all_nchildren, leaves, n_parents)
+%
+% Alternatively, the dependent methods (listed above) can be overloaded.
+% See below for the list of abstract methods to be implemented.
 %
 % JH
 
@@ -155,7 +166,7 @@ classdef TreeBase < handle
     % tree methods
     methods
 
-        % node properties
+        % indices of valid nodes
         function [k,r] = indices(self)
             k = self.store.find();
             if nargout > 1
@@ -163,18 +174,22 @@ classdef TreeBase < handle
             end
         end
 
+        % a node is a leaf if it has no children
         function y = is_leaf(self,k)
             y = self.nchildren(k) == 0;
         end
+        
+        % check storage index
         function y = is_valid(self,k)
             y = self.store.used(k);
         end
         
-        function k = leaves(self)
-            k = self.indices();
-            k = k(self.store.col('nchildren') == 0);
+        % check that all input indices correspond to valid nodes
+        function chkind(self,k)
+            assert( all(self.store.used(k)), 'Invalid node indices.' );
         end
 
+        % parent 
         function p = parent(self,k)
             p = self.store.dget(k,'parent');
         end
@@ -183,6 +198,18 @@ classdef TreeBase < handle
             if nargout > 1, k = self.indices(); end
         end
         
+        % get ancestor of depth d
+        function a = ancestor(self,k,d)
+            assert( all(self.is_valid(k)) && d >= 1, 'Bad input' );
+            assert( all(self.depth(k) > d), 'Node depths should all be > d' );
+            while d > 0
+                a = self.store.dget(k,'parent');
+                k = a;
+                d = d-1;
+            end
+        end
+        
+        % number of children
         function n = nchildren(self,k)
             n = self.store.dget(k,'nchildren');
         end
@@ -191,6 +218,7 @@ classdef TreeBase < handle
             if nargout > 1, k = self.indices(); end
         end
 
+        % node depth (counted from 1 at the root)
         function d = depth(self,k)
             % return tree-depth if called without index
             if nargin > 1
@@ -221,6 +249,11 @@ classdef TreeBase < handle
         % node access
         function [n,m] = root(self,varargin)
             [n,m] = self.get_node(1,varargin{:});
+        end
+        
+        function k = leaves(self)
+            k = self.indices();
+            k = k(self.store.col('nchildren') == 0);
         end
 
         function p = get_props(self,k)
