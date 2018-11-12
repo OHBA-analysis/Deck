@@ -275,7 +275,7 @@ classdef Logger < handle
                 if self.nodate
                     logline = sprintf( '%s [%s] %s', lstr, caller, mstr );
                 else
-                    logline = sprintf( '%s%s [%s] %s', dstr, lstr, caller, mstr );
+                    logline = sprintf( '%s %s [%s] %s', dstr, lstr, caller, mstr );
                 end
                 if levelnum >= self.LEVEL.error
                     fprintf( 2, '%s\n', logline );
@@ -286,7 +286,7 @@ classdef Logger < handle
             
             % write to file
             if self.isFileOpen() && self.LEVEL.(self.fileLevel) <= levelnum
-                logline = sprintf( '%s%s [%s] %s', dstr, lstr, caller, mstr );
+                logline = sprintf( '%s %s [%s] %s', dstr, lstr, caller, mstr );
                 fprintf( self.file.id, '%s\n', logline );
             end
             

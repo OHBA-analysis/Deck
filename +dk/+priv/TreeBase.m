@@ -285,20 +285,26 @@ classdef TreeBase < handle
         % These implementations are reasonably efficient without assumptions about the
         % type of tree; they can be overridden in derived classes if needed.
 
-        function bfs(self,callback,start)
+        function x = bfs(self,callback,start)
             if nargin < 3, start=1; end
 
             C = self.all_children();
             N = self.nn;
             S = zeros(1,N);
             [~,r] = self.indices();
+            o = nargout > 0;
+            if o, x = cell(1,N); end
 
             S(1) = start;
             cur = 1;
             last = 1;
             while cur <= last
                 id = S(cur);
-                callback( id, self.get_node(id), self.get_props(id) );
+                if o
+                    x{id} = callback( id, self.get_node(id), self.get_props(id) );
+                else
+                    callback( id, self.get_node(id), self.get_props(id) );
+                end
                 n = numel(C{r(id)});
                 S( last + (1:n) ) = C{r(id)};
                 last = last + n;
@@ -306,19 +312,25 @@ classdef TreeBase < handle
             end
         end
 
-        function dfs(self,callback,start)
+        function x = dfs(self,callback,start)
             if nargin < 3, start=1; end
 
             C = self.all_children();
             N = self.nn;
             S = zeros(1,N);
             [~,r] = self.indices();
+            o = nargout > 0;
+            if o, x = cell(1,N); end
 
             S(1) = start;
             cur = 1;
             while cur > 0
                 id = S(cur);
-                callback( id, self.get_node(id), self.get_props(id) );
+                if o
+                    x{id} = callback( id, self.get_node(id), self.get_props(id) );
+                else
+                    callback( id, self.get_node(id), self.get_props(id) );
+                end
                 n = numel(C{r(id)});
                 S( cur-1 + (1:n) ) = fliplr(C{r(id)});
                 cur = cur-1 + n;

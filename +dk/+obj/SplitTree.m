@@ -278,18 +278,24 @@ classdef SplitTree < dk.priv.TreeBase
         %
         % More efficient implementation, given storage.
 
-        function bfs(self,callback,start)
+        function x = bfs(self,callback,start)
             if nargin < 3, start=1; end
 
             N = self.nn;
             S = zeros(1,N);
+            o = nargout > 0;
+            if o, x = cell(1,N); end
 
             S(1) = start;
             cur = 1;
             last = 1;
             while cur <= last
                 id = S(cur);
-                callback( id, self.get_node(id), self.get_props(id) );
+                if o
+                    x{id} = callback( id, self.get_node(id), self.get_props(id) );
+                else
+                    callback( id, self.get_node(id), self.get_props(id) );
+                end
                 c = self.crange(id);
                 n = c(2)-c(1)+1;
                 S( last + (1:n) ) = c(1):c(2);
@@ -298,17 +304,23 @@ classdef SplitTree < dk.priv.TreeBase
             end
         end
 
-        function dfs(self,callback,start)
+        function x = dfs(self,callback,start)
             if nargin < 3, start=1; end
 
             N = self.nn;
             S = zeros(1,N);
+            o = nargout > 0;
+            if o, x = cell(1,N); end
 
             S(1) = start;
             cur = 1;
             while cur > 0
                 id = S(cur);
-                callback( id, self.get_node(id), self.get_props(id) );
+                if o
+                    x{id} = callback( id, self.get_node(id), self.get_props(id) );
+                else
+                    callback( id, self.get_node(id), self.get_props(id) );
+                end
                 c = self.crange(id);
                 n = c(2)-c(1)+1;
                 S( cur-1 + (1:n) ) = fliplr(c(1):c(2));

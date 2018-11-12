@@ -32,7 +32,7 @@ function [k,v,dim] = reduce( fun, ind, val, dim, unif )
     if isempty(dim)
         dim = max(ind,[],1);
     end
-    dim = unit64(dim(:)');
+    dim = uint64(dim(:)');
     
     % convert subs to indices
     if d > 1
