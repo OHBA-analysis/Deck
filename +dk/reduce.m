@@ -10,7 +10,11 @@ function [k,v,dim] = reduce( fun, ind, val, dim, unif )
 %
 % Apply fun to the set of values associated with the same index, and return
 % a pair (k,v) with the value associated with that index. This can be seen
-% as generalisation of accumarray.
+% as generalisation of accumarray or splitapply.
+%
+% Function should accept two inputs:
+%   1. The index for the current group
+%   2. The corresponding values (scalar, cell or matrix)
 %
 % JH
 
@@ -69,13 +73,13 @@ function [k,v,dim] = reduce( fun, ind, val, dim, unif )
         v = nan(m,1);
         for i = 1:m
             p = strides(i):(strides(i+1)-1);
-            v(i) = fun(vget(p));
+            v(i) = fun(k(i),vget(p));
         end
     else
         v = cell(m,1);
         for i = 1:m
             p = strides(i):(strides(i+1)-1);
-            v{i} = fun(vget(p));
+            v{i} = fun(k(i),vget(p));
         end
     end
 
