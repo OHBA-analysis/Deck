@@ -1,6 +1,9 @@
 function obj = get(name,varargin)
 %
+% obj = dk.logger.get(name,varargin)
+%
 % Return existing, or create new, instance of dk.logger.Logger.
+% If called without name, print a list of existing loggers to the console.
 %
 % JH
 

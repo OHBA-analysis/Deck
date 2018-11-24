@@ -1,14 +1,21 @@
 
 ## OS generated files
-*.DS_Store
-*.DS_Store?
+.DS_Store*
 *._*
-*.Spotlight-V100
-*.Trashes
+.Spotlight*
+.Trash*
 *ehthumbs.db
 *Thumbs.db
 *~
 *.fuse_hidden*
+
+## Temporary files
+*.swp
+*~
+tmp*
+temp*
+_tmp
+_temp
 
 ## Compiled files
 *.o
@@ -44,11 +51,7 @@
 *.tar.gz
 *.tar.bz2
 
-## Temporary folders
-**/tmp/*
-**/_tmp/*
-
-# Other
+## Other
 dk_flat
 old
 wiki

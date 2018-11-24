@@ -44,7 +44,7 @@ function [k,v,dim] = reduce( fun, ind, val, dim, unif )
         assert( all(ind(:) >= 1), 'Indices should be positive integers.' );
         
         s = cumprod([1,dim]);
-        ind = dot( ind, repmat(s(1:end-1),n,1) );
+        ind = ind * s(1:end-1)';
     end
 
     % filter valid indices and sort them

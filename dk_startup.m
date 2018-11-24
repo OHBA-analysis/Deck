@@ -7,6 +7,9 @@ function dk_startup()
     % add GUI library
     addpath(fullfile( here, 'gui/layout' ));
     addpath(fullfile( here, 'gui/layoutdoc' ));
+    
+    % add JMX library
+    addpath(fullfile( here, 'jmx' ));
 
     % set console encoding
     try
