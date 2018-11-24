@@ -177,7 +177,7 @@ classdef SplitTree < dk.priv.TreeBase
             [r,p] = self.order(k);
             c = self.crange(p); % list children of parents
             n = numel(k);
-            s = cell(1,k);
+            s = cell(1,n);
 
             notb = @(a,b) (a(1)-1) + [ 1:b-1, b+1:(a(2)-a(1)+1) ];
             for i = 1:n
