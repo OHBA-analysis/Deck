@@ -67,7 +67,7 @@ function [k,v,dim] = reduce( fun, ind, val, dim, unif )
     
     % segment indices
     strides = 1 + [0;find(ind(2:end) - ind(1:end-1));n];
-    k = ind(strides(1:end-1));
+    k = double(ind(strides(1:end-1)));
     m = numel(k);
     if unif
         v = nan(m,1);
