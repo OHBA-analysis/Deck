@@ -149,8 +149,12 @@ classdef DataArray < dk.priv.GrowingContainer
             else
                 names = varargin;
             end
-            assert( iscellstr(names) && numel(names) == self.ncols, 'Bad input.' );
-            self.name = containers.Map( names, 1:self.ncols );
+            if isempty(names)
+                self.name = containers.Map();
+            else
+                assert( iscellstr(names) && numel(names) == self.ncols, 'Bad input.' );
+                self.name = containers.Map( names, 1:self.ncols );
+            end
         end
 
         function c = colnum(self,name)
@@ -224,19 +228,24 @@ classdef DataArray < dk.priv.GrowingContainer
             s = self.gcToStruct();
             s.data = self.data;
             s.meta = self.meta;
-            s.name = self.name.keys;
+            s.name_k = self.name.keys();
+            s.name_v = self.name.values();
             s.version = '0.1';
             if nargin > 1, save(file,'-v7','-struct','s'); end
         end
 
-        function self = unseriaise(self,s)
+        function self = unserialise(self,s)
         if ischar(s), s=load(s); end
         switch s.version
             case '0.1'
                 self.data = s.data;
                 self.meta = s.meta;
                 self.gcFromStruct(s);
-                self.setnames(s.name);
+                if ~isempty(s.name_k)
+                    self.name = containers.Map( s.name_k, s.name_v );
+                else
+                    self.name = containers.Map();
+                end
 
             otherwise
                 error('Unknown version: %s',s.version);

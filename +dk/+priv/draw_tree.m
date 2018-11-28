@@ -267,7 +267,7 @@ function gobj = radial_draw(T,nodes,balance,linkopt)
 
     % draw the root
     angle(1) = 0;
-    gobj.node(1) = draw_node( 0, 0, nodes.prop(1) );
+    gobj.node(1) = draw_node2( 0, 0, nodes.prop(1) );
     hold on;
 
     % draw tree level by level, starting from the root
@@ -314,7 +314,7 @@ function gobj = radial_draw(T,nodes,balance,linkopt)
 
                 % draw node and link to parent
                 glink = draw_link( rc*cos(aji), rc*sin(aji), rp*cos(aj), rp*sin(aj), linkopt );
-                gnode = draw_node( rc*cos(aji), rc*sin(aji), nodes.prop(kji) );
+                gnode = draw_node2( rc*cos(aji), rc*sin(aji), nodes.prop(kji) );
 
                 %fprintf( 'Node %d: %.2f\n', kji, 180*aji/pi );
 
@@ -336,7 +336,8 @@ end
 
 % Isolate functions which actually draw stuff.
 function h = draw_node2(x,y,p)
-    opt = { 'MarkerSize', p.size, 'MarkerFaceColor', p.face, 'MarkerEdgeColor', p.edge };
+    %opt = { 'MarkerSize', p.size, 'MarkerFaceColor', p.face, 'MarkerEdgeColor', p.edge };
+    opt = { 'MarkerFaceColor', p.face, 'MarkerEdgeColor', p.edge };
     h = plot(x,y,'o',opt{:});
 end
 function h = draw_node3(x,y,p)
