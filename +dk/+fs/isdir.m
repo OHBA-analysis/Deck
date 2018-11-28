@@ -1,4 +1,4 @@
-function yes = is_dir( name )
+function yes = isdir( name )
 %
 % y = dk.fs.isdir( name )
 %

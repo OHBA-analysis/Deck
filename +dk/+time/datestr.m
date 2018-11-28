@@ -6,11 +6,11 @@ function [d,fmt] = datestr( type )
 % Supports a variety of named format, some without time or time-only.
 % First output is the string, second output is the format.
 %
-%        Chronolexical: longstamp, stamp, shortstamp
+%        Chronolexical: timestamp, datestamp, shortstamp, longstamp
 %   convertible to int: longnum, num, shortnum
 %            Time-only: time, longtime
 %   convertible to int: timenum, longtimenum
-%            Date-only: longdate, date, shortdate, datenum, datestamp
+%            Date-only: longdate, date, shortdate, datenum
 %                 Full: datetime (default), logger, filestamp
 %
 % Notes: 
