@@ -241,10 +241,10 @@ classdef DataArray < dk.priv.GrowingContainer
                 self.data = s.data;
                 self.meta = s.meta;
                 self.gcFromStruct(s);
-                if ~isempty(s.name_k)
-                    self.name = containers.Map( s.name_k, s.name_v );
-                else
+                if isempty(s.name_k)
                     self.name = containers.Map();
+                else
+                    self.name = containers.Map( s.name_k, s.name_v );
                 end
 
             otherwise
