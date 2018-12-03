@@ -1,7 +1,7 @@
 pages:
   stage: deploy
   script:
-  - cp -R doc public
+  - echo "Nothing to do"
   artifacts:
     paths:
     - public/
