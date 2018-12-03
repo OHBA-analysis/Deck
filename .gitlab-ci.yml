@@ -1,7 +1,7 @@
 pages:
   stage: deploy
   script:
-  - rsync -rltP doc/ public/
+  - cp -R doc public
   artifacts:
     paths:
     - public/
