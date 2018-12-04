@@ -1,10 +1,10 @@
 function mat = unsquash( mat, rev )
 %
-% mat = ant.mtx.unsquash( mat, rev )
+% mat = dk.mat.unsquash( mat, rev )
 %
-% Reverse transformation of ant.mtx.squash.
+% Reverse transformation of dk.mat.squash.
 %
-% See also: ant.mtx.squash
+% See also: dk.mat.squash
 %
 % JH
 

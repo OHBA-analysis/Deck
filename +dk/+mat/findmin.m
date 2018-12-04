@@ -1,6 +1,6 @@
 function [sub,val] = findmin(M)
 %
-% [sub,val] = ant.mtx.findmin(M)
+% [sub,val] = dk.mat.findmin(M)
 %
 % Finds subindices of minimum element in array M of arbitrary dimensions.
 %

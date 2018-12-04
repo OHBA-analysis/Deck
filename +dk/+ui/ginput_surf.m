@@ -1,7 +1,15 @@
 function [x,y,z,ax] = ginput_surf(n)
 %
+% [x,y,z,ax] = ginput_surf(n)
+%
 % Ginput that works on surface plots.
-% Note that contrary to dk.ui.ginput, this method is unable to return information about the button pressed.
+%
+% NOTE:
+% Contrary to dk.ui.ginput, this method is unable to return information about the button pressed.
+%
+% See also: ginput
+%
+% JH
 
     x  = zeros(n,1);
     y  = zeros(n,1);

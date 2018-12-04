@@ -1,6 +1,6 @@
 function A = blkscale( A, scale, blk )
 %
-% A = ant.mtx.blkscale( A, scale, blk )
+% A = dk.mat.blkscale( A, scale, blk )
 %
 % Scale specified blocks in matrix A.
 % 

@@ -66,7 +66,7 @@ classdef DataStore < handle
         
         function f = matfile(self,varargin)
         % Full path to MAT file with extension
-            f = dk.str.set_ext( self.file(varargin{:}), 'mat' );
+            f = dk.str.xset( self.file(varargin{:}), 'mat' );
         end
         
         function y = exists(self,varargin)

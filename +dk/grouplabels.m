@@ -1,8 +1,8 @@
 function G = grouplabels(L,n,t)
 %
-% G = dk.util.grouplabels(L)
-% G = dk.util.grouplabels(L,n)
-% G = dk.util.grouplabels(L,n,t)
+% G = dk.grouplabels(L)
+% G = dk.grouplabels(L,n)
+% G = dk.grouplabels(L,n,t)
 %
 % For each unique label in L, find indices of elements equal to this label.
 % Output G is a 1xn cell:
@@ -24,7 +24,7 @@ function G = grouplabels(L,n,t)
 %
 %   x = rand(1,1000);
 %   [u,~,L] = unique(round(x,2));
-%   G = dk.util.grouplabels(L,101);
+%   G = dk.grouplabels(L,101);
 %
 % JH
 
@@ -49,7 +49,7 @@ function G = grouplabels(L,n,t)
         assert( isvector(t) && numel(t)==n, 'Bad input t.' );
         assert( all(dk.num.between( t, 1, nL )), 'Bad indices t.' );
         s = 1:nL;
-        t(end) = nL+1;
+        t(end+1) = nL+1;
         
     end
     

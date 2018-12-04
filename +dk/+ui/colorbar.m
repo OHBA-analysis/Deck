@@ -3,6 +3,7 @@ function [fig,h] = colorbar( range, label, varargin )
 % [fig,h] = dk.ui.colorbar( range, label, varargin )
 %
 % THIS IS NOT A REPLACEMENT FOR MATLAB'S colorbar FUNCTION!
+% It creates a colorbar from scratch, for bettter control of the appearance, for paper figures.
 %
 % Open a new figure with a colorbar in specified range and label.
 % Outputs handles to figure, and a structure with handles to colorbar image and text label.

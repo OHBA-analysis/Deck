@@ -1,6 +1,11 @@
 function p = plot3( varargin )
 %
+% p = dk.ui.plot3( x, y, z, options.. )
+% p = dk.ui.plot3( X, options.. )
+%
 % Simple proxy method that accepts nx3 arrays for 3d plots.
+%
+% JH
     
     is_nmat = @(x) ismatrix(x) && isnumeric(x);
     is_nby3 = @(x) is_nmat(x) && size(x,2) == 3;

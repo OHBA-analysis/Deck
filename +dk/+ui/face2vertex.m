@@ -10,7 +10,8 @@ function cdata = face2vertex(cdata,faces,nvert)
 % This script computes a colour for each vertex as a weighted average amongst the 
 % colour of the faces which contain that vertex.
 %
-% See: http://stackoverflow.com/a/41076913/472610
+% Source: http://stackoverflow.com/a/41076913/472610
+%
 % JH
 
     fmax = max(faces(:));

@@ -1,12 +1,12 @@
 function [h,D,H] = convhull( X, varargin )
 %
-% Source: http://stackoverflow.com/questions/5492806/plotting-a-surface-from-a-set-of-interior-3d-scatter-points-in-matlab
+% [h,D,H] = dk.ui.convhull( X, varargin )
 %
 % This method is appropriate if the set of points in X (which should be nx3) represents a VOLUME SCATTER.
 % If the set of points represent a surface, which you want to triangulate, you should use dk.ui.triangulation instead.
 %
-% An alternative to this method is dk.ui.alphashape.
-% See also delaunayTriangulation, convexhull and trisurf in Matlab.
+% See also: dk.ui.alphashape, delaunayTriangulation, convexhull, trisurf
+% Source: http://stackoverflow.com/questions/5492806/plotting-a-surface-from-a-set-of-interior-3d-scatter-points-in-matlab
 %
 % JH
 

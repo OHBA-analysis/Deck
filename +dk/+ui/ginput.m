@@ -1,6 +1,12 @@
 function [x,y,ax,b] = ginput(n)
 %
-% Ginput that also returns the axes in which the selection was made.
+% [x,y,ax,b] = dk.ui.ginput(n)
+%
+% ginput wrapper, which also returns the axes in which the selection was made.
+%
+% See also: ginput
+%
+% JH
 
     if nargin < 1, n=1; end
 

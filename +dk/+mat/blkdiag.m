@@ -1,6 +1,6 @@
 function [M,blocks] = blkdiag( n, blocks )
 % 
-% M = ant.mtx.blkdiag( n, blocks )
+% M = dk.mat.blkdiag( n, blocks )
 %
 % Create a nxn logical block-diagonal matrix.
 %

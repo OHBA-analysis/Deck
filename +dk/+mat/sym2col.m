@@ -1,6 +1,6 @@
 function C = sym2col( S, strict )
 %
-% C = ant.mtx.sym2col( S, strict=false )
+% C = dk.mat.sym2col( S, strict=false )
 %
 % Converts input symmetric matrix S to a column representation containing the lower-triangular data.
 % The order of elements in the output column corresponds to the vertical concatenation of:

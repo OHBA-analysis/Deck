@@ -13,12 +13,14 @@ function h = errbar( x, y, L, t, varargin )
 %   <----->
 %      Xwidth
 %
-% o If x, y and Ylength are vectors, then multiple bars are plotted.
-% o If Ylength is 2xN, then row1=LOWER diff and row2=UPPER diff.
+%=> If x, y and Ylength are vectors, then multiple bars are plotted.
+%=> If Ylength is 2xN, then row1=LOWER diff and row2=UPPER diff.
 %   This means that LoBound= y-L(1,:), and UpBound= y+L(2,:)
-% o Xwidth should be SCALAR and is replicated for each bar.
-% o If omitted or empty, Xwidth defaults to mean(diff(sort(x)))/4.
-% o Additional inputs are forwarded to plot.
+%=> Xwidth should be SCALAR and is replicated for each bar.
+%=> If omitted or empty, Xwidth defaults to mean(diff(sort(x)))/4.
+%=> Additional inputs are forwarded to plot.
+%
+% See also: dk.ui.errbarh
 %
 % JH
     

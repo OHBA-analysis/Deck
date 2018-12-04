@@ -74,13 +74,13 @@ function [dx,ck] = diff( x, h, dim, horizon, tangency )
     ck = [-fliplr(ck),0,ck]/h; 
     
     % reshape input data as a matrix with dim as first dimension
-    [dx,rev] = ant.mtx.squash( x, dim ); 
+    [dx,rev] = dk.mat.squash( x, dim ); 
     
     % wextend padds smoothly before filtering
     %dx = conv2( padarray(dx,[M,0],'replicate'), flipud(ck(:)), 'valid' );
     dx = conv2( wextend('ar','sp1',dx,M), flipud(ck(:)), 'valid' ); 
     
     % reshape data to the original size
-    dx = ant.mtx.unsquash(dx,rev); 
+    dx = dk.mat.unsquash(dx,rev); 
 
 end

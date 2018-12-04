@@ -1,12 +1,13 @@
-function [k,v,dim] = reduce( fun, ind, val, dim, unif )
+function [k,v,dim] = reduce( fun, ind, val, unif, dim )
 %
-% [k,v,dim] = reduce( fun, ind, val, dim=[], unif=true )
+% [k,v,dim] = reduce( fun, ind, val, unif=true, dim=[] )
 %
 % fun: function handle
 % ind: indices (Nx1 vector or Nxd matrix)
 % val: a scalar, or any container with N elements 
-% dim: the dimensions of the output
 % unif: if true (default) v is a vector, otherwise a cell
+% dim: dimensions used to map subindices to plain indices, 
+%      or determine valid indices (default: [])
 %
 % Apply fun to the set of values associated with the same index, and return
 % a pair (k,v) with the value associated with that index. This can be seen
@@ -18,8 +19,8 @@ function [k,v,dim] = reduce( fun, ind, val, dim, unif )
 %
 % JH
 
-    if nargin < 5, unif=true; end
-    if nargin < 4, dim=[]; end
+    if nargin < 4, unif=true; end
+    if nargin < 5, dim=[]; end
     
     assert( dk.is.fhandle(fun), 'fun should be a function handle' );
     assert( ismatrix(ind), 'ind should be a matrix' );

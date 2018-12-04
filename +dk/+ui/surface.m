@@ -1,6 +1,26 @@
 function h = surface( x, y, z, varargin )
 %
+% h = dk.ui.surface( x, y, z, varargin )
+%
 % Combine all the useful stuff that's usually done when drawing surfaces.
+% Handles title, labels, colors and lighting together.
+%
+% Valid options are:
+%   subplot, title              Title and location of axes
+%   xlabel, ylabel, zlabel      Axis labels
+%   cmap, clim, clabel          Colormap, limits and label
+%   light                       Lighting type
+%   color                       Surface color
+%
+% By default:
+%   - axis labels are set to x,y,z
+%   - color corresponds to the height z
+%   - colormap is jet
+%   - display options are 'tight vis3d', with grid and box off
+%
+% See also: surf, camlight, lighting
+%
+% JH
 
     % parse inputs
     opt = dk.obj.kwArgs(varargin{:});

@@ -22,7 +22,7 @@ function cname = path2name(fpath)
     
     cname = strjoin([ ...
         dk.mapfun(@(s) s(2:end),segments(first:end-1),false), ... remove +
-        { dk.str.rem_ext(segments{end},'.m') } ... remove extension
+        { dk.str.xrem(segments{end},'.m') } ... remove extension
     ], '.');
 
 end

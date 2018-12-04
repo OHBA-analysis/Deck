@@ -36,5 +36,5 @@ function G = do2(L)
 end
 
 function G = do3(L)
-    G = dk.util.grouplabels(L);
+    G = dk.grouplabels(L);
 end

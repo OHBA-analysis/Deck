@@ -1,6 +1,6 @@
 function [mat,rev] = squash( mat, dim )
 %
-% mat = ant.mtx.squash( mat, dim )
+% mat = dk.mat.squash( mat, dim )
 %
 % Whatever the dimensions of input mat, reshape it as a 2D array where the first dimension
 % corresponds to the second input.
@@ -10,18 +10,18 @@ function [mat,rev] = squash( mat, dim )
 % * If dim is an array, then the first output dimension corresponds to the input dimensions
 %   concatenated in the order specified.
 %
-% The second output allows to reverse the trasnformation using ant.mtx.unsquash.
+% The second output allows to reverse the trasnformation using dk.mat.unsquash.
 %
 % Example:
 %
 %   x = rand( 1,4,5,1,7,1,3 );
 %   compare = @(a,b) all(a(:) == b(:));
 %
-%   [y1,r1] = ant.mtx.squash(x); compare(x,ant.mtx.unsquash(y1,r1))
-%   [y2,r2] = ant.mtx.squash(x,3); compare(x,ant.mtx.unsquash(y2,r2))
-%   [y3,r3] = ant.mtx.squash(x,[5,2]); compare(x,ant.mtx.unsquash(y3,r3))
+%   [y1,r1] = dk.mat.squash(x); compare(x,dk.mat.unsquash(y1,r1))
+%   [y2,r2] = dk.mat.squash(x,3); compare(x,dk.mat.unsquash(y2,r2))
+%   [y3,r3] = dk.mat.squash(x,[5,2]); compare(x,dk.mat.unsquash(y3,r3))
 %
-% See also: ant.mtx.unsquash
+% See also: dk.mat.unsquash
 %
 % JH
 

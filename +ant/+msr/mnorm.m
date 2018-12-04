@@ -1,4 +1,20 @@
-function vals = norm( mats, name, varargin )
+function vals = mnorm( mats, name, varargin )
+%
+% vals = ant.msr.mnorm( mats, name, varargin )
+%
+% Matrix norms.
+%
+%   mats: numeric matrix or volume
+%   name: one of the names below
+%
+%   Frobenius           Sum of squares
+%   Lebesgue            Lp norm
+%   amedian             Median absolute value
+%   amedian_nodiag      Same, but excluding diagonal
+%
+% See also: norm
+%
+% JH
 
     % select norm
     switch lower(name)
@@ -6,7 +22,7 @@ function vals = norm( mats, name, varargin )
         case {'fro','frobenius'}
             f = @(x) norm(x,'fro');
             
-        case {'lp'}
+        case {'lp','lebesgue'}
             f = @(x) norm(x,varargin{1});
             
         case {'amedian'}

@@ -20,7 +20,7 @@ function [og,on] = gramschmidt(M)
     % Allocate & initialize
     og = M; 
     on = zeros(size(M));
-    on(:,1) = og(:,1)/ant.msr.norm_l2(og(:,1));
+    on(:,1) = og(:,1)/ant.msr.lnorm(og(:,1),2,1);
     
     % Ortho(gon/norm)alize
     for k = 2:n        

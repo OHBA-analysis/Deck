@@ -16,7 +16,7 @@ function vol2gif( filename, volume, delay, resize )
     if nargin < 4, resize = []; end
     
     % make sure it has the correct extension
-    filename = dk.str.set_ext(filename,'gif');
+    filename = dk.str.xset(filename,'gif');
     
     % convert delay to suitable unit
     delay = delay/10;

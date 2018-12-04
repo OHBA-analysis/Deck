@@ -1,6 +1,6 @@
 function str = set_ext( str, ext, dotc )
 %
-% str = dk.str.set_ext( str, ext, dotc='.' )
+% str = dk.str.xset( str, ext, dotc='.' )
 %
 % Add suffix extension to string if it is not already set.
 %

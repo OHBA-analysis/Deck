@@ -1,6 +1,6 @@
 function S = symindex( n, strict )
 %
-% S = ant.mtx.symindex( n, strict=false )
+% S = dk.mat.symindex( n, strict=false )
 %
 % nxn symmetric matrix like
 %

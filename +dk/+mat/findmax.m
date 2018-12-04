@@ -1,6 +1,6 @@
 function [sub,val] = findmax(M)
 %
-% [sub,val] = ant.mtx.findmax(M)
+% [sub,val] = dk.mat.findmax(M)
 %
 % Finds subindices of maximum element in array M of arbitrary dimensions.
 %

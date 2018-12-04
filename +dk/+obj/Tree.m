@@ -131,7 +131,7 @@ classdef Tree < dk.priv.TreeBase
         end
         function [c,k] = all_children(self)
             [p,k] = self.all_parents();
-            c = dk.util.grouplabels( p(2:end), max(k) ); % root has no parent
+            c = dk.grouplabels( p(2:end), max(k) ); % root has no parent
             c = dk.mapfun( @(i) k(i+1)', c(k), false ); % remap indices, i+1 because excluded root
         end
 

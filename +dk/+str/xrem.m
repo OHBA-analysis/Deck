@@ -1,7 +1,7 @@
 function [s,r] = rem_ext( s, n, dotc )
 %
-% [str,rem] = dk.str.rem_ext( str, n=inf, dotc='.' )
-% [str,rem] = dk.str.rem_ext( str, 'mat', dotc='.' )
+% [str,rem] = dk.str.xrem( str, n=inf, dotc='.' )
+% [str,rem] = dk.str.xrem( str, 'mat', dotc='.' )
 %
 % Remove the extension from string.
 %
