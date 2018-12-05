@@ -27,7 +27,7 @@ function [mat,rev] = squash( mat, dim )
 
     nd = ndims(mat);
 
-    if nargin < 2, dim = dk.util.nsdim(mat); end
+    if nargin < 2, dim = dk.mat.nsdim(mat); end
     assert( isnumeric(dim), 'Second input should be numeric.' );
     assert( all( dim>0 & dim<=ndims(mat) ), 'Bad dimension(s).' );
     

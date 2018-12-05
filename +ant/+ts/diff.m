@@ -20,7 +20,7 @@ function [dx,ck] = diff( x, h, dim, horizon, tangency )
     if nargin < 4, horizon=4; end
     if nargin < 3 || isempty(dim)
         % first non-singleton dimension
-        dim = dk.util.nsdim(x);
+        dim = dk.mat.nsdim(x);
     end
     if nargin < 2, h=1; end
 

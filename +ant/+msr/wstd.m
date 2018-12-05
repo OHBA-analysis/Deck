@@ -9,7 +9,7 @@ function s = wstd( x, w, dim )
 % JH
     
     if nargin < 3
-        dim = dk.util.nsdim(x);
+        dim = dk.mat.nsdim(x);
     end
 
     D = ndims(x);

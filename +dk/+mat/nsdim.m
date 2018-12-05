@@ -1,6 +1,6 @@
 function n = nsdim(x) 
 %
-% n = dk.util.nsdim(x) 
+% n = dk.mat.nsdim(x) 
 %
 % First non-singleton dimension of multidimensional input x.
 % 	n = 0 if x is empty
