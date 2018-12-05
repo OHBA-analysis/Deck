@@ -74,7 +74,13 @@ function [h,crange] = show( img, varargin )
         cmap_signed   = [];
     end
     if isempty(ctype) 
-        ctype = 'auto';
+        if opt.get('positive',false)
+            ctype = 'pos';
+        elseif opt.get('negative',false)
+            ctype = 'neg';
+        else
+            ctype = 'auto';
+        end
 %         if ~isempty(crange)
 %             ctype = 'manual';
 %         else

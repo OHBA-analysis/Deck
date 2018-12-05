@@ -14,10 +14,18 @@ function resize( f, height, width )
     else
         inner = false;
     end
-    if nargin == 2 || numel(height)==2
-        width  = height(2);
-        height = height(1);
+    if nargin == 2
+        switch numel(height)
+            case 1
+                width = height;
+            case 2
+                width = height(2);
+                height = height(1);
+            otherwise
+                error( 'Bad size.' );
+        end
     end
+    assert( all(dk.is.number(height,width)), 'Bad size.' );
     
     [~,hw,sn] = dk.fig.position(f);
     si = dk.screen.info(sn);
