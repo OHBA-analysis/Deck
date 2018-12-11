@@ -1,4 +1,6 @@
-function vals = randomise_phase( vals )
+function vals = phaserand( vals )
+%
+% vals = ant.ts.phaserand( vals )
 %
 % Create a random signal with the same Fourier spectrum as the input by phase randomisation.
 %
