@@ -54,7 +54,7 @@ function [y, ty]  = downsample( x, tx, fs, win )
     b = 1 + (0:nwin-1)*wstep;
     e = b + wsize-1;
     t = [tx(1); (tx(b) + tx(e))/2; tlast];
-    y = [x(1,:); nst.mex.sliding_dot( x, wy, wstep ); xlast];
+    y = [x(1,:); ant.mex.sliding_dot( x, wy, wstep ); xlast];
     
     % interpolate to final precision
     ty = colon( tx(1), 1/fs, tx(end) )';

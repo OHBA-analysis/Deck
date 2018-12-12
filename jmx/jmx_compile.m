@@ -37,12 +37,12 @@ function cmd = jmx_compile( files, options, varargin )
 %
 % ** settings
 % 
-%   flag                CXXFLAGS
-%   def                 -D
+%   flag                CXXFLAGS    Compiler flags
+%   def                 -D          Code flags
 %   undef               -U
-%   lib                 -l
-%   lpath               -L
-%   ipath               -I
+%   lib                 -l          Library name
+%   lpath               -L          Linking path
+%   ipath               -I          Include path
 %
 % JH
 
