@@ -1,4 +1,6 @@
-function vals = shuffle_phase( vals )
+function vals = phaseshuffle( vals )
+%
+% vals = ant.ts.phaseshuffle( vals )
 %
 % Shuffle the Fourier phase of input signals.
 %

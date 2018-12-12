@@ -6,7 +6,7 @@ fail() {
     exit 1;
 }
 
-Target="GUI Layout Toolbox 2.3.3.mltbx"
+Target="GUI Layout Toolbox 2.1.1.mltbx"
 Temporary=$HERE/temp
 
 [ -d "$HERE/layout" ] && fail "Already extracted"

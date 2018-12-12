@@ -2,7 +2,8 @@ function [y, ty] = resample( x, tx, fs, method )
 %
 % [y, ty] = ant.ts.resample( x, tx, fs=[], method=pchip )
 %
-% Wrapper for Matlab function, taking care to demean/remean and using high-precision non-extrapolating method by default.
+% Wrapper for Matlab's resample function. 
+% We demean/remean the input and use high-precision non-extrapolating method by default.
 % Note that if input fs is empty, this method resamples the input at equally spaced points.
 %
 % JH
@@ -45,6 +46,7 @@ function [y, ty] = resample( x, tx, fs, method )
     else
         
         % resample magnitude and angle separately for complex signals
+        % Note: this is better than resampling real/imaginary parts
         [y,ty] = ant.ts.resample( abs(x), tx, fs, method );
         y = y .* exp(1i*ant.ts.resample( unwrap(angle(x),[],1), tx, fs, method ));
         

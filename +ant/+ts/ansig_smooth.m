@@ -11,6 +11,8 @@ function [env,phi,frq] = ansig_smooth( x, fs, npt )
 %
 % JH
 
+    error( 'Not implemented yet' );
+
     if nargin < 3, npt=5; end
     if nargin < 2, fs=1; end
     
