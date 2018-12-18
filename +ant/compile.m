@@ -1,4 +1,4 @@
-function compile()
+function compile(varargin)
 %
 % Compile C++ functions.
 %
@@ -12,6 +12,18 @@ function compile()
     p.src = fullfile( pmex, 'src' );
     p.bin = fullfile( pmex, 'bin' );
 
+    if nargin == 0
+        rebuild(p);
+        compile_inc(p);
+        compile_src(p);
+    else
+        compile_src(p,varargin);
+    end
+    
+end
+
+function rebuild(p)
+
     % remove all existing executables
     jmx_cleanup( p.bin );
     jmx_cleanup( p.mex );
@@ -21,7 +33,10 @@ function compile()
     jmx = fullfile( p.bin, 'jmx.o' ); 
     copyfile( jmx_path('inc/jmx.o'), jmx );
 
-    % build utilities
+end
+
+function compile_inc(p)
+
     opt = struct();
     opt.outdir = p.bin;
     opt.arma = true;
@@ -29,16 +44,21 @@ function compile()
 
     files = lsx( p.inc, 'cpp' );
     dk.mapfun( @(f) jmake( p, f, opt ), files );
+end
 
-    % build Mex files
+function compile_src(p,names)
+
     opt = struct();
     opt.outdir = p.mex;
     opt.arma = true;
     opt.mex = true;
 
-    files = lsx( p.src, 'cpp' );
+    if nargin > 1
+        files = dk.mapfun( @(x) fullfile(p.src, dk.str.xset(x,'cpp')), names, false );
+    else 
+        files = lsx( p.src, 'cpp' );
+    end
     dk.mapfun( @(f) jmake( p, f, opt ), files );
-    
 end
 
 function files = lsx( folder, ext )

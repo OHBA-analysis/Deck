@@ -1,4 +1,4 @@
-function [s,r] = rem_ext( s, n, dotc )
+function [s,r] = xrem( s, n, dotc )
 %
 % [str,rem] = dk.str.xrem( str, n=inf, dotc='.' )
 % [str,rem] = dk.str.xrem( str, 'mat', dotc='.' )

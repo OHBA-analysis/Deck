@@ -1,4 +1,4 @@
-function str = set_ext( str, ext, dotc )
+function str = xset( str, ext, dotc )
 %
 % str = dk.str.xset( str, ext, dotc='.' )
 %

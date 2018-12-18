@@ -1,6 +1,6 @@
-function D = pwdiff( A, B )
+function D = pairdiff( A, B )
 %
-% D = ant.math.pwdiff( A, B )
+% D = ant.math.pairdiff( A, B )
 %
 % Matrix of pairwise differences between elements of A and B (both vectors).
 % Output is antisymmetric.

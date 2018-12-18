@@ -1,8 +1,8 @@
-function [imfs,status] = huang_transform( data, varargin )
+function [imfs,status] = emd( data, varargin )
 %
-% [imfs,status] = ant.ts.huang_transform( data, varargin )
+% [imfs,status] = ant.ts.emd( data, varargin )
 %
-% Compute EMD on input data.
+% Empirical mode decomposition (Hilbert-Huang transform).
 % data should be a scalar-valued time-course (vectorised internally).
 %
 % OPTIONS

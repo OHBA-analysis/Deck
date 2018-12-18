@@ -1,6 +1,6 @@
-function D = dstmat( A, B, metric )
+function D = pairdist( A, B, metric )
 %
-% D = ant.math.dstmat( A, B, metric )
+% D = ant.math.pairdist( A, B, metric )
 %
 % Compute pairwise distances between points A and B with a map/reduce logic.
 % Both A and B should be p x d matrices with one point in each row, ie:
@@ -29,7 +29,7 @@ function D = dstmat( A, B, metric )
     D  = zeros(na,nb);
     
     for d = 1:nd
-        D = D + metric.map(ant.math.pwdiff( A(:,d), B(:,d) ));
+        D = D + metric.map(ant.math.pairdiff( A(:,d), B(:,d) ));
     end
     
     D = metric.red(D);

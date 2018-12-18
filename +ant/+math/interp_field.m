@@ -30,7 +30,7 @@ function Ynew = interp_field( Xold, Yold, Xnew, type )
             % d_ij = || Xnew(i,:) - Xold(j,:) ||_2
             % a_ij = (max_k(d_ik) - d_ij) / sum_k(d_ik)
             
-            I = ant.math.dstmat( Xnew, Xold );
+            I = ant.math.pairdist( Xnew, Xold );
             I = bsxfun( @minus, max(I,[],2), I );
             I = bsxfun( @rdivide, I, sum(I,2) );
             
@@ -44,7 +44,7 @@ function Ynew = interp_field( Xold, Yold, Xnew, type )
             I = zeros( Nnew*Nold, d );
             
             for i = 1:d
-                I(:,i) = dk.tocol(ant.math.pwdiff( Xnew(:,i), Xold(:,i) ));
+                I(:,i) = dk.tocol(ant.math.pairdiff( Xnew(:,i), Xold(:,i) ));
             end
             
             I = sum( (I / S) .* I, 2);

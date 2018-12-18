@@ -1,4 +1,4 @@
-function s = rep_ext( s, e, n )
+function s = xrep( s, e, n )
 %
 % str = dk.str.xrep( str, ext, n=1 )
 %
