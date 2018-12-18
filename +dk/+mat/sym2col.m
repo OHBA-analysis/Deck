@@ -1,6 +1,6 @@
-function C = sym2col( S, strict )
+function C = sym2col( S, nodiag )
 %
-% C = dk.mat.sym2col( S, strict=false )
+% C = dk.mat.sym2col( S, nodiag=false )
 %
 % Converts input symmetric matrix S to a column representation containing the lower-triangular data.
 % The order of elements in the output column corresponds to the vertical concatenation of:
@@ -9,24 +9,22 @@ function C = sym2col( S, strict )
 %   - third column elements under diagonal
 %   - etc.
 %
-% The second input 'strict' is a boolean flag that specifies whether or not the diagonal elements 
-% should be excluded. If strict is false, then the diagonal is included. If strict is true it is not.
-% By default, strict is set to false (diagonal included).
+% S can be a square matrix, or a volume of square slices.
+%   size(S,1)=size(S,2)=n   and   size(S,3)=3
 %
-% S can also be a volume, in which case each slice is treated as an independent matrix and the 
-% output columns are concatenated horizontally into a matrix. 
+% nodiag=true : diagonal elements are excluded              output is n(n+1)/2-by-s
+% nodiag=false: diagonal elements are included (default)    output is n(n-1)/2-by-s
 %
-% That is, if size(S,1)==size(S,2)==n and size(S,3)==s, then the output C will be n(n+1)/2-by-s
-% if strict is false, and n(n-1)/2-by-s if strict is true.
+% JH
 
     assert( size(S,1) == size(S,2), 'S should be square.' );
     assert( ndims(S) <= 3, 'S should be a matrix or a volume.' );
-    if nargin < 2, strict=false; end
+    if nargin < 2, nodiag=false; end
 
     n = size(S,1);
     s = size(S,3);
     
-    if strict
+    if nodiag
         M = tril(true(n),-1);
         m = n*(n-1)/2;
     else
