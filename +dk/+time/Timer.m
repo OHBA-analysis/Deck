@@ -8,6 +8,7 @@ classdef Timer < handle
     
     properties (SetAccess = private)
         start_time;
+        last_step;
     end
     
     methods
@@ -18,6 +19,7 @@ classdef Timer < handle
         
         function start(self)
             self.start_time = tic;
+            self.last_step = 0;
         end
         
         function t = restart(self)
@@ -42,6 +44,17 @@ classdef Timer < handle
         function s = timeleft_str(self,fraction_done)
             t = self.timeleft(fraction_done);
             s = dk.time.sec2str( t );
+        end
+        
+        % show timeleft
+        function showleft(self,fraction_done,fraction_step)
+            if nargin < 3, fraction_step=0.1; end
+            if fraction_done >= 1
+                disp( 'Done!' );
+            elseif fraction_done > self.last_step
+                self.last_step = self.last_step + fraction_step;
+                dk.println( 'Timeleft: %s', self.timeleft_str(fraction_done) );
+            end
         end
         
     end
