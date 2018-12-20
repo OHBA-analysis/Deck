@@ -22,8 +22,7 @@ function S = col2sym( C, nodiag )
     assert( abs(n - floor(n)) < 1e-6, 'Bad number of rows in input.' );
     
     S = zeros(n,n,s,class(C));
-    I = dk.mat.symindex(n,nodiag);
-    if nodiag, I = I + eye(n); end
+    I = dk.mat.symindex(n,nodiag,'diag1');
     
     for i = 1:s
         M = C(:,i);
