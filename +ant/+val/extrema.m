@@ -1,6 +1,6 @@
 function [m,M] = extrema( X, dim )
 %
-% [m,M] = ant.msr.extrema( X, dim )
+% [m,M] = ant.val.extrema( X, dim )
 %
 % Compute extrema (min,max) on input data X along dimension dim.
 %

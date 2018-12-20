@@ -1,6 +1,6 @@
 function [Hxy,Hx,Hy] = joint_entropy( x, y, nbins )
 %
-% [Hxy,Hx,Hy] = joint_entropy( x, y, nbins )
+% [Hxy,Hx,Hy] = ant.val.joint_entropy( x, y, nbins )
 %
 % Estimates joint entropy between sequences x and y (assuming same number of elements and range of value).
 % You can normalise x and y prior to this if they vary with different mean/std.
@@ -11,6 +11,8 @@ function [Hxy,Hx,Hy] = joint_entropy( x, y, nbins )
 %   - Normalised mutual information: MI/sqrt( Hx*Hy )
 %   - Normalised variation information: 2 - (Hx+Hy)/Hxy
 %   - Conditional entropies: H(x|y)=Hxy-Hy 
+%
+% See also: ant.val.entropy
 %
 % JH
 

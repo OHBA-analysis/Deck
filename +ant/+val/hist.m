@@ -1,6 +1,6 @@
-function d = valhist(x,n,s)
+function d = hist(x,n,s)
 %
-% d = ant.math.valhist(x,n,s)
+% d = ant.val.hist(x,n,s)
 %
 % Compute the value histogram on data x.
 % x is the data, considered internally as a single vector x(:).

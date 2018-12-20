@@ -1,7 +1,7 @@
 function vals = mnorm( mats, name, varargin )
 %
-% vals = ant.msr.mnorm( mats, func )
-% vals = ant.msr.mnorm( mats, name, varargin )
+% vals = ant.math.mnorm( mats, func )
+% vals = ant.math.mnorm( mats, name, varargin )
 %
 % Matrix norms.
 %

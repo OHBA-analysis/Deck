@@ -1,12 +1,13 @@
 function out = cumedian( in, dim )
-% out = cumedian( in, dim = 1 )
+%
+% out = ant.val.cumedian( in, dim = 1 )
 %
 % Compute the cumulative sum of in along dim, 
 % and return for each sum the index of the term that first exceeds half of the sum.
 %
 % Note: this doesn't make sense if values change sign.
 %
-% Contact: jhadida [at] fmrib.ox.ac.uk
+% JH
 
     assert( ismatrix(in), 'Only on matrices for now.' );
     if nargin < 2, dim = 1; end

@@ -1,6 +1,6 @@
-function d = valdist(x,n,s)
+function d = distrib(x,n,s)
 %
-% d = ant.math.valdist(x,n,s)
+% d = ant.val.distrib(x,n,s)
 %
 % Compute the value distribution on data x.
 % x is the data, considered internally as a single vector x(:).

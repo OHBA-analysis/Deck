@@ -1,4 +1,10 @@
 function z = nanzscore( x, flag, dim )
+%
+% z = ant.val.nanzscore( x, flag, dim )
+%
+% Matlab doesn't have a nanzscore function.
+%
+% JH
 
     if nargin < 2, flag = []; end
     if nargin < 3, dim = 1; end

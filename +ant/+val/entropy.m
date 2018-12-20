@@ -1,6 +1,6 @@
 function [Hx,Px] = entropy( x, nbins )
 %
-% [Hx,Px] = entropy( x, nbins )
+% [Hx,Px] = ant.val.entropy( x, nbins )
 %
 % Estimate entropy using nbins histogram.
 %
