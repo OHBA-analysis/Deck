@@ -38,7 +38,9 @@ function c = jh(n,varargin)
         otherwise
             c = interp1( (1:7)', c, linspace(1,7,n)' );
     end
-    else
+    end
+    
+    if nargout == 0
         dk.cmap.show(c);
     end
 
