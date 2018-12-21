@@ -1,9 +1,15 @@
+image: ubuntu
+
+before_script:
+  - apt-get update
+  - apt-get --yes --force-yes install git ssh rsync
+
 pages:
   stage: deploy
   script:
-  - echo "Nothing to do"
+  - rsync -rltpP ./doc/ ./public/
   artifacts:
     paths:
-    - public/
+    - public
   only:
   - master
