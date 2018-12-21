@@ -105,7 +105,7 @@ classdef DataArray < dk.priv.GrowingContainer
             self.gcClear();
             self.data = [];
             self.meta = structcol(0,{});
-            self.name = containers.Map();
+            self.name = structcol(0,{});
         end
         
         function y = isempty(self)
@@ -150,15 +150,15 @@ classdef DataArray < dk.priv.GrowingContainer
                 names = varargin;
             end
             if isempty(names)
-                self.name = containers.Map();
+                self.name = structcol(0,{});
             else
                 assert( iscellstr(names) && numel(names) == self.ncols, 'Bad input.' );
-                self.name = containers.Map( names, 1:self.ncols );
+                self.name = cell2struct( num2cell(1:self.ncols), names, 2 );
             end
         end
 
         function c = colnum(self,name)
-            c = self.name(name);
+            c = self.name.(name);
         end
 
         % bulk assign of metadata field by copying the value
@@ -228,9 +228,8 @@ classdef DataArray < dk.priv.GrowingContainer
             s = self.gcToStruct();
             s.data = self.data;
             s.meta = self.meta;
-            s.name_k = self.name.keys();
-            s.name_v = self.name.values();
-            s.version = '0.1';
+            s.name = self.name;
+            s.version = '0.2';
             if nargin > 1, save(file,'-v7','-struct','s'); end
         end
 
@@ -242,10 +241,16 @@ classdef DataArray < dk.priv.GrowingContainer
                 self.meta = s.meta;
                 self.gcFromStruct(s);
                 if isempty(s.name_k)
-                    self.name = containers.Map();
+                    self.name = structcol(0,{});
                 else
-                    self.name = containers.Map( s.name_k, s.name_v );
+                    self.name = cell2struct( s.name_v, s.name_k, 2 );
                 end
+                
+            case '0.2'
+                self.data = s.data;
+                self.meta = s.meta;
+                self.name = s.name;
+                self.gcFromStruct(s);
 
             otherwise
                 error('Unknown version: %s',s.version);
@@ -272,14 +277,14 @@ classdef DataArray < dk.priv.GrowingContainer
 
         % get element(s) by index (single column by name ok)
         function x = dget(self,r,c)
-            if ischar(c), c=self.name(c); end
+            if ischar(c), c=self.name.(c); end
             self.chksub(r);
             x = self.data(r,c);
         end
 
         % set element(s) by index (single column by name ok)
         function dset(self,r,c,x)
-            if ischar(c), c=self.name(c); end
+            if ischar(c), c=self.name.(c); end
             self.chksub(r,c);
             self.data(r,c) = x;
         end
@@ -292,7 +297,7 @@ classdef DataArray < dk.priv.GrowingContainer
 
         % get column(s) by index or name
         function x = col(self,k)
-            if ischar(k), k=self.name(k); end
+            if ischar(k), k=self.name.(k); end
             x = self.data(self.used,k);
         end
 
