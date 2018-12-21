@@ -1,8 +1,7 @@
-image: ubuntu
+image: alpine
 
 before_script:
-  - apt-get update
-  - apt-get --yes --force-yes install git ssh rsync
+  - apk add --no-cache rsync
 
 pages:
   stage: deploy
