@@ -1,6 +1,6 @@
 classdef GrowingContainer < handle
 %
-% Container class with storage grown automatically to avoid reallocating too often.
+% Abstract container with "storage" grown automatically to avoid reallocating too often.
 %
 % ## WARNING
 %
