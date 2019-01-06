@@ -3,7 +3,7 @@ function makedoc( indir, outdir, varargin )
     opt = dk.obj.kwArgs(varargin{:});
 
     % explore
-    T = dk.obj.Tree('path',indir);
+    T = dk.ds.Tree('path',indir);
     next = {folder(indir)};
     
     while ~isempty(next)

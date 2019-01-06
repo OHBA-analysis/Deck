@@ -1,6 +1,6 @@
 classdef SplitTree < dk.priv.TreeBase
 %
-% Tree implementation similar to dk.obj.Tree, but taking advantage of the
+% Tree implementation similar to dk.ds.Tree, but taking advantage of the
 % split-context to improve performance. Specifically, the split tree is
 % designed for cases where the children of a node are specified together
 % at once; no additional children can be created later on, and no node
@@ -19,9 +19,9 @@ classdef SplitTree < dk.priv.TreeBase
 %
 % Construction
 %
-%   T = dk.obj.SplitTree()                         default root node
-%   T = dk.obj.SplitTree( bsize, Name/Value )      setting the root props
-%   T = dk.obj.SplitTree( serialised_path )        unserialise file
+%   T = dk.ds.SplitTree()                         default root node
+%   T = dk.ds.SplitTree( bsize, Name/Value )      setting the root props
+%   T = dk.ds.SplitTree( serialised_path )        unserialise file
 %
 % Tree logic
 %
@@ -97,10 +97,10 @@ classdef SplitTree < dk.priv.TreeBase
             
             % insert root (depth 1, no parent)
             if isstruct(props)
-                self.store = dk.obj.DataArray( colnames, fieldnames(props), bsize );
+                self.store = dk.ds.DataArray( colnames, fieldnames(props), bsize );
                 self.store.add( [0,1,0,0], props );
             else
-                self.store = dk.obj.DataArray( colnames, props, bsize );
+                self.store = dk.ds.DataArray( colnames, props, bsize );
                 self.store.add( [0,1,0,0] );
             end
         end

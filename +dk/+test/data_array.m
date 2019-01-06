@@ -4,7 +4,7 @@ function A = data_array()
     nc = numel(names);
     nb = 5;
     
-    A = dk.obj.DataArray( names, {}, nb );
+    A = dk.ds.DataArray( names, {}, nb );
     D = rand(nb+1,nc);
     
     assert( A.ncols == nc );
@@ -31,7 +31,7 @@ function A = data_array()
     
 %     Try also
 %     x = rand(1e5,10);
-%     D = dk.obj.DataArray(x,732);
+%     D = dk.ds.DataArray(x,732);
 %     D.setnames(num2cell(char('a' + (0:9))))
 %     y = D.col('d');
     

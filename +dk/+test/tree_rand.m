@@ -10,7 +10,7 @@ function T = tree_rand(depth,sel,deg)
     if nargin < 2, sel=0.4; end
     if nargin < 1, depth=5; end
 
-    T = dk.obj.Tree();
+    T = dk.ds.Tree();
     k = 1;
     for d = 1:depth
 

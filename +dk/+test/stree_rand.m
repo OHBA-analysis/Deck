@@ -10,7 +10,7 @@ function T = stree_rand(depth,sel,deg)
     if nargin < 2, sel=0.4; end
     if nargin < 1, depth=5; end
 
-    T = dk.obj.SplitTree();
+    T = dk.ds.SplitTree();
     k = 1;
     for d = 1:depth
 

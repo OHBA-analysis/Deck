@@ -1,6 +1,6 @@
 classdef TreeBase < handle
 %
-% Base class for tree implementations, using a dk.obj.DataArray as storage.
+% Base class for tree implementations, using a dk.ds.DataArray as storage.
 % See below for methods to be implemented in derived classes.
 %
 % ----------------------------------------------------------------------
@@ -97,7 +97,7 @@ classdef TreeBase < handle
     methods
 
         function clear(self)
-            self.store = dk.obj.DataArray();
+            self.store = dk.ds.DataArray();
         end
 
         % dependent properties
@@ -151,7 +151,7 @@ classdef TreeBase < handle
         dk.assert( strcmpi(s.type,self.type), 'Type mismatch: %s != %s', s.type, self.type );
         switch s.version
             case '0.1'
-                self.store = dk.obj.DataArray(s.store);
+                self.store = dk.ds.DataArray(s.store);
             otherwise
                 error('Unknown version: %s',s.version);
         end

@@ -9,7 +9,7 @@ classdef DataArray < dk.priv.GrowingContainer
 %
 % Construction
 %
-%   D = dk.obj.DataArray(varargin)
+%   D = dk.ds.DataArray(varargin)
 %       -> reset( ncols, bsize=100 )
 %       -> reset( colnames, bsize=100 )
 %       -> unserialise( filename )

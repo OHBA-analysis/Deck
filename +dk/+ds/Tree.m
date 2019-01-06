@@ -23,9 +23,9 @@ classdef Tree < dk.priv.TreeBase
 %
 % Construction
 %
-%   T = dk.obj.Tree()                           default root node
-%   T = dk.obj.Tree( bsize, Name/Value )        setting the root props
-%   T = dk.obj.Tree( serialised_path )          unserialise file
+%   T = dk.ds.Tree()                           default root node
+%   T = dk.ds.Tree( bsize, Name/Value )        setting the root props
+%   T = dk.ds.Tree( serialised_path )          unserialise file
 %
 % Tree logic
 %
@@ -94,10 +94,10 @@ classdef Tree < dk.priv.TreeBase
             colnames = {'parent','depth','nchildren'};
             
             if isstruct(props)
-                self.store = dk.obj.DataArray( colnames, fieldnames(props), bsize );
+                self.store = dk.ds.DataArray( colnames, fieldnames(props), bsize );
                 self.store.add( [0,1,0], props );
             else
-                self.store = dk.obj.DataArray( colnames, props, bsize );
+                self.store = dk.ds.DataArray( colnames, props, bsize );
                 self.store.add( [0,1,0] );
             end
         end

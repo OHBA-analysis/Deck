@@ -27,6 +27,27 @@ classdef LinkedList < dk.priv.GrowingContainer
             y = self.numel() == 0;
         end
         
+        function reset(self,bsize)
+            if nargin < 2, bsize=100; end
+            
+            self.gcInit(bsize);
+            self.data = cell(bsize,1);
+            self.link = zeros(bsize,2);
+        end
+        
+        function append(self,vals)
+        end
+        
+        function prepend(self,k,vals)
+        end
+        
+        function remove(self,k)
+        end
+        
+        function insert(self,k,vals)
+            
+        end
+        
     end
     
     methods (Hidden)
