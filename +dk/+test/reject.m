@@ -1,7 +1,7 @@
 function reject( condition, success, varargin )
 
     if ~any(logical(condition))
-        dk.println(success);
+        dk.disp(success);
     else
         error( varargin{:} );
     end

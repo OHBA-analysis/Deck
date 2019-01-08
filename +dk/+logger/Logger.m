@@ -13,6 +13,27 @@ classdef Logger < handle
 %   critical
 %   off
 %
+% To activate file-backup, use setFile(filename).
+%
+% Config options are:
+%
+%   fileLevel
+%   consoleLevel
+%       Control logging level.
+%       DEFAULT: info
+%
+%   nodate
+%       Do not show date-info when printing to console.
+%       DEFAULT: false
+%
+%   lvlchar
+%       Show only a single char to indicate log-level in console.
+%       DEFAULT: false
+%
+%   stdepth
+%       Systematic offset for stack-depth.
+%       DEFAULT: 1
+%
 % JH
 
     properties (Constant)
@@ -36,6 +57,7 @@ classdef Logger < handle
         
         nodate
         lvlchar
+        stdepth
     end
     
     properties (SetAccess = private)
@@ -44,19 +66,6 @@ classdef Logger < handle
         datefmt
         
         backup % backup state to be used with saveState/resetState
-    end
-    
-    methods (Hidden, Static)
-        function str = callerInfo()
-            [ST,~] = dbstack();
-            if length(ST) > 2
-                name = ST(3).name;
-                line = ST(3).line;
-                str = sprintf( '%s:%d', name, line );
-            else
-                str = 'Console';
-            end
-        end
     end
     
     % -----------------------------------------------------------------------------------------
@@ -68,19 +77,27 @@ classdef Logger < handle
             self.reset(varargin{:});
         end
         
-        function reset(self,name,varargin)
+        function self = reset(self,name,varargin)
             assert( ischar(name) && ~isempty(name), 'Name should be a string.' );
-            arg = dk.obj.kwArgs(varargin{:});
+            opt = dk.getopt( varargin, ...
+                'file', [], 'flevel', 'info', 'clevel', 'info', ...
+                'nodate', false, 'lvlchar', false, 'stdepth', 1, ...
+                'datefmt', 'yyyy-mm-dd HH:MM:SS.FFF' ...
+            );
             
+            % internals
             self.name = name;
-            self.file = struct('path', arg.get('file',[]), 'id', -1);
-            self.datefmt = arg.get('datefmt','yyyy-mm-dd HH:MM:SS.FFF');
-            self.nodate = arg.get('nodate',false);
-            self.lvlchar = arg.get('lvlchar',false);
+            self.file = struct('path', opt.file, 'id', -1);
+            self.datefmt = opt.datefmt;
+            
+            % options
+            self.nodate = opt.nodate;
+            self.lvlchar = opt.lvlchar;
+            self.stdepth = opt.stdepth;
             
             % set log levels
-            self.fileLevel = arg.get('flevel','info');
-            self.consoleLevel = arg.get('clevel','info');
+            self.fileLevel = opt.flevel;
+            self.consoleLevel = opt.clevel;
             
             % clear previous backups
             self.backup = [];
@@ -89,6 +106,7 @@ classdef Logger < handle
             self.open();
         end
         
+        % log level
         function set.fileLevel(self,val)
             val = lower(val);
             assert( isfield(self.LEVEL,val), 'Invalid level.' );
@@ -101,8 +119,13 @@ classdef Logger < handle
             self.consoleLevel = val;
         end
         
-        function saveState(self)
-            f = {'fileLevel', 'consoleLevel', 'nodate', 'lvlchar'};
+        function y = ignoreLogging(self)
+            y = strcmp(self.fileLevel,'off') && strcmp(self.consoleLevel,'off');
+        end
+        
+        % state
+        function self = saveState(self)
+            f = {'fileLevel', 'consoleLevel', 'nodate', 'lvlchar', 'stdepth'};
             n = numel(f);
             
             b = struct();
@@ -112,8 +135,8 @@ classdef Logger < handle
             self.backup = b;
         end
         
-        function resetState(self)
-            f = {'fileLevel', 'consoleLevel', 'nodate', 'lvlchar'};
+        function self = resetState(self)
+            f = {'fileLevel', 'consoleLevel', 'nodate', 'lvlchar', 'stdepth'};
             n = numel(f);
             
             b = self.backup;
@@ -122,16 +145,23 @@ classdef Logger < handle
             end
         end
         
+        % depth
+        function self = incDepth(self,k)
+            if nargin < 2, k=1; end
+            self.stdepth = self.stdepth + k;
+        end
+        function self = decDepth(self,k)
+            if nargin < 2, k=1; end
+            self.stdepth = self.stdepth - k;
+        end
+        
+        % file
         function y = hasFile(self)
             y = ~isempty(self.file.path);
         end
         
         function y = isFileOpen(self)
             y = self.hasFile() && (self.file.id > -1);
-        end
-        
-        function y = ignoreLogging(self)
-            y = strcmp(self.fileLevel,'off') && strcmp(self.consoleLevel,'off');
         end
         
         function self = setFile(self,fpath)
@@ -145,67 +175,28 @@ classdef Logger < handle
     % -----------------------------------------------------------------------------------------
     methods
         
-        function trace(self, varargin)
-            if ~self.ignoreLogging()
-                caller = self.callerInfo();
-                self.write('t', caller, varargin{:});
-            end
+        function self = trace(self, varargin)
+            self.write('t', self.stdepth, varargin{:});
         end
 
-        function debug(self, varargin)
-            if ~self.ignoreLogging()
-                caller = self.callerInfo();
-                self.write('d', caller, varargin{:});
-            end
+        function self = debug(self, varargin)
+            self.write('d', self.stdepth, varargin{:});
         end
 
-        function info(self, varargin)
-            if ~self.ignoreLogging()
-                caller = self.callerInfo();
-                self.write('i', caller, varargin{:});
-            end
+        function self = info(self, varargin)
+            self.write('i', self.stdepth, varargin{:});
         end
 
-        function warn(self, varargin)
-            if ~self.ignoreLogging()
-                caller = self.callerInfo();
-                self.write('w', caller, varargin{:});
-            end
+        function self = warn(self, varargin)
+            self.write('w', self.stdepth, varargin{:});
         end
 
-        function error(self, varargin)
-            if ~self.ignoreLogging()
-                caller = self.callerInfo();
-                self.write('e', caller, varargin{:});
-                error( 'Logger "%s" triggered an error.', self.name );
-            end
+        function self = error(self, varargin)
+            self.write('e', self.stdepth, varargin{:});
         end
 
-        function critical(self, varargin)
-            if ~self.ignoreLogging()
-                caller = self.callerInfo();
-                self.write('c', caller, varargin{:});
-                error( 'Logger "%s" triggered an error.', self.name );
-            end
-        end
-        
-        % conditional variants
-        function debugif(self,cdt,varargin)
-            if all(logical(cdt))
-                self.debug(varargin{:});
-            end
-        end
-        
-        function warnif(self,cdt,varargin)
-            if all(logical(cdt))
-                self.warn(varargin{:});
-            end
-        end
-        
-        function errorif(self,cdt,varargin)
-            if all(logical(cdt))
-                self.error(varargin{:});
-            end
+        function self = critical(self, varargin)
+            self.write('c', self.stdepth, varargin{:});
         end
 
     end
@@ -235,7 +226,12 @@ classdef Logger < handle
         end
         
         % generic logging function
-        function write(self,level,caller,message,varargin)
+        function write(self,level,depth,message,varargin)
+            
+            % early cancelling
+            if self.ignoreLogging()
+                return;
+            end
             
             % determine level
             switch lower(level)
@@ -254,20 +250,39 @@ classdef Logger < handle
                 case {'c','critical'}
                     level = 'critical';
                 otherwise
-                    error( 'Unknown level: %s', level );
+                    error( 'Unknown level: "%s"', level );
             end
             levelnum = self.LEVEL.(level);
             
+            % get caller info
+            depth = depth + 2;
+            [dbs,~] = dbstack('-completenames');
+            if length(dbs) >= depth
+                dbs = dbs(depth:end);
+                caller = arrayfun( @stack2caller, dbs, 'UniformOutput', false );
+                caller = strjoin( caller, '; ' );
+            else
+                dbs = dbs(end);
+                caller = 'Console';
+            end
+            
             % build log line
             mstr = sprintf( message, varargin{:} );
+            dlen = length( self.datefmt );
             dstr = datestr( now(), self.datefmt );
-            dstr = sprintf( '%-23s', dstr );
+            dstr = sprintf( ['%-' num2str(dlen) 's'], dstr );
             
             lstr = upper(level); 
             if self.lvlchar
                 lstr = lstr(1);
             else
                 lstr = sprintf( '%-8s', lstr );
+            end
+            
+            % write to file
+            if self.isFileOpen() && self.LEVEL.(self.fileLevel) <= levelnum
+                logline = sprintf( '%s %s [%s] %s', dstr, lstr, caller, mstr );
+                fprintf( self.file.id, '%s\n', logline );
             end
             
             % write to console
@@ -277,21 +292,68 @@ classdef Logger < handle
                 else
                     logline = sprintf( '%s %s [%s] %s', dstr, lstr, caller, mstr );
                 end
-                if levelnum >= self.LEVEL.error
+                % impossible to print in yellow, so print warnings in red too
+                if levelnum >= self.LEVEL.warning
                     fprintf( 2, '%s\n', logline );
                 else
                     fprintf( '%s\n', logline );
                 end
             end
             
-            % write to file
-            if self.isFileOpen() && self.LEVEL.(self.fileLevel) <= levelnum
-                logline = sprintf( '%s %s [%s] %s', dstr, lstr, caller, mstr );
-                fprintf( self.file.id, '%s\n', logline );
+            % take action
+            switch level
+                case 'error'
+                    ME = MException( ...
+                        'deck:Logger:error', ...
+                        sprintf('(Triggered in logger: %s)', self.name) ...
+                    );
+                    throwAsCaller(ME);
+                case 'critical'
+                    fprintf( 2, 'Critical error triggered in logger: %s\n', self.name ); 
+                    exit(1);
             end
             
         end
         
     end
+    
+end
+
+function c = stack2caller(s)
+%
+% Find out whether the file is inside a module or classpath, and
+% format the caller name accordingly.
+%
+
+    f = strsplit( s.file, filesep );
+    n = numel(f);
+    c = cell(1,n);
+    
+    % special case with nested functions
+    fp = dk.str.xrem( f{end} );
+    sp = strsplit( s.name, '.' );
+    if strcmpi( sp{1}, fp )
+        
+        % works well with class-methods
+        c{1} = strrep( s.name, '.', '@' );
+    else
+        
+        % build custom path
+        c{1} = [ fp '/' strjoin(sp,'@') ];
+    end
+    
+    % iterate path segments
+    for i = 2:n
+        ci = f{n-i+1};
+        if ci(1)=='+' || ci(1)=='@'
+            c{i} = [ ci(2:end) '.' ];
+        else
+            break;
+        end
+    end
+    
+    % concatenate
+    c = fliplr(c);
+    c = horzcat( c{:}, ':', num2str(s.line) );
     
 end

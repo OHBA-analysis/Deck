@@ -1,7 +1,7 @@
 function dk_startup()
 
     here = fileparts(mfilename('fullpath'));
-    dk.println('[Deck] Starting up from folder "%s".',here);
+    dk.disp('[Deck] Starting up from folder "%s".',here);
     dk.env.path_flag( 'DECK_ROOT', here );
     
     % add GUI library

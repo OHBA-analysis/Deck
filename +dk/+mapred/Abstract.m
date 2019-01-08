@@ -47,7 +47,7 @@ classdef Abstract < handle
             cfg.exec.options = options.parsed;
 
             % save edited config
-            dk.println('[MapReduce] Configuration edited in "%s".',self.config_file);
+            dk.disp('[MapReduce] Configuration edited in "%s".',self.config_file);
             dk.json.write(self.config_file,cfg);
 
         end
@@ -60,7 +60,7 @@ classdef Abstract < handle
             cfg.folders.save  = save;
 
             % save edited config
-            dk.println('[MapReduce] Configuration edited in "%s".',self.config_file);
+            dk.disp('[MapReduce] Configuration edited in "%s".',self.config_file);
             dk.json.write(self.config_file,cfg);
 
         end
@@ -93,7 +93,7 @@ classdef Abstract < handle
             end
 
             % save edited config
-            dk.println('[MapReduce] Configuration edited in "%s".',self.config_file);
+            dk.disp('[MapReduce] Configuration edited in "%s".',self.config_file);
             dk.json.write(self.config_file,cfg);
 
         end
@@ -180,12 +180,12 @@ classdef Abstract < handle
             jobids = config.exec.workers{workerid};
             njobs  = numel(jobids);
 
-            dk.println('[MapReduce.START] Worker #%d',workerid);
-            dk.println('         folder : %s',pwd);
-            dk.println('           host : %s',dk.env.hostname);
-            dk.println('           date : %s',get_timestamp);
-            dk.println('          njobs : %d',njobs);
-            dk.println('-----------------\n');
+            dk.disp('[MapReduce.START] Worker #%d',workerid);
+            dk.disp('         folder : %s',pwd);
+            dk.disp('           host : %s',dk.env.hostname);
+            dk.disp('           date : %s',get_timestamp);
+            dk.disp('          njobs : %d',njobs);
+            dk.disp('-----------------\n');
 
             timer  = dk.time.Timer();
             output = cell(1,njobs);
@@ -195,22 +195,22 @@ classdef Abstract < handle
                 try
                     [output{i},failed] = self.run_job( workerid, jobid, config );
                     assert(~failed); % force exception to issue FAIL message
-                    dk.println('Job #%d (%d/%d, timeleft %s)...',jobid,i,njobs,timer.timeleft_str(i/njobs));
+                    dk.disp('Job #%d (%d/%d, timeleft %s)...',jobid,i,njobs,timer.timeleft_str(i/njobs));
                 catch
-                    dk.println('Job #%d (%d/%d)... FAILED',jobid,i,njobs);
+                    dk.disp('Job #%d (%d/%d)... FAILED',jobid,i,njobs);
                 end
             end
 
             % save output file
             outfile = fullfile( folder, sprintf( config.files.worker, workerid ) );
-            dk.println('\n\t Saving output file to "%s" (%s)...',outfile,get_timestamp);
+            dk.disp('\n\t Saving output file to "%s" (%s)...',outfile,get_timestamp);
             save( outfile, '-v7.3', 'output' );
 
             fprintf('\n\n');
-            dk.println('[MapReduce.STOP] Worker #%d',workerid);
-            dk.println('          date : %s',get_timestamp);
-            dk.println('        output : %s',outfile);
-            dk.println('----------------\n');
+            dk.disp('[MapReduce.STOP] Worker #%d',workerid);
+            dk.disp('          date : %s',get_timestamp);
+            dk.disp('        output : %s',outfile);
+            dk.disp('----------------\n');
 
         end
 
@@ -224,12 +224,12 @@ classdef Abstract < handle
             nworkers = numel(config.exec.workers);
             outfile  = fullfile( folder, config.files.reduce );
 
-            dk.println('[MapReduce.START] Reduce');
-            dk.println('         folder : %s',pwd);
-            dk.println('           host : %s',dk.env.hostname);
-            dk.println('           date : %s',get_timestamp);
-            dk.println('       nworkers : %d',nworkers);
-            dk.println('-----------------\n');
+            dk.disp('[MapReduce.START] Reduce');
+            dk.disp('         folder : %s',pwd);
+            dk.disp('           host : %s',dk.env.hostname);
+            dk.disp('           date : %s',get_timestamp);
+            dk.disp('       nworkers : %d',nworkers);
+            dk.disp('-----------------\n');
 
             if dk.fs.isfile(outfile)
                 warning( 'Reduce file "%s" already exists, outputs will be merged.', outfile );
@@ -248,22 +248,22 @@ classdef Abstract < handle
                 try
                     workerdata = load( workerfile );
                     output( config.exec.workers{i} ) = workerdata.output;
-                    dk.println('Worker %d/%d merged, timeleft %s...',i,nworkers,timer.timeleft_str(i/nworkers));
+                    dk.disp('Worker %d/%d merged, timeleft %s...',i,nworkers,timer.timeleft_str(i/nworkers));
                     % delete( workerfile );
                 catch
-                    dk.println('Worker %d/%d... FAILED',i,nworkers);
+                    dk.disp('Worker %d/%d... FAILED',i,nworkers);
                 end
             end
 
             % save output file
-            dk.println('\n\t Saving reduced file to "%s" (%s)...',outfile,get_timestamp);
+            dk.disp('\n\t Saving reduced file to "%s" (%s)...',outfile,get_timestamp);
             save( outfile, '-v7.3', 'output' );
 
             fprintf('\n\n');
-            dk.println('[MapReduce.STOP] Reduce');
-            dk.println('          date : %s',get_timestamp);
-            dk.println('        output : %s',outfile);
-            dk.println('----------------\n');
+            dk.disp('[MapReduce.STOP] Reduce');
+            dk.disp('          date : %s',get_timestamp);
+            dk.disp('        output : %s',outfile);
+            dk.disp('----------------\n');
 
         end
 

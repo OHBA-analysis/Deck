@@ -1,7 +1,7 @@
-function val = reject( varargin )
+function success = reject( varargin )
 %
-% val = dk.reject( condition, fmt, varargin )
-% val = dk.reject( channel, condition, fmt, varargin )
+% success = dk.reject( condition, fmt, varargin )
+% success = dk.reject( channel, condition, fmt, varargin )
 %
 % Default channel is 'error'.
 % Returns true if the rejection passes, false otherwise.
@@ -23,23 +23,12 @@ function val = reject( varargin )
         cond = arg1;
         args = varargin(2:end);
     end
+    success = ~any(logical(cond));
 
-    val = ~any(logical(cond));
-    if ~val
-        switch chan
-            case validE
-                s.message = sprintf(args{:});
-                s.stack   = dbstack(1);
-                error(s);
-            case validW
-                dk.warn( args{:} );
-            case validI
-                dk.info( args{:} );
-            case validD
-                dk.debug( args{:} );
-            otherwise
-                error('[dk.reject] That should never happen.');
-        end
+    log = dk.logger.default();
+    depth = log.stdepth;
+    if ~success
+        log.write( chan, depth, args{:} );
     end
     
 end

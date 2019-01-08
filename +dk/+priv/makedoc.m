@@ -37,7 +37,7 @@ function f=folder(base,pfx)
 end
 
 function print(ind,fmt,varargin)
-    dk.println( [repmat('\t',1,ind) fmt], varargin{:} );
+    dk.disp( [repmat('\t',1,ind) fmt], varargin{:} );
 end
 
 function cname = callname(fpath)

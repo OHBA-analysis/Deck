@@ -116,7 +116,7 @@ classdef DataStore < handle
             
             % set MAT filename
             f = self.matfile(name);
-            dk.wreject( dk.fs.isfile(f), '[dk.Datastore] File "%s" will be overwritten.', f );
+            dk.reject('w', dk.fs.isfile(f), '[dk.Datastore] File "%s" will be overwritten.', f );
             
             % parse input to be saved
             if nargin == 3 && isstruct(varargin{1})

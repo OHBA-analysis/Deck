@@ -28,7 +28,7 @@ function [env,phi,frq] = ansig_smooth( x, fs, npt )
     prev = sum(prev) / (nt-1);
     thresh = max( 1/(nt-1), 1e-3 );
     
-    dk.wreject( any(prev > thresh), 'Too many phase-reversals in signals: %s', ...
+    dk.reject('w', any(prev > thresh), 'Too many phase-reversals in signals: %s', ...
         dk.util.vec2str(find(prev > thresh)) ); %#ok
     
     % force phase to be non-decreasing

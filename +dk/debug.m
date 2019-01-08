@@ -1,6 +1,3 @@
-function debug( fmt, varargin )
-if dk.verb.get(true) >= dk.verb.get('debug')
-    dk.println( ['[dk.D] ' fmt], varargin{:} );
-    dbstack(1);
-end
+function debug( varargin )
+    dk.logger.default().write( 'd', 1, varargin{:} );
 end

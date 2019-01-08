@@ -23,8 +23,14 @@ function out = getopt( args, varargin )
 
     out = dk.c2s( varargin );
     n = numel(args);
-    for i = 1:2:n
-        out.(args{i}) = args{i+1};
+    if n == 1
+        assert( dk.is.struct(args), 'Scalar input should be a struct.' );
+        out = dk.struct.merge( out, args );
+    else
+        assert( dk.is.even(n), 'Input args should be key/value pairs.' );
+        for i = 1:2:n
+            out.(args{i}) = args{i+1};
+        end
     end
 
 end

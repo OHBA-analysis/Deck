@@ -148,7 +148,7 @@ classdef GrowingContainer < handle
             self.used(k) = false;
             self.childRemove(k);
             self.notify('OnRemove');
-            dk.wreject( self.sparsity > 0.9, 'Storage is very sparse, you should run compress().' );
+            dk.reject('w', self.sparsity > 0.9, 'Storage is very sparse, you should run compress().' );
         end
 
         % allocate memory for more elements

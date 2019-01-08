@@ -22,7 +22,7 @@ function [best,step] = dichotomy( value, range, varargin )
             dk.test.dichotomy( pi, [1,0], 1e-3 );
             error( 'T3: call should not have succeeded.' );
         catch
-            dk.println( 'T3: ok' );
+            dk.disp( 'T3: ok' );
         end
         
         return;

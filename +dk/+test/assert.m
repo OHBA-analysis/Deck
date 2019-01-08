@@ -1,7 +1,7 @@
 function assert( condition, success, varargin )
 
     if all(logical(condition))
-        dk.println(success);
+        dk.disp(success);
     else
         error( varargin{:} );
     end

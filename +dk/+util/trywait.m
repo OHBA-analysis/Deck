@@ -28,7 +28,7 @@ function varargout = trywait( ntry, twait, fhandle, msg )
             dk.warn( '%s\nError message: %s', msg, err.message );
             assert( ntry > 0, 'Too many failed attempts, aborting.' );
 
-            dk.println( 'Wait %d second(s) and retry (%d attempt(s) left).', twait, ntry );
+            dk.disp( 'Wait %d second(s) and retry (%d attempt(s) left).', twait, ntry );
             pause(twait);
         end
         

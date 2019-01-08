@@ -87,13 +87,13 @@ classdef kwArgs < handle
             ok = isempty(not_accessed);
             
             if nargout == 0
-                dk.println( '[dk.obj.kwArgs] Access report:' );
+                dk.disp( '[dk.obj.kwArgs] Access report:' );
                 if isempty(all_fields)
-                    dk.println( '\t Nothing has been parsed yet.' );
+                    dk.disp( '\t Nothing has been parsed yet.' );
                 elseif isempty(not_accessed)
-                    dk.println( '\t All parsed field(s) were accessed.' );
+                    dk.disp( '\t All parsed field(s) were accessed.' );
                 else
-                    dk.println( '\t %d out of %d field(s) in total were accessed so far, here is the list of unaccessed field(s):' );
+                    dk.disp( '\t %d out of %d field(s) in total were accessed so far, here is the list of unaccessed field(s):' );
                     cellfun( @(x) fprintf(['\t\t - ' x '\n']), not_accessed );
                 end
             end

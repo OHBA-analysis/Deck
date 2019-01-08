@@ -1,7 +1,7 @@
-function val = assert( varargin )
+function success = assert( varargin )
 %
-% val = dk.assert( condition, fmt, varargin )
-% val = dk.assert( channel, condition, fmt, varargin )
+% success = dk.assert( condition, fmt, varargin )
+% success = dk.assert( channel, condition, fmt, varargin )
 %
 % Default channel is 'error'.
 % Returns true if the assertion passes, false otherwise.
@@ -23,23 +23,12 @@ function val = assert( varargin )
         cond = arg1;
         args = varargin(2:end);
     end
-
-    val = all(logical(cond));
-    if ~val
-        switch chan
-            case validE
-                s.message = sprintf(args{:});
-                s.stack   = dbstack(1);
-                error(s);
-            case validW
-                dk.warn( args{:} );
-            case validI
-                dk.info( args{:} );
-            case validD
-                dk.debug( args{:} );
-            otherwise
-                error('[dk.assert] That should never happen.');
-        end
+    success = all(logical(cond));
+    
+    log = dk.logger.default();
+    depth = log.stdepth;
+    if ~success
+        log.write( chan, depth, args{:} );
     end
     
 end
