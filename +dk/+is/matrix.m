@@ -19,8 +19,8 @@ function y = matrix( x, n )
         case 1
             y = y && all(size(x) == n);
         case 2
-            if n(1) > 0, y = y && size(y,1)==n(1); end
-            if n(2) > 0, y = y && size(y,2)==n(2); end
+            if n(1) > 0, y = y && size(x,1)==n(1); end
+            if n(2) > 0, y = y && size(x,2)==n(2); end
         otherwise
             error('Unexpected input.');
     end

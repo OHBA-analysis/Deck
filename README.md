@@ -1,20 +1,23 @@
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 
+> **NOTE (Jan 2019):**
+> This toolbox is undergoing a massive restructuration; the documentation might not be up-to-date, please rely on helptext only.
+> A new, consolidated documentation is being written. The instructions below have been updated.
+
 ## Deck
 
-A general-purpose Matlab (2015+) toolbox that doesn't get in your way.
+A general-purpose Matlab (2015+) toolbox that doesn't get in your way. Deck is now an aggregate of 3 sub-projects:
 
-Documentation is being written on and off, but helptext is already written for most function and should be enough to get you started. 
+ - The original `dk` toolbox, containing general tools to extend Matlab's capabilities;
+ - The new `ant` toolbox, containing analysis tools mainly for time-series data;
+ - The new `jmx` library, with a lightweight C++ library making it super-easy to write Mex files.
 
-## Installation
+## Installation 
 
-### Requirements
-
-Make sure you have `git` installed on your machine (type `git --version` in a terminal). 
-If not, follow [these instructions](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) (if you are on OSX you can also use [Homebrew](http://brew.sh/)).
-
-### Simplest case
+> Requirements:
+> `git` is required to clone this repo (recommended install).
+> You will need a C++ compiler setup with your Matlab installation in order to use `ant` and `jmx`.
 
 From the Matlab console:
 ```
@@ -23,6 +26,7 @@ setenv( 'DECK_FOLDER', folder ); % can be used within system calls
 !git clone https://github.com/jhadida/deck.git "$DECK_FOLDER"
 addpath(folder);
 dk_startup;
+ant.compile(); % optional, if you want to use ant+jmx
 ```
 
 From a terminal:
@@ -33,21 +37,22 @@ echo
 echo "All done. To use it, type in the Matlab console:"
 echo ">> addpath('$DECK_FOLDER');"
 echo ">> dk_startup;"
+echo ">> ant.compile(); % optional, if you want to use ant+jmx"
 ```
 
-### Otherwise
-
- - Clone this repository wherever you like (`git clone https://github.com/jhadida/deck.git "/wherever/I/Like"`), or download a zip by clicking the green button at the top of this page.
- - From the Matlab console, add the folder to your path using `addpath('/wherever/I/Like');`. (Do **NOT** use `genpath`!)
- - Then, type `dk_startup`.
-
+Alternatively without git, download a zip archive (green button near the top), extract it, add the folder to the Matlab path (do **NOT** use `genpath`), and type:
+```
+dk_startup;
+ant.compile(); % optional, if you want to use ant+jmx
+```
 
 ## Usage
 
 ### How do I call these functions?
 
-All Deck functions can be called as if they were methods of an object `dk.<submodule>.<function>( <args> )`. For example: `dk.util.array2string( [1,2,3], 'latex' );`
+All Deck functions can be called as if they were methods of an object `dk.<submodule>.<function>( <args> )`. For example: `dk.util.array2string( [1,2,3], 'latex' );`. Similarly for the `ant` library: `I = imread('cameraman.tif'); ant.img.show(im2double(I));`.
 
+The functions in the `jmx` are prefixed with `jmx_`; they are mainly used to compile Mex files (see `help jmx`).
 
 ### Undefined variable "dk" or class "dk.blah".
 
@@ -65,10 +70,13 @@ If you use Deck regularly, and don't want to do this every time, add the previou
 If you downloaded Deck using `git`, you will also be able to get all future versions simply by typing from a terminal:
 ```
 cd /wherever/deck/is
-git checkout tag/v0.1 # or whatever version you want
+git pull
 ```
 
-You can see what versions are available [here](https://github.com/jhadida/deck/releases).
+Then from the Matlab console:
+```
+ant.compile(); % optional, if you want to use ant+jmx
+```
 
 ## Documentation
 

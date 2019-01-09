@@ -1,5 +1,4 @@
 
-# Lightweight Matlab-Mex C++ library
+# Mex-library
 
-This library is under construction.
-See current [documentation](https://sheljohn.github.io/matlab-mex).
+Documentation in progress.
