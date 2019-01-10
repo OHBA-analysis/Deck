@@ -5,8 +5,14 @@ function dk_startup()
     dk.env.path_flag( 'DECK_ROOT', here );
     
     % add GUI library
-    addpath(fullfile( here, 'gui/layout' ));
-    addpath(fullfile( here, 'gui/layoutdoc' ));
+    layoutSrc = fullfile( here, 'gui', 'layout' );
+    layoutDoc = fullfile( here, 'gui', 'layoutdoc' );
+    try
+        safe_addpath(layoutSrc);
+        safe_addpath(layoutDoc);
+    catch
+        warning( 'GUI layout folder is missing, please run script "extract.sh" in folder "%s".', fullfile(here,'gui') );
+    end
     
     % add JMX library
     addpath(fullfile( here, 'jmx' ));
@@ -18,4 +24,9 @@ function dk_startup()
         warning('Could not set character encoding; is Simulink installed?');
     end
 
+end
+
+function safe_addpath(d)
+    assert( dk.fs.isdir(d), 'Folder not found: "%s"', d );
+    addpath( d );
 end

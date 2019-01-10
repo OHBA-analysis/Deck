@@ -5,6 +5,23 @@ classdef DataArray < dk.priv.GrowingContainer
 %
 %
 % ------------------------------
+% ## Storage
+%
+%   Data is stored in a matrix with the specified number of columns.
+%   This matrix usually has more rows than needed, in order to allow for efficient push operations.
+%
+%   By default, rows are allocated by block as needed (see GrowingContainer).
+%   For example, if more memory is needed is order to push rows, a new block of size bsize is allocated.
+%
+%   If the number of rows needed is unknown, set a generous block-size (typically in the range 100-1000).
+%   The default is 100.
+%
+%   If you have a reliable upper-bound on the number of rows:
+%     - set a rather small block-size at construction time, e.g. obj.bsize = max(10, fix(n/100));
+%     - allocate the desired number of rows in advance with obj.reserve(n)
+%
+%
+% ------------------------------
 % ## Usage
 %
 % Construction
@@ -31,8 +48,8 @@ classdef DataArray < dk.priv.GrowingContainer
 %       mget    Get meta-data for a set of rows
 %       mfield  Get meta-data field for all used rows
 %
-%   Note that these methods are provided mainly for convenience (and they can resolve a column name)
-%   but you should access the properties directly for performance.
+%   Note that these methods are provided for convenience (and they can resolve a column name),
+%   but for better performance, you should access the properties/data directly.
 %
 % Column names
 %
@@ -44,23 +61,6 @@ classdef DataArray < dk.priv.GrowingContainer
 %   D.assign( k, Field/Value )      possible to set multiple indices
 %                                   with values either cell or vec
 %   D.rmfield( names )              remove fields for all points
-%
-%
-% ------------------------------
-% ## Storage
-%
-%   Data is stored in a matrix with the specified number of columns.
-%   This matrix usually has more rows than needed, in order to allow for efficient push operations.
-%
-%   By default, rows are allocated by block as needed.
-%   For example, if more memory is needed is order to push rows, a new block of size bsize is allocated.
-%
-%   If the number of rows needed is unknown, set a generous block-size (typically in the range 100-1000).
-%   The default is 100.
-%
-%   If you have a reliable upper-bound on the number of rows:
-%       set a rather small block-size at construction time, e.g. obj.bsize = max(10, fix(n/100));
-%       allocate the desired number of rows in advance with obj.reserve(n)
 %
 %
 % See also: dk.priv.GrowingContainer
@@ -96,11 +96,7 @@ classdef DataArray < dk.priv.GrowingContainer
                     self.reset(varargin{:});
             end
         end
-
-        function n = get.nrows(self), n = self.nelm; end
-        function n = get.ncols(self), n = size(self.data,2); end
-        function n = get.numel(self), n = self.nrows * self.ncols; end
-
+        
         function clear(self)
             self.gcClear();
             self.data = [];
@@ -108,6 +104,12 @@ classdef DataArray < dk.priv.GrowingContainer
             self.name = structcol(0,{});
         end
         
+        % dependent properties
+        function n = get.nrows(self), n = self.nelm; end
+        function n = get.ncols(self), n = size(self.data,2); end
+        function n = get.numel(self), n = self.nrows * self.ncols; end
+        
+        % overload parent
         function y = isempty(self)
             y = self.numel() == 0;
         end
@@ -143,6 +145,7 @@ classdef DataArray < dk.priv.GrowingContainer
             
         end
 
+        % set column names (expects correct number of strings)
         function setnames(self,varargin)
             if nargin == 2 && iscellstr(varargin{1})
                 names = varargin{1};
@@ -157,30 +160,27 @@ classdef DataArray < dk.priv.GrowingContainer
             end
         end
 
+        % get column index from column name
         function c = colnum(self,name)
             c = self.name.(name);
         end
 
         % bulk assign of metadata field by copying the value
         function self = assign(self,k,varargin)
-            if nargin > 2 && ~isempty(k)
-                
-                self.chksub(k);
-                v = dk.c2s(varargin{:});
-                %if isscalar(v) && ~isscalar(k)
-                %    v = repmat(v,size(k));
-                %end
-                
-                f = fieldnames(v);
-                n = numel(f);
-                for i = 1:n
-                    [self.meta(k).(f{i})] = dk.deal(v.(f{i}));
-                end
+            if nargin < 2 || isempty(k), return; end
+            
+            self.chksub(k);
+            v = dk.c2s(varargin{:});
+            f = fieldnames(v);
+            n = numel(f);
+            for i = 1:n
+                [self.meta(k).(f{i})] = dk.deal(v.(f{i}));
             end
         end
         
         % remove metadata fields
         function rmfield(self,varargin)
+            assert( nargin > 1, 'Fields need to be specified.' );
             if iscellstr(varargin{1})
                 fields = varargin{1};
             else

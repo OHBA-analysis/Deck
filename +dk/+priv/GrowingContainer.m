@@ -135,12 +135,6 @@ classdef GrowingContainer < handle
         function k = find(self)
             k = find(self.used);
         end
-
-        % reserve the next n entries (possibly causing allocation),
-        % marking them as used, and return their indices
-        function k = book(self,n)
-            k = self.gcAdd(n);
-        end
         
         % remove elements by marking them as unused to preserve indexing
         function rem(self,k)
@@ -149,6 +143,12 @@ classdef GrowingContainer < handle
             self.childRemove(k);
             self.notify('OnRemove');
             dk.reject('w', self.sparsity > 0.9, 'Storage is very sparse, you should run compress().' );
+        end
+        
+        % reserve the next n entries (possibly causing allocation),
+        % marking them as used, and return their indices
+        function k = book(self,n)
+            k = self.gcAdd(n);
         end
 
         % allocate memory for more elements
@@ -192,14 +192,14 @@ classdef GrowingContainer < handle
         %
         function gcClear(self)
             self.used = false(0);
-            self.bsize = 100;
             self.last = 0;
+            self.bsize = 100;
         end
 
         function gcInit(self,b)
             self.bsize = b;
-            self.used = false(b,1);
             self.last = 0;
+            self.used = false(b,1);
         end
 
         % addition of new element(s)

@@ -2,9 +2,9 @@ function out = wrap(varargin)
 %
 % out = wrap(varargin)
 %
-% Make a scalar cell from inputs.
-% This is simply:
-%   out = {dk.unwrap( varargin{:} )}
+% Output a cell wrapping the inputs.
+% If input is a cell, then output is the input.
+% Nested scalar cells are unwrapped.
 %
 % JH
 
