@@ -36,7 +36,7 @@ function vol2gif( filename, volume, delay, resize )
     end
     
     % export to temporary folder
-    folder  = fullfile( '/tmp', dk.fs.tempname );
+    folder  = fullfile( tempdir, dk.fs.tempname );
     pattern = sprintf('img_%%0%dd.png',1 + floor(log10(nslices)));
     ant.img.save( volume, folder, pattern );
     

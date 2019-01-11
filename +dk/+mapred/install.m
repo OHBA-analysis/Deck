@@ -1,8 +1,10 @@
 function install( bindir )
 
+    assert( isunix(), 'Sorry, this submodule only works on Unix systems.' );
+
     % default to $HOME/.local/bin
     if nargin < 1
-        bindir = fullfile(dk.env.home,'.local/bin');
+        bindir = fullfile(dk.env.home,'.local','bin');
         warning( 'No target directory selected, selecting "%s" by default.', bindir );
     end
     if ~dk.fs.isdir(bindir)

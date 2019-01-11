@@ -109,7 +109,7 @@ classdef Abstract < handle
         function config = load_running_config( self, folder )
 
             % load config (contains options)
-            config = dk.json.read(fullfile( folder, 'config/config.json' ));
+            config = dk.json.read(fullfile( folder, 'config', 'config.json' ));
             %config = fix_config(config);
 
             % make sure the ID is correct
