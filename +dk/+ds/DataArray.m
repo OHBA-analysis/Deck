@@ -78,7 +78,30 @@ classdef DataArray < dk.priv.GrowingContainer
         ncols
         numel
     end
+    
+    % dependent + state
+    methods
+        
+        function n = get.nrows(self), n = self.count; end
+        function n = get.ncols(self), n = size(self.data,2); end
+        function n = get.numel(self), n = self.nrows * self.ncols; end
+        
+        % overload parent
+        function y = isempty(self)
+            y = self.numel() == 0;
+        end
+        
+        % check row/column indices
+        function chksub(self,r,c)
+            assert( all(self.used(r(:))), 'Invalid row indices' );
+            if nargin > 2
+                assert( all(dk.num.between(c(:),1,self.ncols)), 'Column index out of bounds.' );
+            end
+        end
+        
+    end
 
+    % main
     methods
 
         function self = DataArray(varargin)
@@ -103,26 +126,15 @@ classdef DataArray < dk.priv.GrowingContainer
             self.meta = structcol(0,{});
             self.name = structcol(0,{});
         end
-        
-        % dependent properties
-        function n = get.nrows(self), n = self.nelm; end
-        function n = get.ncols(self), n = size(self.data,2); end
-        function n = get.numel(self), n = self.nrows * self.ncols; end
-        
-        % overload parent
-        function y = isempty(self)
-            y = self.numel() == 0;
-        end
 
+        % initialise container
         function reset(self,c,m,b)
         %
         % reset( matrix, metafields, bsize )
         % reset( numcols, metafields, bsize )
         % reset( colnames, metafields, bsize )
         %
-        % defaults:
-        %   metafields = {}
-        %   bsize = 100
+        % defaults: metafields={}, bsize=100
         % 
         
             if nargin < 3, m={}; end
@@ -132,15 +144,20 @@ classdef DataArray < dk.priv.GrowingContainer
             
             self.gcInit(b);
             self.meta = structcol(b,m);
+            self.name = structcol(0,{});
+            
             if iscellstr(c)
                 self.data = nan(b,numel(c));
                 self.setnames(c);
+                
             elseif isscalar(c)
                 self.data = nan(b,c);
+                
             else
                 assert( ismatrix(c), 'Bad input.' );
                 self.data = nan(b,size(c,2));
                 self.add(c);
+                
             end
             
         end
@@ -160,11 +177,6 @@ classdef DataArray < dk.priv.GrowingContainer
             end
         end
 
-        % get column index from column name
-        function c = colnum(self,name)
-            c = self.name.(name);
-        end
-
         % bulk assign of metadata field by copying the value
         function self = assign(self,k,varargin)
             if nargin < 2 || isempty(k), return; end
@@ -176,6 +188,15 @@ classdef DataArray < dk.priv.GrowingContainer
             for i = 1:n
                 [self.meta(k).(f{i})] = dk.deal(v.(f{i}));
             end
+        end
+
+        % add entries
+        function k = add(self,x,varargin)
+            assert( ismatrix(x) && size(x,2) == self.ncols, 'Bad number of columns.' );
+            n = size(x,1);
+            k = self.gcAdd(n);
+            self.data(k,:) = x;
+            self.assign(k,varargin{:});
         end
         
         % remove metadata fields
@@ -190,28 +211,96 @@ classdef DataArray < dk.priv.GrowingContainer
             self.meta = rmfield(self.meta, fields);
         end
 
-        % add entries
-        function k = add(self,x,varargin)
-            assert( ismatrix(x) && size(x,2) == self.ncols, 'Bad number of columns.' );
-            n = size(x,1);
-            k = self.gcAdd(n);
-            self.data(k,:) = x;
-            self.assign(k,varargin{:});
+    end
+    
+    % access
+    methods
+        
+        % NOTE:
+        % For all methods below, both scalar and vector indices work.
+        % However, name resolution requires single name only.
+        
+%         % experimental overload of subsref/subsasgn operator
+%         function varargout = subsref(self,s)
+%             varargout = cell(1,max(1,nargout));
+%             switch s(1).type
+%                 case '.' 
+%                     [varargout{:}] = builtin('subsref',self,s); % obj.prop
+%                 case '()'
+%                     [varargout{:}] = subsref(self.data,s); % obj(...) => obj.data(...)
+%                 case '{}'
+%                     s(1).type = '()';
+%                     [varargout{:}] = subsref(self.meta,s); % obj{...} => obj.meta(...)
+%             end
+%         end
+%         function self = subsasgn(self,s,v)
+%             switch s(1).type
+%                 case '.' 
+%                     self = builtin('subasgn',self,s,v); % obj.prop = val
+%                 case '()'
+%                     self.data = subsasgn(self.data,s,v); % obj(...) => obj.data(...) = val
+%                 case '{}'
+%                     s(1).type = '()';
+%                     [subsref(self.meta,s)] = dk.deal(v); %#ok obj{...} => obj.meta(...) = val
+%             end
+%         end
+        
+        % get column index from column name
+        function c = colnum(self,name)
+            c = self.name.(name);
         end
 
-        % get data (row and meta) associated with a (set of) row(s)
-        function [d,m] = both(self,k)
+        % get row(s) by index
+        function x = row(self,k)
+            self.chksub(k);
+            x = self.data(k,:);
+        end
+
+        % get column(s) by index or name
+        function x = col(self,k)
+            if ischar(k), k=self.name.(k); end
+            x = self.data(self.used,k);
+        end
+        
+        % get meta-data for a given (set of) row(s)
+        function x = mget(self,k)
+            self.chksub(k);
+            x = self.meta(k);
+        end
+
+        % get field by name
+        function x = mfield(self,n)
+            x = { self.meta(self.used).(n) };
+        end
+        
+        % get element(s) by index (single column by name ok)
+        function x = dget(self,r,c)
+            if ischar(c), c=self.name.(c); end
+            self.chksub(r);
+            x = self.data(r,c);
+        end
+
+        % set element(s) by index (single column by name ok)
+        function dset(self,r,c,x)
+            if ischar(c), c=self.name.(c); end
+            self.chksub(r,c);
+            self.data(r,c) = x;
+        end
+        
+        % short for calling row and mget (row and metadata) for given row indices
+        function [d,m] = getboth(self,k)
             d = self.row(k);
             m = self.mget(k);
         end
 
     end
 
+    % abstract methods
     methods (Hidden)
 
         function childAlloc(self,n)
             self.data = vertcat(self.data, nan(n,self.ncols));
-            self.meta(self.nmax) = dk.struct.make(fieldnames(self.meta));
+            self.meta(self.capacity) = dk.struct.make(fieldnames(self.meta));
         end
 
         function childCompress(self,id,remap)
@@ -260,58 +349,6 @@ classdef DataArray < dk.priv.GrowingContainer
         function c = compare(self,other)
             c = dk.compare( self.serialise(), other.serialise() );
         end
-    end
-
-    % access
-    methods
-
-        % NOTE:
-        % For all methods below, both scalar and vector indices work.
-        % However, name resolution requires single name only.
-        function chksub(self,r,c)
-            assert( all(self.used(r(:))), 'Invalid row indices' );
-            if nargin > 2
-                assert( all(dk.num.between(c(:),1,self.ncols)), 'Column index out of bounds.' );
-            end
-        end
-
-        % get element(s) by index (single column by name ok)
-        function x = dget(self,r,c)
-            if ischar(c), c=self.name.(c); end
-            self.chksub(r);
-            x = self.data(r,c);
-        end
-
-        % set element(s) by index (single column by name ok)
-        function dset(self,r,c,x)
-            if ischar(c), c=self.name.(c); end
-            self.chksub(r,c);
-            self.data(r,c) = x;
-        end
-
-        % get row(s) by index
-        function x = row(self,k)
-            self.chksub(k);
-            x = self.data(k,:);
-        end
-
-        % get column(s) by index or name
-        function x = col(self,k)
-            if ischar(k), k=self.name.(k); end
-            x = self.data(self.used,k);
-        end
-
-        % get meta-data for a given (set of) row(s)
-        function x = mget(self,k)
-            self.chksub(k);
-            x = self.meta(k);
-        end
-
-        % get field by name
-        function x = mfield(self,n)
-            x = {self.meta(self.used).(n)};
-        end
-
     end
 
 end

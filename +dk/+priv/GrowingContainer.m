@@ -66,9 +66,9 @@ classdef GrowingContainer < handle
     end
 
     properties (Transient,Dependent)
-        nmax        % number of elements allocated
-        nelm        % number of elements in use
-        capacity    % number of elements that can be added without reallocation
+        capacity    % number of elements allocated
+        count       % number of elements in use
+        free        % number of elements that can be added without reallocation
         sparsity    % sparsity ratio (compress when between 0.2-0.5)
     end
 
@@ -78,7 +78,9 @@ classdef GrowingContainer < handle
         OnRemove    % triggered after removal
     end
 
-    methods (Abstract) % TO BE IMPLEMENTED BY DERIVED CLASSES
+    
+    % TO BE IMPLEMENTED BY DERIVED CLASSES
+    methods (Abstract) 
 
         % extend data containers by n elements
         %
@@ -93,8 +95,40 @@ classdef GrowingContainer < handle
         childCompress(self,id,remap);
 
     end
+    
+    % dependent + state
+    methods
 
-    methods % main public methods
+        function n = get.capacity(self), n=numel(self.used); end
+        function n = get.count(self), n=nnz(self.used); end
+        function n = get.free(self), n = self.capacity - self.last; end
+        function s = get.sparsity(self), s = 1 - (self.bsize + self.count)/(self.bsize + self.last); end
+
+        function set.bsize(self,b)
+            b = floor(b);
+            assert( b > 0, 'Block-size should be positive.' );
+            self.bsize = b;
+        end
+        
+        % check that all input indices correspond to used samples
+        function chkind(self,k)
+            assert( all(self.used(k)), 'Invalid indices.' );
+        end
+        
+        % check whether the container contains something
+        function y = isempty(self)
+            y = self.count == 0;
+        end
+        
+        % check whether container has been initialised
+        function y = isready(self)
+            y = ~isempty(self.used);
+        end
+        
+    end
+
+    % main public methods
+    methods 
         
         % deal with the release of unused elements (e.g. garbage collection)
         %
@@ -103,46 +137,10 @@ classdef GrowingContainer < handle
         function childRemove(self,k)
             % nothing by default, overload if needed
         end
-        
-        % check that all input indices correspond to used samples
-        function chkind(self,k)
-            assert( all(self.used(k)), 'Invalid indices.' );
-        end
-
-        % dependent properties
-        function n = get.nmax(self), n=numel(self.used); end
-        function n = get.nelm(self), n=nnz(self.used); end
-        function n = get.capacity(self), n = self.nmax - self.last; end
-        function s = get.sparsity(self), s = 1 - (self.bsize + self.nelm)/(self.bsize + self.last); end
-
-        function set.bsize(self,b)
-            b = floor(b);
-            assert( b > 0, 'Block-size should be positive.' );
-            self.bsize = b;
-        end
-        
-        % check whether the container contains something
-        function y = isempty(self)
-            y = self.nelm == 0;
-        end
-        
-        % check whether container has been initialised
-        function y = isready(self)
-            y = ~isempty(self.used);
-        end
 
         % return indices of used elements
         function k = find(self)
             k = find(self.used);
-        end
-        
-        % remove elements by marking them as unused to preserve indexing
-        function rem(self,k)
-            dk.assert( all(k <= self.last), 'Index out of bounds.' );
-            self.used(k) = false;
-            self.childRemove(k);
-            self.notify('OnRemove');
-            dk.reject('w', self.sparsity > 0.9, 'Storage is very sparse, you should run compress().' );
         end
         
         % reserve the next n entries (possibly causing allocation),
@@ -157,22 +155,33 @@ classdef GrowingContainer < handle
             self.childAlloc(n);
             self.notify('OnAlloc');
         end
+        
         % ensure the capacity is large enough for adding n elements
         function n = reserve(self,n)
-            n = max(0, n-self.capacity);
+            n = max(0, n-self.free);
             if n > 0, self.alloc(n); end
         end
+        
         % ensure the capacity is large enough to fit all indices in k
         function n = accom(self,k)
-            n = max(0, max(k(:))-self.nmax);
+            n = max(0, max(k(:))-self.capacity);
             if n > 0, self.alloc(n); end
+        end
+        
+        % remove elements by marking them as unused to preserve indexing
+        function rem(self,k)
+            dk.assert( all(k <= self.last), 'Index out of bounds.' );
+            self.used(k) = false;
+            self.childRemove(k);
+            self.notify('OnRemove');
+            dk.reject('w', self.sparsity > 0.9, 'Storage is very sparse, you should run compress().' );
         end
 
         % reduce the storage only to used element
         %
         % this causes capacity to become 0
         function remap = compress(self)
-            ne = self.nelm;
+            ne = self.count;
             nl = self.last;
             id = self.find();
 
@@ -186,7 +195,8 @@ classdef GrowingContainer < handle
 
     end
 
-    methods (Hidden, Access=protected) % internal methods to be called by children classes
+    % internal methods to be called by children classes
+    methods (Hidden, Access=protected) 
 
         % initialisation
         %
@@ -209,8 +219,8 @@ classdef GrowingContainer < handle
             b = self.last+1;
             e = self.last+n;
             k = b:e;
-            if e > self.nmax
-                self.alloc(ceil( (e - self.nmax)/self.bsize ) * self.bsize);
+            if e > self.capacity
+                self.alloc(ceil( (e - self.capacity)/self.bsize ) * self.bsize);
             end
             self.last = e;
             self.used(k) = true;

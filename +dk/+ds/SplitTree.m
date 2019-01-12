@@ -105,21 +105,69 @@ classdef SplitTree < dk.priv.TreeBase
             end
         end
         
-        % ensure indices are valid
-        function chkind(self,k)
-            assert( all(self.is_valid(k)), 'Invalid node indices.' );
-        end
-
         % compress storage and reindex the tree
         function remap = compress(self,res)
             if nargin < 2, res = self.store.bsize; end
             remap = self.store.compress();
             remap = [0; remap(:)]; % allow parent/eldest to be 0
-            self.store.data(:,1) = remap(1+self.store.data(:,1));
-            self.store.data(:,3) = remap(1+self.store.data(:,3));
+            self.store.data(:,[1,3]) = remap(1+self.store.data(:,[1,3]));
             self.store.reserve(res);
         end
 
+        % struct-array nodes (p:parent, d:depth, c:children, nc:#children)
+        function [n,p] = get_node(self,k,with_children) % works with k vector
+            if nargin < 3, with_children=false; end
+            if nargout > 1
+                [d,p] = self.store.getboth(k);
+            else
+                d = self.store.row(k);
+            end
+            n = cell2struct( num2cell(d(:,[1,2,4])), {'p','d','nc'}, 2 );
+
+            if with_children
+                [n.c] = dk.deal(self.children(k,false));
+            end
+        end
+
+        % split multiple nodes
+        %   p: parent indices
+        %   n: number of children
+        %   + properties
+        %
+        % output k is the list of children indices
+        function c = split(self,p,n,varargin)
+            p = p(:);
+            n = n(:);
+            m = numel(p);
+
+            assert( all(n > 0), 'Number of children should be positive.' );
+            assert( all(numel(unique(p)) == m), 'Duplicate parents not allowed.' );
+            assert( all(self.is_valid(p)), 'Invalid parent node.' );
+            assert( all(self.is_leaf(p)), 'Nodes can only be split once.' );
+
+            % repeat parents according to n
+            t = 1 + cumsum([ 0; n ]);
+            L(t) = 1;
+            L = cumsum(L(1:end-1));
+
+            x = p(L);
+            x = [x(:), self.depth(x)+1, zeros(sum(n),2)]; % parent, depth, 0, 0
+            k = self.store.add( x, varargin{:} );
+            
+            % group children indices by parent
+            c = cell(1,m);
+            for i = 1:m
+                c{i} = k(t(i):(t(i+1)-1));
+            end
+
+            % update parents
+            self.store.data(p,3) = cellfun( @(ck) ck(1), c ); % index of first child
+            self.store.data(p,4) = n; % number of children
+            
+            % unwrap children as a vector if p is scalar
+            if m==1, c = c{1}; end
+        end
+        
         % special function for split-trees
         % gives the order of current nodes relative to oldest sibling
         % accept root
@@ -157,6 +205,11 @@ classdef SplitTree < dk.priv.TreeBase
             if nargout > 1, k = self.indices(); end
         end
 
+    end
+    
+    % abstract methods
+    methods
+
         function c = children(self,k,unwrap)
             if nargin < 3, unwrap=true; end
 
@@ -183,9 +236,7 @@ classdef SplitTree < dk.priv.TreeBase
             for i = 1:n
                 s{i} = notb( c(i,:), r(i) );
             end
-            if unwrap && n == 1
-                s = s{1};
-            end
+            if unwrap && n==1, s = s{1}; end
         end
 
         function o = offspring(self,k,unwrap)
@@ -208,75 +259,13 @@ classdef SplitTree < dk.priv.TreeBase
                 end
                 o{i} = [x{1:di}];
             end
-
-            if unwrap && n == 1
-                o = o{1};
-            end
+            if unwrap && n==1, o = o{1}; end
         end
-
-        % struct-array nodes (p:parent, d:depth, c:children, nc:#children)
-        function [n,p] = get_node(self,k,with_children) % works with k vector
-            if nargin < 3, with_children=false; end
-            if nargout > 1
-                [d,p] = self.store.both(k);
-            else
-                d = self.store.row(k);
-            end
-            n = cell2struct( num2cell(d(:,[1,2,4])), {'p','d','nc'}, 2 );
-
-            if with_children
-                [n.c] = dk.deal(self.children(k,false));
-            end
-        end
-
-        % split multiple nodes
-        %   p: parent indices
-        %   n: number of children
-        %   + properties
-        %
-        % output k is the list of children indices
-        function c = split(self,p,n,varargin)
-            p = p(:);
-            n = n(:);
-            m = numel(p);
-            u = unique(p);
-
-            assert( all(n > 0), 'Number of children should be positive.' );
-            assert( all(numel(u) == m), 'Duplicate parents not allowed.' );
-            assert( all(self.is_valid(p)), 'Invalid parent node.' );
-            assert( all(self.is_leaf(p)), 'Nodes can only be split once.' );
-
-            % repeat parents according to n
-            t = 1 + cumsum([ 0; n ]);
-            L(t) = 1;
-            L = cumsum(L(1:end-1));
-
-            x = p(L);
-            x = [x(:), self.depth(x)+1, zeros(sum(n),2)]; % parent, depth, 0, 0
-            k = self.store.add( x, varargin{:} );
-            
-            % group children indices by parent
-            c = cell(1,m);
-            for i = 1:m
-                c{i} = k(t(i):(t(i+1)-1));
-            end
-
-            % update parents
-            self.store.data(p,3) = cellfun( @(ck) ck(1), c );
-            self.store.data(p,4) = n;
-            
-            % unwrap children as a vector if p is scalar
-            c = dk.unwrap(c);
-        end
-
-    end
-
-    % traversal methods
-    methods
+        
 
         % see: https://stackoverflow.com/a/51124171/472610
         %
-        % More efficient implementation, given storage.
+        % More efficient traversal methods, given storage.
 
         function x = bfs(self,callback,start)
             if nargin < 3, start=1; end

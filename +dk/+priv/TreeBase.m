@@ -74,6 +74,7 @@ classdef TreeBase < handle
         type
     end
 
+    
     methods (Abstract)
 
         % rootprops is either:
@@ -93,16 +94,12 @@ classdef TreeBase < handle
         [c,k] = all_children(self);
 
     end
-
+    
+    % dependent + state
     methods
-
-        function clear(self)
-            self.store = dk.ds.DataArray();
-        end
-
-        % dependent properties
-        function n = get.nn(self), n = self.store.nelm; end
-        function n = get.np(self), n = nnz(self.store.col('nchildren')); end
+        
+        function n = get.nn(self), n = self.store.count; end
+        function n = get.np(self), n = nnz(self.all_nchildren()); end
         function n = get.nl(self), n = self.nn - self.np; end
 
         function n = get.n_nodes(self), n = self.nn; end
@@ -111,61 +108,7 @@ classdef TreeBase < handle
 
         function s = get.sparsity(self), s = self.store.sparsity; end
         function r = isready(self), r = self.nn > 0; end
-
-        function gobj = plot(self,varargin)
-        %
-        % Plot tree;
-        %   - classic and radial available
-        %   - customise nodes and edges
-        %   - customise data-tip
-        %   - many other options
-        %
-        % See also: dk.priv.draw_tree
-
-            gobj = dk.priv.draw_tree( self, varargin{:} );
-        end
-
-        function print(self,varargin)
-        %
-        % Display tree in console, or write to file.
-        %
-        % See also: dk.priv.disp_tree
-
-            dk.priv.disp_tree( self, varargin{:} );
-        end
-
-    end
-
-    % i/o
-    methods
-
-        function s=serialise(self,file)
-            s.version = '0.1';
-            s.type = self.type;
-            s.store = self.store.serialise();
-            if nargin > 1, save(file,'-v7','-struct','s'); end
-        end
-
-        function self=unserialise(self,s)
-        if ischar(s), s=load(s); end
-        dk.assert( strcmpi(s.type,self.type), 'Type mismatch: %s != %s', s.type, self.type );
-        switch s.version
-            case '0.1'
-                self.store = dk.ds.DataArray(s.store);
-            otherwise
-                error('Unknown version: %s',s.version);
-        end
-        end
-
-        function same=compare(self,other)
-            same = dk.compare( self.serialise(), other.serialise() );
-        end
-
-    end
-
-    % tree methods
-    methods
-
+        
         % indices of valid nodes
         function [k,r] = indices(self)
             k = self.store.find();
@@ -188,7 +131,38 @@ classdef TreeBase < handle
         function chkind(self,k)
             assert( all(self.store.used(k)), 'Invalid node indices.' );
         end
+        
+    end
 
+    % main
+    methods
+
+        function clear(self)
+            self.store = dk.ds.DataArray();
+        end
+
+        function gobj = plot(self,varargin)
+        %
+        % Plot tree;
+        %   - classic and radial available
+        %   - customise nodes and edges
+        %   - customise data-tip
+        %   - many other options
+        %
+        % See also: dk.priv.draw_tree
+
+            gobj = dk.priv.draw_tree( self, varargin{:} );
+        end
+
+        function print(self,varargin)
+        %
+        % Display tree in console, or write to file.
+        %
+        % See also: dk.priv.disp_tree
+
+            dk.priv.disp_tree( self, varargin{:} );
+        end
+        
         % parent 
         function p = parent(self,k)
             p = self.store.dget(k,'parent');
@@ -209,6 +183,7 @@ classdef TreeBase < handle
             end
         end
         
+        
         % number of children
         function n = nchildren(self,k)
             n = self.store.dget(k,'nchildren');
@@ -218,6 +193,7 @@ classdef TreeBase < handle
             if nargout > 1, k = self.indices(); end
         end
 
+        
         % node depth (counted from 1 at the root)
         function d = depth(self,k)
             % return tree-depth if called without index
@@ -232,6 +208,7 @@ classdef TreeBase < handle
             if nargout > 1, k = self.indices(); end
         end
 
+        
         % tree properties
         function [width,depth] = shape(self)
             depth = self.store.col('depth');    % depth of each node
@@ -252,8 +229,8 @@ classdef TreeBase < handle
         end
         
         function k = leaves(self)
-            k = self.indices();
-            k = k(self.store.col('nchildren') == 0);
+            [n,k] = self.all_nchildren();
+            k = k(n == 0);
         end
 
         function p = get_props(self,k)
@@ -271,6 +248,7 @@ classdef TreeBase < handle
     % traversal methods
     methods
 
+        % iterate nodes (undefined order)
         function [out,id] = iter(self,callback)
             id = self.indices();
             if nargout == 0
@@ -338,5 +316,32 @@ classdef TreeBase < handle
         end
 
     end
+    
+    % i/o
+    methods
 
+        function s=serialise(self,file)
+            s.version = '0.1';
+            s.type = self.type;
+            s.store = self.store.serialise();
+            if nargin > 1, save(file,'-v7','-struct','s'); end
+        end
+
+        function self=unserialise(self,s)
+        if ischar(s), s=load(s); end
+        dk.assert( strcmpi(s.type,self.type), 'Type mismatch: %s != %s', s.type, self.type );
+        switch s.version
+            case '0.1'
+                self.store = dk.ds.DataArray(s.store);
+            otherwise
+                error('Unknown version: %s',s.version);
+        end
+        end
+
+        function same=compare(self,other)
+            same = dk.compare( self.serialise(), other.serialise() );
+        end
+
+    end
+    
 end

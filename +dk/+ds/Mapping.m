@@ -8,7 +8,7 @@ classdef Mapping < dk.priv.GrowingContainer
 % ## Construction
 % 
 %   Constructor arguments are forwarded to:
-%       reset( ndim, nvar, bsize=500 )
+%       reset( ndim, nvar, bsize=100 )
 %
 %   This method allocates:
 %       arrays of NaNs for x and y, 
@@ -89,18 +89,117 @@ classdef Mapping < dk.priv.GrowingContainer
         nvar        % number of columns in y
     end
     
-    % dependent properties
+    % dependent
     methods
         
-        function n = get.npts(self)
-            n = self.nelm;
+        function n = get.npts(self), n = self.count; end
+        function n = get.ndim(self), n = size(self.x,2); end
+        function n = get.nvar(self), n = size(self.y,2); end
+        
+    end
+    
+    % main
+    methods
+        
+        function self = Mapping(varargin)
+            self.clear();
+            if nargin == 1 && isstruct(varargin{1})
+                self.unserialise(varargin{1});
+            elseif nargin > 1
+                self.reset(varargin{:});
+            end
         end
-        function n = get.ndim(self)
-            n = size(self.x,2);
+        
+        function clear(self)
+            self.gcClear();
+            self.x = [];
+            self.y = [];
+            self.meta = structcol(0);
         end
-        function n = get.nvar(self)
-            n = size(self.y,2);
+        
+        % initialise container
+        function reset(self,nd,nv,b)
+            if nargin < 4, b=100; end
+            
+            self.gcInit(b);
+            self.x = nan( b, nd );
+            self.y = nan( b, nv );
+            self.meta = structcol(b);
         end
+        
+        % assign and access
+        function k = add(self,x,y,varargin)
+            n = size(x,1);
+            assert( ismatrix(x) && size(x,2)==self.ndim, 'Bad x.' );
+            assert( ismatrix(y) && size(y,2)==self.nvar && size(y,1)==n, 'Bad y.' );
+            
+            k = self.gcAdd(n);
+            self.x(k,:) = x;
+            self.y(k,:) = y;
+            self.assign(k,varargin{:});
+        end
+        function [x,y,m] = data(self,k)
+            self.chkind(k);
+            x = self.x(k,:);
+            y = self.y(k,:);
+            m = self.meta(k);
+        end
+        
+        % bulk assign of metadata field by copying the value
+        function self = assign(self,k,varargin)
+            if nargin > 2 && ~isempty(k)
+                
+                self.chkind(k);
+                v = dk.c2s(varargin{:});
+                f = fieldnames(v);
+                n = numel(f);
+                for i = 1:n
+                    [self.meta(k).(f{i})] = dk.deal(v.(f{i}));
+                end
+                
+            end
+        end
+        
+        % iterate valid rows
+        function [out,idx] = iter(self,callback,idx)
+            if nargin < 3, idx = self.find(); end
+            ni = numel(idx);
+            
+            if nargout > 0
+                out = cell(1,ni);
+                for i = 1:ni
+                    k = idx(i);
+                    out{i} = callback( k, self.x(k,:), self.y(k,:), self.meta(k) );
+                end
+            else
+                for i = 1:ni
+                    k = idx(i);
+                    callback( k, self.x(k,:), self.y(k,:), self.meta(k) );
+                end
+            end
+        end
+        
+    end
+    
+    % abastract methods
+    methods (Hidden)
+        
+        function childAlloc(self,n)
+            nd = self.ndim;
+            nv = self.nvar;
+            nm = self.capacity;
+            
+            self.x = vertcat(self.x, nan(n,nd));
+            self.y = vertcat(self.y, nan(n,nv));
+            self.meta(nm+n) = dk.struct.make( fieldnames(self.meta) );
+        end
+        
+        function childCompress(self,id,remap)
+            self.x = self.x(id,:);
+            self.y = self.y(id,:);
+            self.meta = self.meta(id);
+        end
+        
     end
     
     % i/o
@@ -131,109 +230,6 @@ classdef Mapping < dk.priv.GrowingContainer
         
         function same=compare(self,other)
             same = dk.compare( self.serialise(), other.serialise() );
-        end
-        
-    end
-    
-    % setup
-    methods
-        
-        function self = Mapping(varargin)
-            self.clear();
-            if nargin == 1 && isstruct(varargin{1})
-                self.unserialise(varargin{1});
-            elseif nargin > 1
-                self.reset(varargin{:});
-            end
-        end
-        
-        function clear(self)
-            self.gcClear();
-            self.x = [];
-            self.y = [];
-            self.meta = structcol(0);
-        end
-        
-        function reset(self,nd,nv,b)
-            if nargin < 4, b=500; end
-            self.gcInit(b);
-            self.x = nan( b, nd );
-            self.y = nan( b, nv );
-            self.meta = structcol(b);
-        end
-        
-        function k = add(self,x,y,varargin)
-            n = size(x,1);
-            assert( ismatrix(x) && size(x,2)==self.ndim, 'Bad x.' );
-            assert( ismatrix(y) && size(y,2)==self.nvar && size(y,1)==n, 'Bad y.' );
-            
-            k = self.gcAdd(n);
-            self.x(k,:) = x;
-            self.y(k,:) = y;
-            self.assign(k,varargin{:});
-        end
-        function [x,y,m] = data(self,k)
-            self.chkind(k);
-            x = self.x(k,:);
-            y = self.y(k,:);
-            m = self.meta(k);
-        end
-        
-        function [out,idx] = iter(self,callback,idx)
-            if nargin < 3, idx = self.find(); end
-            ni = numel(idx);
-            
-            if nargout > 0
-                out = cell(1,ni);
-                for i = 1:ni
-                    k = idx(i);
-                    out{i} = callback( k, self.x(k,:), self.y(k,:), self.meta(k) );
-                end
-            else
-                for i = 1:ni
-                    k = idx(i);
-                    callback( k, self.x(k,:), self.y(k,:), self.meta(k) );
-                end
-            end
-        end
-        
-        % bulk assign of metadata field by copying the value
-        function self = assign(self,k,varargin)
-            if nargin > 2 && ~isempty(k)
-                
-                self.chkind(k);
-                v = dk.c2s(varargin{:});
-                %if isscalar(v) && ~isscalar(k)
-                %    v = repmat(v,size(k));
-                %end
-                
-                f = fieldnames(v);
-                n = numel(f);
-                for i = 1:n
-                    [self.meta(k).(f{i})] = dk.deal(v.(f{i}));
-                end
-                
-            end
-        end
-        
-    end
-    
-    methods (Hidden)
-        
-        function childAlloc(self,n)
-            nd = self.ndim;
-            nv = self.nvar;
-            nm = self.nmax;
-            
-            self.x = vertcat(self.x, nan(n,nd));
-            self.y = vertcat(self.y, nan(n,nv));
-            self.meta(nm+n) = dk.struct.make( fieldnames(self.meta) );
-        end
-        
-        function childCompress(self,id,remap)
-            self.x = self.x(id,:);
-            self.y = self.y(id,:);
-            self.meta = self.meta(id);
         end
         
     end

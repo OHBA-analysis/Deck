@@ -24,8 +24,8 @@ classdef Tree < dk.priv.TreeBase
 % Construction
 %
 %   T = dk.ds.Tree()                           default root node
-%   T = dk.ds.Tree( bsize, Name/Value )        setting the root props
-%   T = dk.ds.Tree( serialised_path )          unserialise file
+%   T = dk.ds.Tree( props=struct, bsize=100 )  setting the root props
+%   T = dk.ds.Tree( filename )                 unserialise file
 %
 % Tree logic
 %
@@ -85,10 +85,9 @@ classdef Tree < dk.priv.TreeBase
             end
         end
 
+        % initialise container
         function reset(self,props,bsize)
-        %
-        % reset( props={}, bsize=100 )
-        %
+            
             if nargin < 2, props={}; end
             if nargin < 3, bsize=100; end
             colnames = {'parent','depth','nchildren'};
@@ -100,8 +99,9 @@ classdef Tree < dk.priv.TreeBase
                 self.store = dk.ds.DataArray( colnames, props, bsize );
                 self.store.add( [0,1,0] );
             end
+            
         end
-
+        
         % compress storage and reindex the tree
         function remap = compress(self,res)
             if nargin < 2, res = self.store.bsize; end
@@ -110,77 +110,12 @@ classdef Tree < dk.priv.TreeBase
             self.store.data(:,1) = remap(1+self.store.data(:,1));
             self.store.reserve(res);
         end
-
-        function c = children(self,k,unwrap)
-            if nargin < 3, unwrap=true; end
-
-            n = numel(k);
-            if n > log(1+self.nn)
-                c = self.all_children();
-                c = c(k);
-            else
-                c = cell(1,n);
-                for i = 1:n
-                    % valid nodes whose parent is k(i)
-                    c{i} = find(self.store.used & (self.store.data(:,1) == k(i)));
-                end
-            end
-            if unwrap && n==1
-                c = c{1};
-            end
-        end
-        function [c,k] = all_children(self)
-            [p,k] = self.all_parents();
-            c = dk.grouplabels( p(2:end), max(k) ); % root has no parent
-            c = dk.mapfun( @(i) k(i+1)', c(k), false ); % remap indices, i+1 because excluded root
-        end
-
-        function s = siblings(self,k,unwrap)
-            if nargin < 3, unwrap=true; end
-            s = self.children(self.parent(k),false); % list children of parents
-            n = numel(s);
-
-            rems = @(x,y) x( x ~= y );
-            for i = 1:n
-                s{i} = rems( s{i}, k(i) ); % remove self
-            end
-            if unwrap && n == 1
-                s = s{1};
-            end
-        end
-
-        function o = offspring(self,k,unwrap)
-        %
-        % Most efficient given storage, but pretty slow...
-            if nargin < 3, unwrap=true; end
-
-            n = numel(k);
-            N = self.nchildren(k);
-            d = self.depth();
-            o = cell(1,n);
-
-            if all(N == 0), return; end
-            C = self.all_children();
-
-            for i = 1:n
-                t = cell(1,d);
-                t{1} = C{k(i)};
-                for j = 2:d
-                    t{j} = horzcat(C{t{j-1}});
-                    if isempty(t{j}), break; end
-                end
-                o{i} = horzcat(t{:});
-            end
-            if unwrap && n == 1
-                o = o{1};
-            end
-        end
-
-        % struct-array nodes (p:parent, d:depth, nc:#children)
-        function [n,p] = get_node(self,k,with_children) % works with k vector
+        
+        % struct-array nodes (p:parent, d:depth, c:children, nc:#children)
+        function [n,m] = get_node(self,k,with_children) % works with k vector
             if nargin < 3, with_children=false; end
             if nargout > 1
-                [d,p] = self.store.both(k);
+                [d,m] = self.store.getboth(k);
             else
                 d = self.store.row(k);
             end
@@ -214,6 +149,73 @@ classdef Tree < dk.priv.TreeBase
 
             self.store.rem(r);
             self.store.data(p,3) = self.store.data(p,3) - 1; % subtract from parent count
+        end
+        
+    end
+    
+    % implementation of abstract methods
+    methods
+
+        function c = children(self,k,unwrap)
+            if nargin < 3, unwrap=true; end
+
+            n = numel(k);
+            if n > log(1+self.nn)
+                c = self.all_children();
+                c = c(k);
+            else
+                c = cell(1,n);
+                for i = 1:n
+                    % valid nodes whose parent is k(i)
+                    c{i} = find(self.store.used & (self.store.data(:,1) == k(i)));
+                end
+            end
+            if unwrap && n==1, c = c{1}; end
+        end
+        
+        function [c,k] = all_children(self)
+            [p,k] = self.all_parents();
+            c = dk.grouplabels( p(2:end), max(k) ); % root has no parent
+            c = dk.mapfun( @(i) k(i+1)', c(k), false ); % remap indices, i+1 because excluded root
+        end
+
+        function s = siblings(self,k,unwrap)
+            if nargin < 3, unwrap=true; end
+            
+            s = self.children(self.parent(k),false); % list children of parents
+            n = numel(s);
+
+            rems = @(x,y) x( x ~= y );
+            for i = 1:n
+                s{i} = rems( s{i}, k(i) ); % remove self
+            end
+            if unwrap && n==1, s = s{1}; end
+        end
+
+        function o = offspring(self,k,unwrap)
+        %
+        % Most efficient given storage, but pretty slow...
+        
+            if nargin < 3, unwrap=true; end
+
+            n = numel(k);
+            N = self.nchildren(k);
+            d = self.depth();
+            o = cell(1,n);
+
+            if all(N == 0), return; end
+            C = self.all_children();
+
+            for i = 1:n
+                t = cell(1,d);
+                t{1} = C{k(i)};
+                for j = 2:d
+                    t{j} = horzcat(C{t{j-1}});
+                    if isempty(t{j}), break; end
+                end
+                o{i} = horzcat(t{:});
+            end
+            if unwrap && n==1, o = o{1}; end
         end
 
     end
