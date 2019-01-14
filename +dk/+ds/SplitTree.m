@@ -6,7 +6,7 @@ classdef SplitTree < dk.priv.TreeBase
 % at once; no additional children can be created later on, and no node
 % can be deleted.
 %
-% The columns of the storage are:
+% The columns are:
 %   parent
 %   depth
 %   eldest
@@ -168,9 +168,8 @@ classdef SplitTree < dk.priv.TreeBase
             if m==1, c = c{1}; end
         end
         
-        % special function for split-trees
-        % gives the order of current nodes relative to oldest sibling
-        % accept root
+        % order of input nodes relative to their oldest sibling
+        %   (root node is accepted)
         function [r,p] = order(self,k)
             p = self.parent(k);
             m = p > 0;
@@ -182,6 +181,7 @@ classdef SplitTree < dk.priv.TreeBase
             r = self.order(k);
         end
 
+        % index of oldest sibling
         function e = eldest(self,k)
             e = self.store.dget(k,3);
         end
@@ -243,9 +243,9 @@ classdef SplitTree < dk.priv.TreeBase
             if nargin < 3, unwrap=true; end
 
             n = numel(k);
-            d = self.depth();
+            h = self.height();
             o = cell(1,n);
-            x = cell(1,d);
+            x = cell(1,h);
             C = self.children(k);
 
             for i = 1:n

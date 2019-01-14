@@ -1,6 +1,8 @@
-classdef AVLTree < dk.priv.TreeBase
+classdef BinaryTree < dk.priv.TreeBase
 %
-% Columns:
+% Memory-efficient implementation of Binary Search Tree.
+%
+% The columns are:
 %   key
 %   parent
 %   depth
@@ -11,7 +13,7 @@ classdef AVLTree < dk.priv.TreeBase
     
 
     properties (Constant)
-        type = 'avlTree';
+        type = 'binaryTree';
     end
     
     % utilities
@@ -40,7 +42,7 @@ classdef AVLTree < dk.priv.TreeBase
         
         function reset(self,bsize)
             if nargin < 2, bsize=100; end
-            colnames = {'key','parent','depth','eldest','nchildren'};
+            colnames = {'key','parent','depth','left','right'};
             self.store = dk.ds.DataArray( colnames, {}, bsize );
         end
         

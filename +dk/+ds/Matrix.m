@@ -1,6 +1,20 @@
 classdef Matrix < dk.priv.GrowingContainer
 %
-% Push-matrix
+% Efficient implementation of a "growing matrix" with memory block-allocation.
+%
+% Number of columns cannot be modified after construction: 
+%   reset( ncols, bsize=100 )
+%   reset( init_rows, bsize=100 )
+%
+% New rows can be added at the bottom of the matrix using:
+%   add( rows )
+% 
+% Rows can also be removed, although this simply marks them as unused.
+% Unused rows are removed from the container when using:
+%   remap = compress()
+%
+% which leads to a re-indexing: newidx = remap(oldidx).
+%
 %
 % See also: dk.priv.GrowingContainer
 %

@@ -1,7 +1,31 @@
 classdef TreeBase < handle
 %
-% Base class for tree implementations, using a dk.ds.DataArray as storage.
+% Abstract base class for tree implementations, using a dk.ds.DataArray as storage.
 % See below for methods to be implemented in derived classes.
+%
+%
+% ----------------------------------------------------------------------
+% ## Inheritance
+%
+% This implementation requires derived classes to define the following columns:
+%   parent      (cf. parent, all_parents, ancestor)
+%   depth       (cf. depth, all_depths, height)
+%   nchildren   (cf. nchildren, all_nchildren)
+%
+% If these are not defined in the derived classes, then the methods listed above 
+% should be overloaded.
+%
+% Furthermore, the list of abstract methods to be implemented is:
+%
+%   reset()
+%   remap = compress()
+%   [node,prop] = get_node( nid[] )
+%   
+%   cell = siblings( nid[] )
+%   cell = children( nid[] )
+%   cell = offspring( nid[] )
+%   [cell,pid] = all_children( nid[] )
+%
 %
 % ----------------------------------------------------------------------
 % ## Usage
@@ -43,16 +67,6 @@ classdef TreeBase < handle
 %   dfs ( callback )     with callback( id, node, props )
 %   bfs ( callback )
 %
-% ----------------------------------------------------------------------
-% ## Inheritance
-%
-% This implementation requires derived classes to define the following columns:
-%   parent      (cf. parent, all_parents)
-%   depth       (cf. depth, all_depths, shape)
-%   nchildren   (cf. nchildren, all_nchildren, leaves, n_parents)
-%
-% Alternatively, the dependent methods (listed above) can be overloaded.
-% See below for the list of abstract methods to be implemented.
 %
 % JH
 
@@ -196,22 +210,22 @@ classdef TreeBase < handle
         
         % node depth (counted from 1 at the root)
         function d = depth(self,k)
-            % return tree-depth if called without index
-            if nargin > 1
-                d = self.store.dget(k,'depth');
-            else
-                d = max(self.store.col('depth'));
-            end
+            d = self.store.dget(k,'depth');
         end
         function [d,k] = all_depths(self)
             d = self.store.col('depth');
             if nargout > 1, k = self.indices(); end
         end
+        
+        % tree height = max node depth
+        function h = height(self)
+            h = max(self.store.col('depth'));
+        end
 
         
         % tree properties
         function [width,depth] = shape(self)
-            depth = self.store.col('depth');    % depth of each node
+            depth = self.all_depths();          % depth of each node
             width = accumarray( depth(:), 1 );  % width at each depth
             depth = max(depth);                 % depth of the tree
         end
