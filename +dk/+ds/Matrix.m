@@ -185,10 +185,6 @@ classdef Matrix < dk.priv.GrowingContainer
         end
         end
         
-        function same=compare(self,other)
-            same = dk.compare( self.serialise(), other.serialise() );
-        end
-        
     end
     
 end

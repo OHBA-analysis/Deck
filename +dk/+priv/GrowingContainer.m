@@ -93,6 +93,10 @@ classdef GrowingContainer < handle
         % this is called after compression of this object (cf compress), and before
         % triggering the OnCompress event
         childCompress(self,id,remap);
+        
+        % i/o
+        s = serialise(self,filename);
+        unserialise(self,s);
 
     end
     
@@ -111,8 +115,12 @@ classdef GrowingContainer < handle
         end
         
         % check that all input indices correspond to used samples
-        function chkind(self,k)
+        function chkind(self,k,nodup)
+            if nargin < 3, nodup=false; end
             assert( all(self.used(k)), 'Invalid indices.' );
+            if nodup
+                assert( numel(unique(k)) == numel(k), 'Duplicate indices.' );
+            end
         end
         
         % check whether the container contains something
@@ -132,10 +140,14 @@ classdef GrowingContainer < handle
         
         % deal with the release of unused elements (e.g. garbage collection)
         %
-        % this is called after the elements have been marked as unused, and before 
-        % triggering the OnRemove event
+        % called after elements are marked unused and before triggering OnRemove event
         function childRemove(self,k)
             % nothing by default, overload if needed
+        end
+        
+        % compare instances
+        function same = compare(self,other)
+            same = dk.compare( self.serialise(), other.serialise() );
         end
 
         % return indices of used elements
@@ -170,7 +182,7 @@ classdef GrowingContainer < handle
         
         % remove elements by marking them as unused to preserve indexing
         function rem(self,k)
-            dk.assert( all(k <= self.last), 'Index out of bounds.' );
+            self.chkind(k,true);
             self.used(k) = false;
             self.childRemove(k);
             self.notify('OnRemove');

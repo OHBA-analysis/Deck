@@ -246,15 +246,15 @@ classdef SplitTree < dk.priv.TreeBase
             h = self.height();
             o = cell(1,n);
             x = cell(1,h);
-            C = self.children(k);
+            C = self.children(k,false);
 
             for i = 1:n
-                ci = C(i,:);
+                ci = C{i};
                 di = 0;
                 while ~isempty(ci)
                     di = di+1;
                     x{di} = ci;
-                    ci = self.children(x{di});
+                    ci = self.children(ci);
                     ci = [ci{:}];
                 end
                 o{i} = [x{1:di}];

@@ -102,10 +102,10 @@ classdef TreeBase < handle
         % struct-array nodes (p:parent, d:depth, nc:#children)
         [n,p] = get_node(self,k)
 
-        o = offspring(self,k);
         s = siblings(self,k);
         c = children(self,k);
         [c,k] = all_children(self);
+        o = offspring(self,k);
 
     end
     
@@ -130,7 +130,7 @@ classdef TreeBase < handle
                 r(k) = 1:numel(k); % reverse mapping
             end
         end
-
+        
         % a node is a leaf if it has no children
         function y = is_leaf(self,k)
             y = self.nchildren(k) == 0;

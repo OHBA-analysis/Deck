@@ -346,9 +346,6 @@ classdef DataArray < dk.priv.GrowingContainer
         end
         end
 
-        function c = compare(self,other)
-            c = dk.compare( self.serialise(), other.serialise() );
-        end
     end
 
 end
