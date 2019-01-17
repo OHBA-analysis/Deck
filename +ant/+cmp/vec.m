@@ -12,6 +12,8 @@ function val = vec( a, b, method )
 %   cov
 %   cor,corr
 %
+% See also: ant.cmp.mat
+%
 % JH
 
     assert( isvector(a) && isvector(b), 'Inputs should be vectors' );
