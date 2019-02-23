@@ -12,7 +12,6 @@ function val = cross( a, b, method )
 %   cov
 %   cor,corr
 %
-% NOTE:
 % If a has Na columns, and b has Nb columns, the output is a Na x Nb matrix,
 % where element (i,j) = comparison( a(:,i), b(:,j) ).
 %

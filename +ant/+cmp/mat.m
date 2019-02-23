@@ -67,14 +67,13 @@ function val = mat(a, b, method, varargin)
         otherwise
             
             % try comparing as vectors
-            if dk.str.startswith( method, 'lt-' )
-                val = ant.cmp.vec( dk.mat.vtril(a), dk.mat.vtril(b), method(4:end), varargin{:} );
-                
-            elseif dk.str.startswith( method, 'ut-' )
-                val = ant.cmp.vec( dk.mat.vtriu(a), dk.mat.vtriu(b), method(4:end), varargin{:} );
-                
-            else
-                error( 'Unknown method: %s', method );
+            switch lower(method(1:3))
+                case 'lt-'
+                    val = ant.cmp.vec( dk.mat.vtril(a), dk.mat.vtril(b), method(4:end), varargin{:} );
+                case 'ut-'
+                    val = ant.cmp.vec( dk.mat.vtriu(a), dk.mat.vtriu(b), method(4:end), varargin{:} );
+                otherwise
+                    error( 'Unknown method: %s', method );
             end
             
     end

@@ -12,6 +12,8 @@ function val = vec( a, b, method )
 %   cov
 %   cor,corr
 %
+% Output is a scalar.
+%
 % See also: ant.cmp.mat
 %
 % JH

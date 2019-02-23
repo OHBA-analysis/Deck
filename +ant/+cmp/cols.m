@@ -12,6 +12,8 @@ function val = cols( a, b, method )
 %   cov
 %   cor,corr
 %
+% Output is a 1xC vector where C is the number of columns.
+%
 % See also: ant.cmp.vec, ant.cmp.mat
 %
 % JH
