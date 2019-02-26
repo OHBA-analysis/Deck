@@ -58,7 +58,7 @@ function fig = grid( slices, names, samerng, varargin )
     end
     
     % draw figure
-    fig = figure;
+    fig = dk.fig.new( '', 0.8 );
     for i = 1:n
         ant.img.show( slices{i}, 'subplot', {h,l,i}, 'title', names{i}, 'crange', r, ...
             'rmbar', samerng && mod(i,l), varargin{:} );
