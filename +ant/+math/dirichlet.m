@@ -6,7 +6,13 @@ function x = dirichlet( a, n )
 % The number of elements in a determines the dimensionality.
 % n is the number of samples.
 %
-% See: https://en.wikipedia.org/wiki/Dirichlet_distribution#Gamma_distribution
+% If all elements in a are 1, then output weights sample a simplex uniformly.
+% If ai < 1, then samples are "pushed away" from point i.
+% If all ai > 1, then samples concentrate near the centre.
+%
+% See: 
+%   https://en.wikipedia.org/wiki/Dirichlet_distribution#Gamma_distribution
+%   https://stats.stackexchange.com/a/244946/44129
 %
 % JH
 
