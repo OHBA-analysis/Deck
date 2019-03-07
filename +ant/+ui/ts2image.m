@@ -1,6 +1,6 @@
 function [img,xvals,yvals] = ts2image( ts, mag, nrows, ncols, vrange, trange )
 %
-% [img,xvals,yvals] = nst.util.ts2image( ts, mag, nrows, ncols, vrange, trange )
+% [img,xvals,yvals] = ant.ts.ts2image( ts, mag, nrows, ncols, vrange, trange )
 %
 % Turns the input time-series TS into a NROWS x NCOLS image where the rows
 % correspond to the range of values taken by all signals in ts, and the
@@ -24,7 +24,9 @@ function [img,xvals,yvals] = ts2image( ts, mag, nrows, ncols, vrange, trange )
 %
 % JH
 
-    if nargin < 6, trange = ts.timeframe; end
+    if nargin < 6
+        trange = ts.time([1,end]); 
+    end
     if nargin < 5
         [vmin,vmax] = ant.val.extrema( ts.vals(:) );
         vrange      = [vmin,vmax];
@@ -40,10 +42,11 @@ function [img,xvals,yvals] = ts2image( ts, mag, nrows, ncols, vrange, trange )
     
     dx = diff(trange)/(ncols-1);
     dy = diff(vrange)/(nrows-1);
+    ns = size(ts.vals,2);
     
     x  = 1+round( (ts.time - trange(1)) / dx );
     y  = 1+round( (ts.vals - vrange(1)) / dy );
-    z  = repmat( x, 1, ts.ns );
+    z  = repmat( x, 1, ns );
     
     xm = x >= 1 & x <= ncols;
     ym = y >= 1 & y <= nrows;
