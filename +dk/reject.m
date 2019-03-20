@@ -6,6 +6,12 @@ function success = reject( varargin )
 % Default channel is 'error'.
 % Returns true if the rejection passes, false otherwise.
 %
+% Available channels are:
+%   e,err,error
+%   w,warn,warning
+%   i,info
+%   d,dbg,debug
+%
 % JH
 
     validE = {'e', 'err', 'error'};

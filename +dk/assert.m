@@ -6,6 +6,12 @@ function success = assert( varargin )
 % Default channel is 'error'.
 % Returns true if the assertion passes, false otherwise.
 %
+% Available channels are:
+%   e,err,error
+%   w,warn,warning
+%   i,info
+%   d,dbg,debug
+%
 % JH
 
     validE = {'e', 'err', 'error'};
