@@ -59,7 +59,7 @@ void mexFunction(
         for ( r = 0; r < nr; r++ ) { // iterate over rows of H
 
             // advance over columns as long as the difference is below threshold
-            for ( c=0; c < nd && std::abs(Qry(r,c) - Ref(p,c)) < absdiff; c++ ) {}
+            for ( c=0; c < nd && std::abs(Qry(p,c) - Ref(r,c)) < absdiff; c++ ) {}
 
             // if all coordinates are close enough, we found a match
             if ( c == nd ) tmp.push_back(r+1); // +1 because Matlab indices start at 1

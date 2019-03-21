@@ -62,7 +62,11 @@ void mexFunction(
         for ( r = 0; r < nr; r++ ) { // iterate over rows of H
 
             // advance over columns as long as the difference is below threshold
-            for ( c=0, sqdist=0.0; c < nd && (sqdist += square(Qry(r,c) - Ref(p,c))) < sqrad; c++ ) {}
+            sqdist = 0.0;
+            for ( c = 0; c < nd; c++ ) {
+                sqdist += square(Qry(p,c) - Ref(r,c));
+                if ( sqdist >= sqrad ) break;
+            }
 
             // if all coordinates are close enough, we found a match
             if ( c == nd ) tmp.push_back(r+1); // +1 because Matlab indices start at 1

@@ -49,7 +49,11 @@ void mexFunction(
         for ( r = 0; r < nr; r++ ) { // iterate over rows of Ref
 
             // advance over columns as long as the difference is below threshold
-            for ( c=0, dist=0.0; c < nd && (dist += std::abs(Qry(r,c) - Ref(p,c))) < mindist; c++ ) {}
+            dist = 0.0;
+            for ( c = 0; c < nd; c++ ) {
+                dist += std::abs(Qry(p,c) - Ref(r,c));
+                if ( dist >= mindist ) break;
+            }
 
             // if all coordinates are close enough, we found a match
             if ( c == nd ) {

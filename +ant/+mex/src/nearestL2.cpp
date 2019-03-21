@@ -53,7 +53,11 @@ void mexFunction(
         for ( r = 0; r < nr; r++ ) { // iterate over rows of Ref
 
             // advance over columns as long as the difference is below threshold
-            for ( c=0, sqdist=0.0; c < nd && (sqdist += square(Qry(r,c) - Ref(p,c))) < mindist; c++ ) {}
+            sqdist = 0.0;
+            for ( c = 0; c < nd; c++ ) {
+                sqdist += square(Qry(p,c) - Ref(r,c));
+                if ( sqdist >= mindist ) break;
+            }
 
             // if all coordinates are close enough, we found a match
             if ( c == nd ) {
