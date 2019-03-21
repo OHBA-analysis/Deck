@@ -336,6 +336,12 @@ function c = stack2caller(s)
         
         % works well with class-methods
         c{1} = strrep( s.name, '.', '@' );
+        
+    elseif dk.str.startswith( sp{1}, '@(' )
+        
+        % works well with function handles
+        c{1} = [ fp '@(lambda)' ];
+        
     else
         
         % build custom path

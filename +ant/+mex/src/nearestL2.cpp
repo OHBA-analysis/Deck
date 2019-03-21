@@ -11,8 +11,8 @@ constexpr real_t square( const real_t& x ) { return x*x; }
 // ------------------------------------------------------------------------
 
 void usage() {
-    jmx::println("Usage [nearest neighbour search]:");
-    jmx::println("    [index,dist] = nns( reference, query )");
+    jmx::println("Usage [nearest neighbour search using L2 distance]:");
+    jmx::println("    [index,dist] = nearestL2( reference, query )");
     jmx::println("where");
     jmx::println("    reference = nxd matrix");
     jmx::println("    query     = pxd matrix");

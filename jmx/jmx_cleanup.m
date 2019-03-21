@@ -24,11 +24,11 @@ function files = jmx_cleanup( folder, type )
             
         case 'mex'
             files = dk.fs.lsext( folder, mexext );
-            print = @(x) dk.info('[jmx_cleanup] Removing mex-file "%s"',x);
+            print = @(x) dk.info('Removing mex-file "%s"',x);
             
         case 'obj'
             files = dk.fs.lsext( folder, 'o' );
-            print = @(x) dk.info('[jmx_cleanup] Removing object-file "%s"',x);
+            print = @(x) dk.info('Removing object-file "%s"',x);
         
         otherwise
             error( 'Unknown source type "%s".', type );

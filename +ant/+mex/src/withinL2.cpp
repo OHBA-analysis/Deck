@@ -6,6 +6,8 @@ using namespace jmx_types;
 
 // ------------------------------------------------------------------------
 
+constexpr real_t square( const real_t& x ) { return x*x; }
+
 template <class T>
 void copyvec( const T& target, const std::vector<index_t>& source )
 {
@@ -16,14 +18,14 @@ void copyvec( const T& target, const std::vector<index_t>& source )
 // ------------------------------------------------------------------------
 
 void usage() {
-    jmx::println("Usage [find points within L1 distance]:");
-    jmx::println("    index = findL1( reference, query, radius )");
+    jmx::println("Usage [find points within L2 distance]:");
+    jmx::println("    index = withinL2( reference, query, radius )");
     jmx::println("where");
     jmx::println("    reference = nxd matrix");
     jmx::println("    query     = pxd matrix");
     jmx::println("    radius    = scalar");
     jmx::println("    index     = 1xp cell\n");
-    jmx::println("For each query point, find indices of all reference points which coordinates differ by no more than radius.");
+    jmx::println("For each query point, find indices of all reference points within a given radius.");
     jmx::println("Complexity is O(pnd) time, O(np) space worst case.");
 }
 
@@ -37,7 +39,7 @@ void mexFunction(
     // parse inputs
     auto Ref = args.getmat(0);
     auto Qry = args.getmat(1);
-    const real_t absdiff = args.getnum(2);
+    const real_t sqrad = square(args.getnum(2));
 
     // check inputs
     const index_t nd = Ref.nc;
@@ -45,7 +47,7 @@ void mexFunction(
     const index_t nq = Qry.nr;
 
     JMX_ASSERT( Qry.nc == nd, "Input size mismatch" );
-    JMX_ASSERT( absdiff > 0, "Radius should be positive." );
+    JMX_ASSERT( sqrad > 0, "Radius should be positive." );
 
     // allocate output
     auto ind = args.mkcell(0, nq);
@@ -54,12 +56,13 @@ void mexFunction(
 
     // find fixed-radius near neighbours
     index_t r,c,p;
+    real_t sqdist;
     for ( p = 0; p < nq; p++ ) { // iterate over rows of Qry
         tmp.clear();
         for ( r = 0; r < nr; r++ ) { // iterate over rows of H
 
             // advance over columns as long as the difference is below threshold
-            for ( c=0; c < nd && std::abs(Qry(r,c) - Ref(p,c)) < absdiff; c++ ) {}
+            for ( c=0, sqdist=0.0; c < nd && (sqdist += square(Qry(r,c) - Ref(p,c))) < sqrad; c++ ) {}
 
             // if all coordinates are close enough, we found a match
             if ( c == nd ) tmp.push_back(r+1); // +1 because Matlab indices start at 1
