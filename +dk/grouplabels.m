@@ -1,13 +1,14 @@
-function G = grouplabels(L,n,t)
+function [G,u] = grouplabels(L,n,t)
 %
-% G = dk.grouplabels(L)
-% G = dk.grouplabels(L,n)
-% G = dk.grouplabels(L,n,t)
+% [G,u] = dk.grouplabels(L)
+% [G,u] = dk.grouplabels(L,n)
+% [G,u] = dk.grouplabels(L,n,t)
 %
 % For each unique label in L, find indices of elements equal to this label.
 % Output G is a 1xn cell:
 %   - if n is not specified, then n=max(L) by default;
 %   - otherwise, if n < max(L), then G only contains the first n groups.
+% Output u is a 1xn vector with the corresponding labels.
 %
 % If t is specified, then:
 %   - L should be sorted, and 
@@ -59,6 +60,9 @@ function G = grouplabels(L,n,t)
     G = cell(1,n);
     for i = 1:n
         G{i} = s( t(i):(t(i+1)-1) );
-    end
+    end 
+    
+    u = L(s(t(1:n)))';
+    u(diff(t) == 0) = nan;
 
 end
