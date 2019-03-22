@@ -6,14 +6,14 @@ function [grp,val] = groupunique(x,n)
 % For each unique element in x, find corresponding group of indices.
 % If n is specified, then grp is 1xn, and the last output groups may be empty.
 %
-% See also: dk.grouplabels
+% See also: dk.grouplabel
 %
 % JH
 
     if nargin < 2, n=[]; end
 
     [val,~,L] = unique(x(:));
-    grp = dk.grouplabels(L,n);
+    grp = dk.grouplabel(L,n);
     
 end
 

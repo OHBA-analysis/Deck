@@ -232,7 +232,7 @@ classdef TreeBase < handle
 
         function L = levels(self)
             [d,k] = self.all_depths();
-            L = dk.grouplabels(d);
+            L = dk.grouplabel(d);
             L = dk.mapfun( @(i) k(i), L, false );
         end
 

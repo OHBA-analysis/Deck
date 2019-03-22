@@ -190,7 +190,7 @@ classdef LinkTree < dk.priv.TreeBase
         
         function [c,k] = all_children(self)
             [p,k] = self.all_parents();
-            c = dk.grouplabels( p(2:end), max(k) ); % root has no parent
+            c = dk.grouplabel( p(2:end), max(k) ); % root has no parent
             c = dk.mapfun( @(i) k(i+1)', c(k), false ); % remap indices, i+1 because excluded root
         end
 

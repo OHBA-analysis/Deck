@@ -1,8 +1,8 @@
-function G = grouplabels(L,n,t)
+function G = grouplabel(L,n,t)
 %
-% G = dk.grouplabels(L)
-% G = dk.grouplabels(L,n)
-% G = dk.grouplabels(L,n,t)
+% G = dk.grouplabel(L)
+% G = dk.grouplabel(L,n)
+% G = dk.grouplabel(L,n,t)
 %
 % For each unique label in L, find indices of elements equal to this label.
 % Output G is a 1xn cell:
