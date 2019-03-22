@@ -1,7 +1,7 @@
 function p = plot2( varargin )
 %
-% p = dk.ui.plot2( x, y, options.. )
-% p = dk.ui.plot2( X, options.. )
+% p = dk.ui.plot( x, y, options.. )
+% p = dk.ui.plot( X, options.. )
 %
 % Simple proxy method that accepts nx3 arrays for 2d plots.
 %
