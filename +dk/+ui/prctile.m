@@ -24,7 +24,7 @@ function [ph,fh] = prctile( x, y, lo, hi, varargin )
 
     [popt,fopt,fcol] = dk.priv.linefill_options(varargin{:});
     
-    [y,x] = ant.ts.format(y,x,'vert');
+    [y,x] = dk.formatmv(y,x,'vert');
     assert( isscalar(lo) && isscalar(hi), 'Lower/higher percentiles should integers between 0 and 100.' );
     
     n = size(y,2);

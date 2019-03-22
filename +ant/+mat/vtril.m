@@ -1,6 +1,6 @@
 function v = vtril( A, k )
 %
-% v = dk.mat.vtril( A, k=1 )
+% v = ant.mat.vtril( A, k=1 )
 %
 % Extract lower-triangular values of matrix A.
 %

@@ -8,7 +8,7 @@ function [y, ty]  = upsample( x, tx, fs, method )
     
     if nargin < 4, method = 'pchip'; end
     
-    [x,tx] = ant.ts.format(x,tx,'vertical');
+    [x,tx] = dk.formatmv(x,tx,'vertical');
     
     % check that fs is greater than current sampling rate
     dt = mean(diff(tx));

@@ -1,6 +1,6 @@
 function [M,r,c] = shuffle( M )
 %
-% [B,r,c] = dk.mat.shuffle( A )
+% [B,r,c] = ant.mat.shuffle( A )
 %
 % Shuffle the rows and columns of a matrix.
 % Additional outputs are the inverse permutations, such that B(r,c) == A.

@@ -6,7 +6,7 @@ function x = ifftshift(x,dim)
 %
 % JH
 
-    if nargin < 2, dim = dk.mat.nsdim(x); end
+    if nargin < 2, dim = ant.nsdim(x); end
     
     n = size(x,dim);
     n = floor( n/2 + 1 );

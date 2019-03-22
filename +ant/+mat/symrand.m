@@ -1,6 +1,6 @@
 function cmat = symrand(cmat)
 %
-% cmat = dk.mat.symrand(cmat)
+% cmat = ant.mat.symrand(cmat)
 %
 % Symmetric randomisation (shuffle edges while preserving symmetry).
 %

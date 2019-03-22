@@ -69,9 +69,9 @@ function val = mat(a, b, method, varargin)
             % try comparing as vectors
             switch lower(method(1:3))
                 case 'lt-'
-                    val = ant.cmp.vec( dk.mat.vtril(a), dk.mat.vtril(b), method(4:end), varargin{:} );
+                    val = ant.cmp.vec( ant.mat.vtril(a), ant.mat.vtril(b), method(4:end), varargin{:} );
                 case 'ut-'
-                    val = ant.cmp.vec( dk.mat.vtriu(a), dk.mat.vtriu(b), method(4:end), varargin{:} );
+                    val = ant.cmp.vec( ant.mat.vtriu(a), ant.mat.vtriu(b), method(4:end), varargin{:} );
                 otherwise
                     error( 'Unknown method: %s', method );
             end
@@ -81,6 +81,6 @@ function val = mat(a, b, method, varargin)
 end
 
 function x = laplacian(x)
-    x = dk.mat.setdiag(x,0);
+    x = ant.mat.setdiag(x,0);
     x = diag(sum(x,1)) - x;
 end

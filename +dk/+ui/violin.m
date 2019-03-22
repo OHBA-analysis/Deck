@@ -78,7 +78,7 @@ function dist = violin( data, varargin )
 
     % process ksdensity options
     if isempty(opt_range)
-        if dk.util.minver(2016)
+        if dk.chkmver(2016)
             ksarg = { [], 'NumPoints', opt_npts, 'Kernel',opt_kern };
         else
             ksarg = { [], 'npoints', opt_npts, 'Kernel',opt_kern };

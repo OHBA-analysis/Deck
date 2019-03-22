@@ -10,7 +10,7 @@ function [y, ty]  = downsample( x, tx, fs, win )
     
     if nargin < 4, win = 'hamming'; end
     
-    [x,tx] = ant.ts.format(x,tx,'vertical');
+    [x,tx] = dk.formatmv(x,tx,'vertical');
     
     % make sure input is sampled arithmetically
     dt = diff(tx);

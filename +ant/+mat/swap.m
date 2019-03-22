@@ -1,6 +1,6 @@
 function x = swap( x, i, j )
 %
-% x = dk.mat.swap( x, i, j )
+% x = ant.mat.swap( x, i, j )
 %
 % Swap elements in x:
 %

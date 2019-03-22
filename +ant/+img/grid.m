@@ -3,7 +3,7 @@ function fig = grid( slices, names, samerng, varargin )
 % fig = ant.img.grid( slices, names, samerange=false, varargin )
 %
 % Opens a new figure and draw each slice of input 3D matrix in a separate subplot.
-% The size of the subplot grid is computed using dk.util.gridfit.
+% The size of the subplot grid is computed using dk.gridfit.
 % Additional inputs are forwarded to ant.img.show.
 %
 % INPUTS
@@ -22,7 +22,7 @@ function fig = grid( slices, names, samerng, varargin )
 % OUTPUT
 %   fig is the figure handle.
 %
-% See also: ant.img.show, dk.util.gridfit
+% See also: ant.img.show, dk.gridfit
 %
 % JH
 
@@ -37,7 +37,7 @@ function fig = grid( slices, names, samerng, varargin )
     
     % compute grid size
     n = numel(slices);
-    [h,l] = dk.util.gridfit(n);
+    [h,l] = dk.gridfit(n);
     
     % default names
     if nargin < 2 || isempty(names)

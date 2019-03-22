@@ -1,9 +1,9 @@
-function c = minver(v)
+function c = chkmver(v)
 %
-% c = dk.util.minver(v)
+% c = dk.chkmver(v)
 %
-% Check that current Matlab version is more recent than the input.
-% Input should be a string of the form '2014b', or an integer denoting the year.
+% Check that current Matlab version is more recent than requested.
+% Input should be a string like '2014b', or an integer denoting the year.
 %
 % JH
 

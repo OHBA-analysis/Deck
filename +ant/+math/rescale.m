@@ -8,7 +8,7 @@ function Y = rescale( X, range, dim, method )
 % JH
 
     if nargin < 2, range = [0 1]; end
-    if nargin < 3, dim = dk.mat.nsdim(X); end
+    if nargin < 3, dim = ant.nsdim(X); end
     if nargin < 4, method = 'linear'; end
     
     xmin = min(X,[],dim);

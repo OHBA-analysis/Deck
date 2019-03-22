@@ -5,7 +5,7 @@ function clus = init_parpool( nworkers )
 % JH
 	
 	% Old and new version of cluster management
-	if dk.util.minver(2014)
+	if dk.chkmver(2014)
 		
 		% Get cluster config
 		cfg  = defaultParallelConfig();

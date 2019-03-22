@@ -1,6 +1,6 @@
 function v = vtriu( A, k )
 %
-% v = dk.mat.vtriu( A, k=1 )
+% v = ant.mat.vtriu( A, k=1 )
 %
 % Extract upper-triangular values of matrix A.
 %

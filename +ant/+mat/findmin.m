@@ -1,12 +1,12 @@
-function [sub,val] = findmax(M)
+function [sub,val] = findmin(M)
 %
-% [sub,val] = dk.mat.findmax(M)
+% [sub,val] = ant.mat.findmin(M)
 %
-% Finds subindices of maximum element in array M of arbitrary dimensions.
+% Finds subindices of minimum element in array M of arbitrary dimensions.
 %
 % JH
 
-    [val,k] = max(M(:));
+    [val,k] = min(M(:));
 
     if isvector(M)
         sub = k;

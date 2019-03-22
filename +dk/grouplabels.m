@@ -62,6 +62,7 @@ function [G,u] = grouplabels(L,n,t)
         G{i} = s( t(i):(t(i+1)-1) );
     end 
     
+    % get corresponding labels (empty groups are assigned NaN)
     u = L(s(t(1:n)))';
     u(diff(t) == 0) = nan;
 

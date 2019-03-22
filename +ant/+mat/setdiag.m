@@ -1,6 +1,6 @@
 function M = setdiag( M, val )
 %
-% M = dk.mat.setdiag( M, val )
+% M = ant.mat.setdiag( M, val )
 %
 % Set diagonal elements to specified value(s).
 %   M does not need to be square

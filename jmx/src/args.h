@@ -82,7 +82,7 @@ namespace jmx {
         inline void verify( index_t inmin, index_t outmin, std::function<void()> usage ) {
             if ( in.len < inmin || out.len < outmin ) {
                 usage();
-                JMX_THROW( "Bad input; please refer to usage help above." );
+                JMX_THROW( "Bad i/o; please refer to usage help above." );
             }
         }
     };

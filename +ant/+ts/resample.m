@@ -11,7 +11,7 @@ function [y, ty] = resample( x, tx, fs, method )
     if nargin < 4, method = 'pchip'; end
     if nargin < 3, fs = []; end
     
-    [x,tx] = ant.ts.format(x,tx,'vertical');
+    [x,tx] = dk.formatmv(x,tx,'vertical');
     if isreal(x)
 
         m = mean(x,1);

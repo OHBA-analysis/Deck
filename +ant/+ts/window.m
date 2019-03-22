@@ -66,7 +66,7 @@ function show_all()
     n = numel(names);
     x = linspace(0,1,L);
     
-    [h,w] = dk.util.gridfit(n);
+    [h,w] = dk.gridfit(n);
 
     figure;
     for i = 1:n

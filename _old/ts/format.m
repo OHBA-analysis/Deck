@@ -1,6 +1,6 @@
 function [x,tx] = format( x, tx, type )
 %
-% [x, tx] = ant.ts.format( x, tx, type='vert' )
+% [x, tx] = dk.formatmv( x, tx, type='vert' )
 % 
 % Format time-series data vertically or horizontally.
 % x contains the values (matrix), and tx is the correpsonding timecourse (vector).
