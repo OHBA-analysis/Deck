@@ -2,8 +2,10 @@ function out = mapfun( fun, val, unif )
 %
 % out = dk.mapfun( fun, val, unif=false )
 %
-% Use cellfun, arrayfun or structfun depending on the type of input.
+% Use cellfun or arrayfun depending on the type of input (struct treated as arrays).
 % Fine not to collect output (in which case no need for fun to return anything).
+%
+% See also: dk.struct.kvfun
 % 
 % JH
 
@@ -11,8 +13,8 @@ function out = mapfun( fun, val, unif )
     
     if iscell(val)
         map = @cellfun;
-    elseif isscalar(val) && isstruct(val)
-        map = @structfun;
+    %elseif isscalar(val) && isstruct(val)
+    %    map = @structfun;
     else
         map = @arrayfun;
     end
