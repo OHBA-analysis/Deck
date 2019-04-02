@@ -6,7 +6,7 @@ before_script:
 pages:
   stage: deploy
   script:
-  - rsync -rltpP ./docs/ ./public/
+  - rsync -rltpP ./doc/ ./public/
   artifacts:
     paths:
     - public
