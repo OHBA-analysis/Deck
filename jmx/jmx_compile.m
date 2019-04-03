@@ -17,6 +17,7 @@ function cmd = jmx_compile( files, options, varargin )
 %
 %   dry         false  -n         Dry-run mode (will not actually compile target files if true).
 %   cpp11       true              Set appropriate compiler flags for the C++11 standard.
+%   mwlapack    false             Setup paths/libs to use Matlab's BLAS/LAPACK.
 %   arma        false             Setup paths/libs to use Armadillo.
 %   jmx         true              Setup paths/libs to use JMX.
 %
@@ -71,6 +72,9 @@ function cmd = jmx_compile( files, options, varargin )
     if T.jmx || T.arma 
         S = append(S,'ipath',jmx_path('inc'));
         S = append(S,'lib','ut');
+    end
+    if T.mwlapack
+        S = append(S,'lib','mwlapack'); % provided by Matlab
     end
     if T.arma 
         S = append(S,'lib','lapack'); % provided by Matlab
@@ -129,6 +133,7 @@ function out = parse_options(in,filedir)
     out.dry = false;
     
     out.jmx = true;
+    out.mwlapack = false;
     out.arma = false;
     out.cpp11 = true;
 

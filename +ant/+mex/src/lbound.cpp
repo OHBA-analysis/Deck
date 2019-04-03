@@ -21,7 +21,7 @@ void mexFunction(
     int nargin, const mxArray *in[] )
 {
     auto args = jmx::Arguments( nargout, out, nargin, in );
-    args.verify( 2, 1, usage ); // 3 inputs, 1 output
+    args.verify( 2, 1, usage ); // 2 inputs, 1 output
 
     // parse inputs
     auto Val = args.getmat(0);

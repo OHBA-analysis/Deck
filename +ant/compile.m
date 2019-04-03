@@ -35,6 +35,11 @@ function rebuild(p)
 
 end
 
+function files = lsx( folder, ext )
+    files = dk.fs.lsext( folder, ext );
+    files = dk.mapfun( @(x) fullfile(folder,x), files, false );
+end
+
 function compile_inc(p)
 
     opt = struct();
@@ -59,11 +64,6 @@ function compile_src(p,names)
         files = lsx( p.src, 'cpp' );
     end
     dk.mapfun( @(f) jmake( p, f, opt ), files );
-end
-
-function files = lsx( folder, ext )
-    files = dk.fs.lsext( folder, ext );
-    files = dk.mapfun( @(x) fullfile(folder,x), files, false );
 end
 
 function jmake( paths, file, opt )
