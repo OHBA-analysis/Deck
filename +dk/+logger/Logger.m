@@ -198,6 +198,40 @@ classdef Logger < handle
         function self = critical(self, varargin)
             self.write('c', self.stdepth, varargin{:});
         end
+        
+        function suc = assert(self, chan, cdt, varargin)
+            try
+                lvl = self.match_level(chan);
+                lvl = lvl(1);
+                msg = sprintf(varargin{:});
+            catch
+                lvl = 'e';
+                cdt = lvl;
+                msg = sprintf(cdt,varargin{:});
+            end
+            
+            suc = all(logical(cdt));
+            if suc
+                self.write(lvl, self.stdepth+1, msg);
+            end
+        end
+        
+        function suc = reject(self, chan, cdt, varargin)
+            try
+                lvl = self.match_level(chan);
+                lvl = lvl(1);
+                msg = sprintf(varargin{:});
+            catch
+                lvl = 'e';
+                cdt = lvl;
+                msg = sprintf(cdt,varargin{:});
+            end
+            
+            suc = ~any(logical(cdt));
+            if suc
+                self.write(lvl, self.stdepth+1, msg);
+            end
+        end
 
     end
 
@@ -225,15 +259,9 @@ classdef Logger < handle
             end
         end
         
-        % generic logging function
-        function write(self,level,depth,message,varargin)
-            
-            % early cancelling
-            if self.ignoreLogging()
-                return;
-            end
-            
-            % determine level
+        % determine level from input string
+        function [level,num] = match_level(self,level)
+            assert( ischar(level), 'Input should be a string.' );
             switch lower(level)
                 case {'a','all'}
                     level = 'all';
@@ -252,7 +280,20 @@ classdef Logger < handle
                 otherwise
                     error( 'Unknown level: "%s"', level );
             end
-            levelnum = self.LEVEL.(level);
+            num = self.LEVEL.(level);
+        end
+        
+        % generic logging function
+        function write(self,level,depth,message,varargin)
+            
+            % early cancelling
+            if self.ignoreLogging()
+                return;
+            end
+            
+            % process inputs
+            [level,levelnum] = self.match_level(level);
+            if isempty(depth), depth=self.stdepth; end
             
             % get caller info
             depth = depth + 2;
