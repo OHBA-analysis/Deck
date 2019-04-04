@@ -11,6 +11,6 @@ function L = default()
 %
 % JH
 
-    L = dk.logger.get( 'Deck', 'nodate', true, 'lvlchar', true );
+    L = dk.logger.get( 'Deck', 'nodate', true, 'lvlchar', true, 'stdepth', 1 );
     
 end

@@ -200,35 +200,37 @@ classdef Logger < handle
         end
         
         function suc = assert(self, chan, cdt, varargin)
+            assert( nargin >= 3, 'At least two inputs required.' );
             try
                 lvl = self.match_level(chan);
                 lvl = lvl(1);
                 msg = sprintf(varargin{:});
             catch
                 lvl = 'e';
-                cdt = lvl;
                 msg = sprintf(cdt,varargin{:});
+                cdt = chan;
             end
             
             suc = all(logical(cdt));
-            if suc
+            if ~suc
                 self.write(lvl, self.stdepth+1, msg);
             end
         end
         
         function suc = reject(self, chan, cdt, varargin)
+            assert( nargin >= 3, 'At least two inputs required.' );
             try
                 lvl = self.match_level(chan);
                 lvl = lvl(1);
                 msg = sprintf(varargin{:});
             catch
                 lvl = 'e';
-                cdt = lvl;
                 msg = sprintf(cdt,varargin{:});
+                cdt = chan;
             end
             
             suc = ~any(logical(cdt));
-            if suc
+            if ~suc
                 self.write(lvl, self.stdepth+1, msg);
             end
         end
@@ -296,7 +298,7 @@ classdef Logger < handle
             if isempty(depth), depth=self.stdepth; end
             
             % get caller info
-            depth = depth + 2;
+            depth = depth + 1;
             [dbs,~] = dbstack('-completenames');
             if length(dbs) >= depth
                 dbs = dbs(depth:end);

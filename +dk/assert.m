@@ -1,4 +1,4 @@
-function success = assert( varargin )
+function success = assert( chan, cdt, varargin )
 %
 % success = dk.assert( condition, fmt, varargin )
 % success = dk.assert( channel, condition, fmt, varargin )
@@ -14,6 +14,21 @@ function success = assert( varargin )
 %
 % JH
 
-    success = dk.logger.default().assert(varargin{:});
+    assert( nargin >= 2, 'At least two inputs required.' );
+    log = dk.logger.default();
+    try
+        lvl = log.match_level(chan);
+        lvl = lvl(1);
+        msg = sprintf(varargin{:});
+    catch
+        lvl = 'e';
+        msg = sprintf(cdt,varargin{:});
+        cdt = chan;
+    end
+
+    success = all(logical(cdt));
+    if ~success
+        log.write(lvl, log.stdepth+1, msg);
+    end
     
 end
