@@ -74,7 +74,6 @@ classdef SplitTree < dk.priv.TreeBase
         function self = SplitTree(varargin)
             self.clear();
             switch nargin
-                case 0 % nothing to do
                 case 1
                     arg = varargin{1};
                     if dk.is.string(arg)

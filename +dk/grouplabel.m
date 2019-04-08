@@ -28,6 +28,13 @@ function G = grouplabel(L,n,t)
 %
 % JH
 
+    % empty input
+    if isempty(L)
+        G = {};
+        return
+    end
+
+    % format labels
     L = L(:);
     if nargin < 2 || isempty(n)
         n = max(L); 

@@ -387,7 +387,7 @@ function nodes = add_prop(nodes,sz,fc,ec)
     ec = check_numrows(ec,n);
 
     % normalisation factor for the size
-    w = min(nonzeros( nodes.width ./ nodes.deg ))/2;
+    w = min(nonzeros( nodes.width ./ (1+nodes.deg) ));
 
     prop = dk.struct.repeat( {'size','face','edge'}, 1, n );
     for i = 1:n
