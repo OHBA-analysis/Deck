@@ -22,9 +22,10 @@ function out = getopt( arg, varargin )
 % JH
 
     out = dk.c2s( varargin );
-    arg = dk.unwrap(arg);
+    arg = dk.wrap(arg);
     n = numel(arg);
     if n == 1
+        arg = arg{1};
         assert( dk.is.struct(arg), 'Scalar input should be a struct.' );
         out = dk.struct.merge( out, arg );
     else
