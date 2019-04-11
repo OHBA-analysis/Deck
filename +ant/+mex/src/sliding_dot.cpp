@@ -10,6 +10,12 @@
 #include "armadillo.h"
 using namespace jmx_types;
 
+// Fix issues with Matlab's LAPACK/BLAS libs on Unix
+#if !defined(_WIN32)
+    #define dgemv dgemv_
+    #define sgemv sgemv_
+#endif
+
 
 
 		/********************     **********     ********************/
