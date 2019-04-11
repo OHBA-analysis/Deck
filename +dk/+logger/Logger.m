@@ -213,7 +213,7 @@ classdef Logger < handle
             
             suc = all(logical(cdt));
             if ~suc
-                self.write(lvl, self.stdepth+1, msg);
+                self.write(lvl, self.stdepth, msg);
             end
         end
         
@@ -231,7 +231,7 @@ classdef Logger < handle
             
             suc = ~any(logical(cdt));
             if ~suc
-                self.write(lvl, self.stdepth+1, msg);
+                self.write(lvl, self.stdepth, msg);
             end
         end
 
@@ -298,7 +298,7 @@ classdef Logger < handle
             if isempty(depth), depth=self.stdepth; end
             
             % get caller info
-            depth = depth + 1;
+            depth = depth + 2;
             [dbs,~] = dbstack('-completenames');
             if length(dbs) >= depth
                 dbs = dbs(depth:end);
