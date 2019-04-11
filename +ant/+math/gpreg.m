@@ -12,8 +12,8 @@ function [gpr,reg,ph,fh] = gpreg( x, y, q, gopt, popt, fopt )
 %         Default: 100 points between bounds of x
 %   gopt  Structure with options for fitrgp, or cell of key-value pairs.
 %         Default: BasisFunction, constant, KernelFunction, squaredexponential
-%   popt  Struct or cell of options for dk.ui.std
-%   fopt  Struct or cell of options for dk.ui.std
+%   popt  Struct or cell of options for dk.ui.sdplot
+%   fopt  Struct or cell of options for dk.ui.sdplot
 %
 % OUTPUTS
 %
@@ -30,7 +30,7 @@ function [gpr,reg,ph,fh] = gpreg( x, y, q, gopt, popt, fopt )
 %
 %   -
 %
-% See also: fitrgp, dk.ui.std
+% See also: fitrgp, dk.ui.sdplot
 %
 % JH
 
@@ -72,7 +72,7 @@ function [gpr,reg,ph,fh] = gpreg( x, y, q, gopt, popt, fopt )
     
     % plot
     if nargin > 4 || nargout > 2
-        [ph,fh] = dk.ui.std( reg.x, reg.y, reg.ci, popt, fopt );
+        [ph,fh] = dk.ui.sdplot( reg.x, reg.y, reg.ci, popt, fopt );
     end
     
 end

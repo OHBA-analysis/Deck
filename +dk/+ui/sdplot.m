@@ -1,7 +1,7 @@
-function [ph,fh] = std( x, y, yd, varargin )
+function [ph,fh] = sdplot( x, y, yd, varargin )
 %
-% [ph,fh] = dk.ui.std( x, y, yd, theme )
-% [ph,fh] = dk.ui.std( x, y, yd, popt, fopt )
+% [ph,fh] = dk.ui.sdplot( x, y, yd, theme )
+% [ph,fh] = dk.ui.sdplot( x, y, yd, popt, fopt )
 %
 % Mean-deviation plot.
 % Plot the curve (x,y) on top of a background area spanning (y-yd,y+yd).
@@ -20,7 +20,7 @@ function [ph,fh] = std( x, y, yd, varargin )
 %   x  = linspace( 0, 2*pi, 100 ); 
 %   y  = sin(x); 
 %   yd = .05 + abs(y)/10; 
-%   dk.ui.std(x,y,yd);
+%   dk.ui.sdplot(x,y,yd);
 %
 % JH
 

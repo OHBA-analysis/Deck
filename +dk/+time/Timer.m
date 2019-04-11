@@ -53,7 +53,8 @@ classdef Timer < handle
                 disp( 'Done!' );
             elseif fraction_done > self.last_step
                 self.last_step = self.last_step + fraction_step;
-                dk.disp( 'Timeleft: %s', self.timeleft_str(fraction_done) );
+                dk.disp( 'Timeleft [%d %%]: %s', ...
+                    floor(100*fraction_done), self.timeleft_str(fraction_done) );
             end
         end
         
