@@ -9,6 +9,11 @@ function y = struct( x, fields, num )
 % fields can be a string or a cell of strings.
 % If fields is empty, then fields are not checked.
 %
+% LEGACY:
+%   It is also possible, but discouraged, to call:
+%       dk.is.struct( x, fields, true )     scalar-struct
+%       dk.is.struct( x, fields, false )    struct-array
+%
 % JH
 
     if nargin < 2, fields = {}; end
