@@ -23,7 +23,7 @@ classdef Cell < dk.priv.GrowingContainer
                 case 0 % nothing to do
                 case 1
                     arg = varargin{1};
-                    if dk.is.string(arg) || dk.is.struct(arg,{'version'})
+                    if dk.is.string(arg) || dk.is.struct(arg,'version')
                         self.unserialise(arg);
                     else
                         self.reset(arg);

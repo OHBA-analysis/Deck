@@ -12,17 +12,34 @@ function out = mapfun( fun, val, unif )
     if nargin < 3, unif=false; end
     
     if iscell(val)
-        map = @cellfun;
-    %elseif isscalar(val) && isstruct(val)
-    %    map = @structfun;
+        if nargout == 0
+            cellfun( fun, val, 'UniformOutput', unif );
+        else
+            out = cellfun( fun, val, 'UniformOutput', unif );
+        end
     else
-        map = @arrayfun;
+        if nargout == 0
+            arrayfun( fun, val, 'UniformOutput', unif );
+        else
+            out = arrayfun( fun, val, 'UniformOutput', unif );
+        end
     end
     
-    if nargout == 0
-        map( fun, val, 'UniformOutput', unif );
-    else
-        out = map( fun, val, 'UniformOutput', unif );
-    end
+% Old version.
+% Branching as above is much faster than using function handles.
+%
+%     if iscell(val)
+%         map = @cellfun;
+%     %elseif isscalar(val) && isstruct(val)
+%     %    map = @structfun;
+%     else
+%         map = @arrayfun;
+%     end
+%     
+%     if nargout == 0
+%         map( fun, val, 'UniformOutput', unif );
+%     else
+%         out = map( fun, val, 'UniformOutput', unif );
+%     end
 
 end

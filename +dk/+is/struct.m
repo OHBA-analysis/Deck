@@ -1,9 +1,10 @@
-function y = struct( x, fields, scalar )
+function y = struct( x, fields, num )
 %
-% y = dk.is.struct( x, fields={}, scalar=true )
+% y = dk.is.struct( x, fields={}, num=1 )
 % 
 % Checks whether input is a structure with specified fields.
-% Set the scalar flag to false in order to accept struct-arrays.
+% Set num to an integer > 0 to accept struct-arrays of specified size only.
+% Set num to 0 in order to accept struct-arrays of any size (incl. empty).
 % 
 % fields can be a string or a cell of strings.
 % If fields is empty, then fields are not checked.
@@ -11,7 +12,7 @@ function y = struct( x, fields, scalar )
 % JH
 
     if nargin < 2, fields = {}; end
-    if nargin < 3, scalar = true; end
+    if nargin < 3, num = 1; end
 
     y = isstruct(x);
     
@@ -19,8 +20,8 @@ function y = struct( x, fields, scalar )
         y = y && all(isfield(x,fields));
     end
     
-    if scalar
-        y = y && isscalar(x);
+    if num > 0
+        y = y && numel(x)==num;
     end
     
 end
