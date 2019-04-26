@@ -11,7 +11,7 @@ function c = compare( v1, v2, cmp_shape, fp_thresh )
 %
 % JH
 
-    if nargin < 3, cmp_shape=true; end
+    if nargin < 3 || isempty(cmp_shape), cmp_shape=true; end
     if nargin < 4, fp_thresh=1e-10; end
     
     if cmp_shape
@@ -60,6 +60,18 @@ function c = compare( v1, v2, cmp_shape, fp_thresh )
         
     elseif isa(v1,'function_handle')
         c = isa(v2,'function_handle') && strcmp(func2str(v1), func2str(v2));
+        
+    elseif isa(v1,'table')
+        c = isa(v2,'table') && dk.compare(table2struct(v1), table2struct(v2), [], fp_thresh);
+        
+    elseif isa(v1,'containers.Map')
+        if isa(v2,'containers.Map')
+            k1 = v1.keys(); v1 = v1.values();
+            k2 = v2.keys(); v2 = v2.values();
+            c = dk.compare(k1,k2,[],fp_thresh) && dk.compare(v1,v2,[],fp_thresh);
+        else
+            c = false;
+        end
         
     else
         try
