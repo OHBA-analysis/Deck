@@ -1,9 +1,10 @@
-function y = odd(varargin)
+function varargout = odd(varargin)
 %
 % y = odd(x)
-% y = odd(x1, x2, ...)
+% [y1,y2,...] = odd(x1,x2,...)
 %
-% Check if input is odd.
+% Check if input is/are odd integers.
+% Accepts matrices in input.
 
-    y = dk.mapfun( @(x) dk.priv.modtest(x,2,1), varargin, true );
+    varargout = dk.mapfun( @(x) dk.num.modeq(x,2,1), varargin, false );
 end
