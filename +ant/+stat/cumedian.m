@@ -1,6 +1,6 @@
 function out = cumedian( in, dim )
 %
-% out = ant.val.cumedian( in, dim = 1 )
+% out = ant.stat.cumedian( in, dim = 1 )
 %
 % Compute the cumulative sum of in along dim, 
 % and return for each sum the index of the term that first exceeds half of the sum.

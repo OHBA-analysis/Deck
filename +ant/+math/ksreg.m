@@ -78,7 +78,7 @@ function r = ksreg( x, y, n, b, kerf, doplot )
     for i = 1:n
         w = kerf( (x - r.x(i))/b );
         r.w(i) = sum(w);
-        r.s(i) = ant.val.wstd( y, w );
+        r.s(i) = ant.stat.wstd( y, w );
         r.y(i) = sum(w.*y) / sum(w);
     end
 

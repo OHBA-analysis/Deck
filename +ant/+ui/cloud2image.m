@@ -10,11 +10,11 @@ function [img,xvals,yvals] = cloud2image( X, w, nrows, ncols, xrange, yrange )
     n = size(X,1);
     
     if nargin < 6
-        [ymin,ymax] = ant.val.extrema( X(:,2) );
+        [ymin,ymax] = ant.stat.extrema( X(:,2) );
         yrange      = [ymin,ymax];
     end
     if nargin < 5
-        [xmin,xmax] = ant.val.extrema( X(:,1) );
+        [xmin,xmax] = ant.stat.extrema( X(:,1) );
         xrange      = [xmin,xmax];
     end
     

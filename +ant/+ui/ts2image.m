@@ -28,7 +28,7 @@ function [img,xvals,yvals] = ts2image( ts, mag, nrows, ncols, vrange, trange )
         trange = ts.time([1,end]); 
     end
     if nargin < 5
-        [vmin,vmax] = ant.val.extrema( ts.vals(:) );
+        [vmin,vmax] = ant.stat.extrema( ts.vals(:) );
         vrange      = [vmin,vmax];
     end
     if isempty(mag), mag = 1; end

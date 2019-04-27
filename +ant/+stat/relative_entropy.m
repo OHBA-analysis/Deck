@@ -1,10 +1,10 @@
 function [KL,Px,Py] = relative_entropy( x, y, nbins )
 %
-% [KL,Px,Py] = ant.val.relative_entropy( x, y, nbins )
+% [KL,Px,Py] = ant.stat.relative_entropy( x, y, nbins )
 %
 % Estimate relative entropy (aka KL divergence) between sequences x and y.
 %
-% See also: ant.val.joint_entropy, ant.val.entropy
+% See also: ant.stat.joint_entropy, ant.stat.entropy
 %
 % JH
 

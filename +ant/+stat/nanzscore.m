@@ -1,6 +1,6 @@
 function z = nanzscore( x, flag, dim )
 %
-% z = ant.val.nanzscore( x, flag, dim )
+% z = ant.stat.nanzscore( x, flag, dim )
 %
 % Matlab doesn't have a nanzscore function.
 %

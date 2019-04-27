@@ -1,6 +1,6 @@
 function d = distrib(x,n,s)
 %
-% d = ant.val.distrib(x,n,s)
+% d = ant.stat.distrib(x,n,s)
 %
 % Compute the value distribution on data x.
 % x is the data, considered internally as a single vector x(:).
