@@ -1,6 +1,6 @@
 function [img,xvals,yvals] = ts2image( ts, mag, nrows, ncols, vrange, trange )
 %
-% [img,xvals,yvals] = ant.ts.ts2image( ts, mag, nrows, ncols, vrange, trange )
+% [img,xvals,yvals] = ant.ui.ts2image( ts, mag, nrows, ncols, vrange, trange )
 %
 % Turns the input time-series TS into a NROWS x NCOLS image where the rows
 % correspond to the range of values taken by all signals in ts, and the

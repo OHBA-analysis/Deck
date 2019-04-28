@@ -4,6 +4,8 @@ function [c,o] = matlab(n)
 %
 % Default Matlab colors in 2016+
 %
+% See also: dk.cmap.jh 
+%
 % JH
 
     c = [ ... Default Matlab palette
@@ -22,5 +24,6 @@ function [c,o] = matlab(n)
     if nargin > 0
         c = interp1( (1:7)', c, linspace(1,7,n)' );
     end
+    if nargout == 0, dk.cmap.show(c); end
 
 end

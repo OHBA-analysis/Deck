@@ -2,6 +2,15 @@ function c = rwb( n, signed )
 %
 % c = rwb( n=64, signed=false )
 %
+% Basic red-white-blue colormap.
+% Default number of colors is 64, from white to red.
+%
+% In the unsigned case, the values go from white to red.
+% In the signed case, the negative part is from blue to red.
+%
+% See also: dk.cmap.rwb2
+%
+% JH
 
     if nargin < 1, n = 64; end
     if nargin < 2, signed = false; end
@@ -40,5 +49,6 @@ function c = rwb( n, signed )
     end
 
     c = interp1( C(:,1), C(:,2:4), x, method );
+    if nargout == 0, dk.cmap.show(c); end
 
 end

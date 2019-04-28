@@ -1,8 +1,17 @@
 function [img,xvals,yvals] = cloud2image( X, w, nrows, ncols, xrange, yrange )
 %
-% [img,xvals,yvals] = com.ui.cloud2image( X, w, nrows, ncols, xrange, yrange )
+% [img,xvals,yvals] = ant.ui.cloud2image( X, w, nrows, ncols, xrange, yrange )
 %
 % Create image from cloud of 2d points, by binning points into pixels.
+%
+%      X: Nx2 matrix
+%      w: scalar or Nx1 matrix of weights (defaults to 1 if input is [])
+%  nrows: number of rows in output image
+%  ncols: number of columns
+% xrange: to limit the range of values in first column (default [min,max])
+% yrange: same in the second column (default [min,max])
+%
+% See also: ant.ui.ts2image
 %
 % JH
 

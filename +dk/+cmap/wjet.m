@@ -17,4 +17,6 @@ function x = wjet( n, f )
     x = bsxfun( @power, x, 1-0.7*w );
     x = bsxfun( @times, x, 1-f*w );
     
+    if nargout == 0, dk.cmap.show(x); end
+    
 end

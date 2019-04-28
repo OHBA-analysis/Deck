@@ -2,11 +2,14 @@ function c = jh(n,varargin)
  %
  % c = dk.cmap.jh(n=7)
  %
- % My colormap (heavily inspired by Matlab).
+ % My own colormap, based on Matlab's 2016+ defaults.
  %
  % Goes from blue to red, through green.
  % Behaves "well" for values of n<7.
  %
+ % See also: dk.cmap.matlab
+ %
+ % JH
  
     c = [ ...
         0.0780    0.1840    0.6350 ; ...
@@ -40,8 +43,6 @@ function c = jh(n,varargin)
     end
     end
     
-    if nargout == 0
-        dk.cmap.show(c);
-    end
+    if nargout == 0, dk.cmap.show(c); end
 
 end

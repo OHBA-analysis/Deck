@@ -8,6 +8,9 @@ function c = rwb2( n, signed )
 % In the unsigned case, the values go from white to red.
 % In the signed case, the negative part is from blue to red.
 %
+% See also: dk.cmap.rwb
+%
+% JH
 
     if nargin < 1, n = 64; end
     if nargin < 2, signed = false; end
@@ -45,5 +48,6 @@ function c = rwb2( n, signed )
     end
 
     c = interp1( C(:,1), C(:,2:4), x, method );
+    if nargout == 0, dk.cmap.show(c); end
 
 end

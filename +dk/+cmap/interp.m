@@ -4,7 +4,7 @@ function col = interp( cmap, val, range, method )
 %
 % Interpolate color for each value in val according to specified range using colormap cmap.
 % By default, the range is set to the extremal values in val, and the interpolation is linear.
-% The colormap input should be a nx3 array.
+% The colormap input should be a nx3 array or RGB colors.
 %
 % JH
 
