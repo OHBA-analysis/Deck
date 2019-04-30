@@ -1,6 +1,6 @@
 function c = optdis( dmat, h )
 %
-% c = optdis( dmat, h=1e-4 )
+% c = optdis( dmat, h=1 )
 %
 % Optimised colormap based on dissimilarity matrix.
 %
@@ -8,7 +8,7 @@ function c = optdis( dmat, h )
 %
 % JH
 
-    if nargin < 2, h=1e-4; end
+    if nargin < 2, h=1; end
     c = dk.cmap.optsim(1./(h + dmat));
 
 end
