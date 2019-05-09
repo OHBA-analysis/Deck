@@ -22,7 +22,7 @@ end
 
 function t=ducktest(x)
     try
-        t = isscalar(x) && (x*0 == 0);
+        t = isscalar(x) && isnumeric(x) && (x*0 == 0);
     catch 
         t = false;
     end
