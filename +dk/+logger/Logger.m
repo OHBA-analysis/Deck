@@ -124,7 +124,7 @@ classdef Logger < handle
         end
         
         % state
-        function self = saveState(self)
+        function b = saveState(self)
             f = {'fileLevel', 'consoleLevel', 'nodate', 'lvlchar', 'stdepth'};
             n = numel(f);
             
@@ -135,11 +135,16 @@ classdef Logger < handle
             self.backup = b;
         end
         
-        function self = resetState(self)
+        function self = resetState(self,b)
             f = {'fileLevel', 'consoleLevel', 'nodate', 'lvlchar', 'stdepth'};
             n = numel(f);
             
-            b = self.backup;
+            if nargin < 2
+                b = self.backup;
+            else
+                self.backup = b;
+            end
+            assert( dk.is.struct(b,f), 'Bad state.' );
             for i = 1:n
                 self.(f{i}) = b.(f{i});
             end

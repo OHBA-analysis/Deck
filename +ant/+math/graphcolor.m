@@ -12,7 +12,7 @@ function [c,k] = graphcolor(G,r)
 %      where n is the number of nodes in G
 %   k = number of colors
 % 
-% Increasing the number of runs can lead to colorings with fewer colors.
+% Increasing the number of runs can lead to better colorings (ie fewer colors).
 % For more information, see https://en.wikipedia.org/wiki/Greedy_coloring
 %
 % JH
