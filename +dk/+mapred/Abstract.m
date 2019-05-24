@@ -204,7 +204,7 @@ classdef Abstract < handle
             % save output file
             outfile = fullfile( folder, sprintf( config.files.worker, workerid ) );
             dk.disp('\n\t Saving output file to "%s" (%s)...',outfile,get_timestamp);
-            save( outfile, '-v7.3', 'output' );
+            dk.savehd( outfile, output );
 
             fprintf('\n\n');
             dk.disp('[MapReduce.STOP] Worker #%d',workerid);
@@ -257,7 +257,7 @@ classdef Abstract < handle
 
             % save output file
             dk.disp('\n\t Saving reduced file to "%s" (%s)...',outfile,get_timestamp);
-            save( outfile, '-v7.3', 'output' );
+            dk.savehd( outfile, output );
 
             fprintf('\n\n');
             dk.disp('[MapReduce.STOP] Reduce');

@@ -258,7 +258,7 @@ classdef LinkedList < dk.priv.GrowingContainer
             s.front = self.front;
             s.back = self.back;
             
-            if nargin > 1, save(file,'-v7','-struct','s'); end
+            if nargin > 1, dk.save(file,s); end
         end
 
         function self=unserialise(self,s)

@@ -170,7 +170,7 @@ classdef Matrix < dk.priv.GrowingContainer
             s = self.gcToStruct();
             s.data = self.data;
             s.version = '0.1';
-            if nargin > 1, save(file,'-v7','-struct','s'); end
+            if nargin > 1, dk.save(file,s); end
         end
         
         function self=unserialise(self,s)

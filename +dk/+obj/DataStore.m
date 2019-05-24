@@ -129,7 +129,7 @@ classdef DataStore < handle
             
             % save data
             dk.info('[dk.Datastore] Saving to "%s"...',f);
-            save( f, '-v7', '-struct', 'data' );
+            dk.save( f, data );
             
         end
         
@@ -154,22 +154,9 @@ classdef DataStore < handle
             % load data
             name = self.matfile(name);
             dk.info('[dk.Datastore] Loading from "%s"...',name);
-            data = load(name);
-
-            if nargin > 2
-                % extract specific variables
-                data = dk.mapfun( @(n) dk.struct.get( data, n, [] ), varargin, false );
-
-                if nargout == 1 && nargin > 3
-                    % more than one field required, but only one output: return a structure
-                    varargout = {cell2struct( data, varargin, 2 )};
-                else
-                    varargout = data;
-                end
-            else
-                % return the whole structure
-                varargout = {data};
-            end
+            
+            varargout = cell(1,nargout);
+            [varargout{:}] = dk.load(name,varargin{:});
             
         end
         

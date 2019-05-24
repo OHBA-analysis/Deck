@@ -338,7 +338,7 @@ classdef TreeBase < handle
             s.version = '0.1';
             s.type = self.type;
             s.store = self.store.serialise();
-            if nargin > 1, save(file,'-v7','-struct','s'); end
+            if nargin > 1, dk.save(file,s); end
         end
 
         function self=unserialise(self,s)
