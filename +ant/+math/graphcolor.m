@@ -46,7 +46,6 @@ function [c,k] = run(G)
     n = size(G,1);
     c = zeros(n,1);
     c(1) = 1;
-    a(1) = 1;
     k = 1;
     
     for i = 2:n
@@ -56,11 +55,9 @@ function [c,k] = run(G)
         
         if isempty(ci)
             k = k+1;
-            a(k) = 1;
             c(i) = k;
         else
             c(i) = ci;
-            a(ci) = a(ci)+1;
         end
     end
 
