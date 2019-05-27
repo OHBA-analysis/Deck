@@ -98,6 +98,10 @@ classdef Grid < handle
             s = [ self.ny, self.nx ];
         end
         
+        function n = numel(self)
+            n = self.ny * self.nx;
+        end
+        
         function x = reshape(self,x)
             s = self.size();
             if any(size(x) ~= s) && numel(x)==prod(s)
@@ -116,6 +120,7 @@ classdef Grid < handle
                 n = size(xq,1);
                 M = dk.mapfun( @(i) fun(xq(i,:)), (1:n)', unif );
             end
+            M = self.reshape(M);
         end
         
         function [M,xq] = evalctr(self,fun,unif)

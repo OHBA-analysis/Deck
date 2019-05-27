@@ -3,9 +3,7 @@ function y = integer(varargin)
 % y = integer( x )
 % y = integer( x1, x2, ... )
 %
-% Check if inputs are integers.
-% If input is numeric array, then return logical array of the same size (element-wise).
-% Otherwise, return scalar false.
+% Check if inputs are (scalar) integers.
 %
 % JH
 
