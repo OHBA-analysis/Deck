@@ -1,4 +1,4 @@
-function out = mapfun( fun, val, unif )
+function varargout = mapfun( fun, val, unif )
 %
 % out = dk.mapfun( fun, val, unif=false )
 %
@@ -11,18 +11,11 @@ function out = mapfun( fun, val, unif )
 
     if nargin < 3, unif=false; end
     
+    varargout = cell(1,nargout);
     if iscell(val)
-        if nargout == 0
-            cellfun( fun, val, 'UniformOutput', unif );
-        else
-            out = cellfun( fun, val, 'UniformOutput', unif );
-        end
+        [varargout{:}] = cellfun( fun, val, 'UniformOutput', unif );
     else
-        if nargout == 0
-            arrayfun( fun, val, 'UniformOutput', unif );
-        else
-            out = arrayfun( fun, val, 'UniformOutput', unif );
-        end
+        [varargout{:}] = arrayfun( fun, val, 'UniformOutput', unif );
     end
     
 % Old version.
