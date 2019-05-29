@@ -14,14 +14,14 @@ function Y = rescale( X, range, dim, method )
     xmin = min(X,[],dim);
     xmax = max(X,[],dim);
     
-    m = range(1);
-    M = range(2);
+    lo = range(1);
+    up = range(2);
     
     switch lower(method)
     
         case 'linear'
-            Y = (M-m)*dk.bsx.sub(X,xmin);
-            Y = m + dk.bsx.rdiv( Y, max( xmax-xmin, eps ) );
+            Y = (up-lo)*dk.bsx.sub(X,xmin);
+            Y = lo + dk.bsx.rdiv( Y, max( xmax-xmin, eps ) );
             
         otherwise
             error('Unknown method "%s".',method);
