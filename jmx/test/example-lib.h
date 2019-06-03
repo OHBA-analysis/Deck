@@ -21,11 +21,11 @@
 // ------------------------------------------------------------------------
 
 // declare a simple function, implement it in example-lib.cpp
-void simple_function( const jhm::Vector<double>& x, const jhm::Struct& s );
+void simple_function( const jmx::Vector<double>& x, const jmx::Struct& s );
 
 // declare a template function or class, and implement it here
 template <class T>
-bool template_function( const jhm::Vector<T>& x )
+bool template_function( const jmx::Vector<T>& x )
 {
     // do clever stuff...
 }

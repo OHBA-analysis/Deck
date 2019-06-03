@@ -72,7 +72,7 @@ namespace jmx {
     int set_cell( mxArray *mxc, index_t index, mxArray *value )
     {
         JMX_ASSERT( mxc, "Null pointer." );
-        JMX_ASSERT( mxIsStruct(mxc), "Input is not a cell." );
+        JMX_ASSERT( mxIsCell(mxc), "Input is not a cell." );
 
         mxSetCell( mxc, index, value );
         return 0; // mxSetCell doesn't return a status...
