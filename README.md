@@ -1,11 +1,12 @@
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
+[![Documentation](https://img.shields.io/badge/-documentation-yellowgreen.svg)](https://jhadida.gitlab.io/deck)
 
-> **NOTE (Jan 2019):**
-> This toolbox is undergoing a massive restructuration; the documentation might not be up-to-date, please rely on helptext only.
+> **NOTE (June 2019):**
+> This toolbox has undergone a considerable restructuration; the documentation might not be up-to-date, please rely on helptext only.
 > A new, consolidated documentation is being written. The instructions below have been updated.
 
-## Deck
+# Deck
 
 A general-purpose Matlab (2015+) toolbox that doesn't get in your way. Deck is now an aggregate of 3 sub-projects:
 
@@ -13,38 +14,52 @@ A general-purpose Matlab (2015+) toolbox that doesn't get in your way. Deck is n
  - The new `ant` toolbox, containing analysis tools mainly for time-series data;
  - The new `jmx` library, with a lightweight C++ library making it super-easy to write Mex files.
 
+## Requirements
+
+ - Matlab 2015+;
+ - A recent version of `git` (tested with 2.0+);
+ - Linux or OSX system (some users reported ok on Windows, but untested);
+ - Up-to-date C++ compiler (tested with `g++` and `clang++`);
+ - Mex setup (see [how to](https://uk.mathworks.com/help/matlab/matlab_external/changing-default-compiler.html)).
+
 ## Installation 
 
-> Requirements:
-> `git` is required to clone this repo (recommended install).
-> You will need a C++ compiler setup with your Matlab installation in order to use `ant` and `jmx`.
-
-From the Matlab console:
-```
-folder = fullfile( userpath(), 'deck' ); % where Deck will be downloaded
-setenv( 'DECK_FOLDER', folder ); % can be used within system calls
-!git clone https://github.com/jhadida/deck.git "$DECK_FOLDER"
-addpath(folder);
-dk_startup;
-ant.compile(); % optional, if you want to use ant+jmx
-```
+Choose a folder where you would like to put this toolbox; a good default choice is Matlab's `userpath()` (usually `~/Documents/MATLAB`).
+Whatever you choose, we refer to this location as `FOLDER` in Matlab, and `$FOLDER` in a shell.
 
 From a terminal:
 ```
-DECK_FOLDER=${HOME}/Documents/MATLAB/deck
-git clone https://github.com/jhadida/deck.git "$DECK_FOLDER"
-echo
-echo "All done. To use it, type in the Matlab console:"
-echo ">> addpath('$DECK_FOLDER');"
-echo ">> dk_startup;"
-echo ">> ant.compile(); % optional, if you want to use ant+jmx"
+# wherever you chose:
+FOLDER="~/Documents/MATLAB"
+
+git clone https://gitlab.com/jhadida/deck.git "$FOLDER/deck"
+pushd "$FOLDER/deck/jmx"
+bash install.sh
+popd
 ```
 
-Alternatively without git, download a zip archive (green button near the top), extract it, add the folder to the Matlab path (do **NOT** use `genpath`), and type:
+**_Then_** from a Matlab console:
 ```
+% wherever you chose
+FOLDER = fullfile( userpath(), 'deck' );
+
+addpath(FOLDER);     % !! DO NOT USE genpath() !!
 dk_startup;
-ant.compile(); % optional, if you want to use ant+jmx
+ant.compile();       % optional, if you want to use ant+jmx
 ```
+
+If this gives you an error, [let me know](mailto:jonathan.hadida@ohba.ox.ac.uk).
+
+Finally, if you like Deck and would like to use it by default when Matlab starts, then add the following to your [startup.m](http://uk.mathworks.com/help/matlab/ref/startup.html):
+```
+% Add Deck toolbox to the path
+addpath(fullfile( userpath, 'deck' )); % or wherever you installed it
+dk_startup();
+```
+
+## Bugs & Issues
+
+Please report new issues [here](https://gitlab.com/jhadida/deck/issues) (check the existing open+closed ones before posting please).
 
 ## Usage
 
@@ -59,11 +74,9 @@ The functions in the `jmx` are prefixed with `jmx_`; they are mainly used to com
 You installed Deck previously, and it worked, but now it doesn't?
 You just need to add the folder to your Matlab path again. From the Matlab console:
 ```
-folder = fullfile( userpath(), 'deck' ); % or wherever you cloned/downloaded Deck
-addpath( folder ); dk_startup;
+addpath(fullfile( userpath, 'deck' )); % or wherever you installed it
+dk_startup();
 ```
-
-If you use Deck regularly, and don't want to do this every time, add the previous commands to your [startup.m](http://uk.mathworks.com/help/matlab/ref/startup.html).
 
 ### Updates
 
@@ -75,30 +88,24 @@ git pull
 
 Then from the Matlab console:
 ```
-ant.compile(); % optional, if you want to use ant+jmx
+jmx_build(); % optional, if you want to use ant+jmx
+ant.compile(); 
 ```
 
 ## Documentation
 
-As you can see in the folder `+dk`, there is a lot of stuff in there. 
-The documentation is being written on and off (sorry), and can be read by browsing the source folders on GitHub. 
-Go ahead, click on [`+dk/+str`](https://github.com/jhadida/deck/tree/master/%2Bdk/%2Bstr) for example.
+The documentation is being written on and off (sorry); but there are many helpful READMEs within the source folders themselves. 
+Go ahead and check [`+dk/+str`](https://gitlab.com/jhadida/deck/tree/master/+dk/+str) for example.
 
 If you are looking for something specific, you'll either need to guess from the names that 'such' function might be relevant, or ask someone who knows, or maybe try something at random :)
-Either way, there is a help-text written for most functions, which should be enough to get you started (if you're a hacker, the code should also be fairly legible). 
+Most functions have a helpful helptext, which should be enough to get you started (if you're a hacker, the code should also be fairly legible). 
 To get help about a function, type `help dk.some.function` from the Matlab console. 
-If that's not helpful, and you really want to know, [open an issue](https://github.com/jhadida/deck/issues) asking for documentation about that particular function.
+If that's not helpful, and you really want to know, [open an issue](https://gitlab.com/jhadida/deck/issues) asking for documentation about that particular function.
 
 ## Contributions
 
-This is free software, all contributions are welcome. 
-Bugs can be reported by creating new issues (check the existing open+closed ones before posting please).
+This is free and open software; all contributions are welcome. 
 
-For contributing, you'll need a [GitHub account](https://github.com/join). Also, checkout [the docs](https://help.github.com/articles/connecting-to-github-with-ssh/) to link your various computers with your account using SSH keys (avoids having to type passwords).
+For contributing, you'll need a [GitLab account](https://gitlab.com/users/sign_in#register-pane). Also, checkout [the docs](https://docs.gitlab.com/ee/ssh/) to link your various computers with your account using SSH keys (avoids having to type passwords).
 
-Then, the recipe is: [fork](https://help.github.com/articles/fork-a-repo/) it, change it ([learn how](https://rogerdudler.github.io/git-guide/)), push it, [pull-request](https://help.github.com/articles/creating-a-pull-request/) it. Send me a message if you're not sure.
-
-## Bugs
-
-Report anything fishy by creating a [new issue](https://github.com/jhadida/deck/issues). 
-
+<!-- Then, the recipe is: [fork](https://help.github.com/articles/fork-a-repo/) it, change it ([learn how](https://rogerdudler.github.io/git-guide/)), push it, [pull-request](https://help.github.com/articles/creating-a-pull-request/) it. Send me a message if you're not sure. -->
