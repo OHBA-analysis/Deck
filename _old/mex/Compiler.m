@@ -90,8 +90,7 @@ classdef Compiler < handle
             self.debug         = false;
             
             % detect integer width
-            [~,maxArraySize]   = computer();
-            self.use_64b_size  = maxArraySize > pow2(31);
+            self.use_64b_size = dk.env.is64bits();
             
         end
         

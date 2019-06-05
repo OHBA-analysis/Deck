@@ -3,6 +3,10 @@ function cmd = jmx( files, options, varargin )
 % cmd = jmx( files, options, varargin )
 %
 % Compile a Mex file using the JMX library.
+% Essentially calls jmx_compile with:
+%   - including jmx.o object as dependency;
+%   - and setting the jmx option.
+%
 %
 % files:    path to Mex file
 %           or a cell starting with path to Mex file, followed by object files
@@ -15,17 +19,25 @@ function cmd = jmx( files, options, varargin )
 
     if nargin < 2, options=struct(); end
 
-    objfile = jmx_path('inc/jmx.o');
-    if exist(objfile,'file') ~= 2
-        jmx_build();
-    end
-    
+    % check input
     if ~iscell(files)
         files = {files};
     end
     assert( iscellstr(files), 'Bad files list.' );
-    files{end+1} = objfile;
     
+    % force jmx option
+    options.jmx = true;
+    
+    % include jmx.o
+    objfile = jmx_path('inc/jmx.o');
+    if exist(objfile,'file') ~= 2
+        jmx_build();
+    end
+    if ~ismember( 'jmx.o', dk.mapfun( @dk.fs.basename, files, false ) )
+        files{end+1} = objfile;
+    end
+    
+    % call jmx_compile
     cmd = jmx_compile( files, options, varargin{:} );
 
 end

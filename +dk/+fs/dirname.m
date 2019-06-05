@@ -2,6 +2,11 @@ function d = dirname( x, n )
 %
 % d = dk.fs.dirname( x, n=0 )
 %
+% Return directory part in input path x:
+%   - if the last segment of x has a dot, interpret as basename and ignore;
+%   - if x is empty (either no input, or after previous step), take pwd;
+%   - if n > 0, remove the last n segments.
+%
 % JH
 
     if nargin < 2, n=0; end

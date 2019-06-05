@@ -1,16 +1,19 @@
 function cmd = jmx_compile( files, options, varargin )
 %
-% cmd = jmx_compile( files, options, ... )
+% cmd = jmx_compile( files, options, settings... )
 %
 % Compile C++ files using Mex.
+%
 % 
-% ** files
+% FILES
+% -----
 %  
 %   Either a string or a cell of strings.
 %   If a file depends on other files, then needs to be a cellstr with object files last.
 %
 %
-% ** options
+% OPTIONS
+% -------
 %
 %   mex         true   -c         Whether the target source file is a Mex-file.
 %                                 I.e. it should have a mexFunction() instead of a main().
@@ -21,7 +24,7 @@ function cmd = jmx_compile( files, options, varargin )
 %   arma        false             Setup paths/libs to use Armadillo.
 %   jmx         true              Setup paths/libs to use JMX.
 %
-%   index32     false             Newer versions of Matlab use 64-bits indices (-largeArrayDims).
+%   index32     <auto>            Newer versions of Matlab use 64-bits indices (-largeArrayDims).
 %                                 Set to true to use 32-bits legacy indexing (-compatibleArrayDims).
 %
 %   outdir      pwd    -outdir    The folder in which to put the compiled object.
@@ -30,13 +33,14 @@ function cmd = jmx_compile( files, options, varargin )
 %
 % See the documentation of mex for the following options:
 %
-%   optimise    false  -O
+%   optimise    true   -O
 %   debug       false  -g
 %   verbose     false  -v
 %   silent      false  -silent
 %
 %
-% ** settings
+% SETTINGS
+% --------
 % 
 %   flag                CXXFLAGS    Compiler flags
 %   def                 -D          Code flags
@@ -45,16 +49,20 @@ function cmd = jmx_compile( files, options, varargin )
 %   lpath               -L          Linking path
 %   ipath               -I          Include path
 %
+% Multiple definitions can be specified as a cell, e.g.:
+%   jmx_compile( ... 'def', {'FOO=5', 'BAR'} )
+%
+%
 % JH
 
     % process inputs
     if nargin < 2 || isempty(options), options = struct(); end
 
     files = wrap_cell(files);
-    filetest = @(f) ismember( exist(f,'file'), [2,7] );
+    filetest = @(f) any( exist(f,'file') == [2,7] );
     
     assert( iscellstr(files), 'Files ($1) should be a string or cell-string.' );
-    assert( all(cellfun( filetest, files )), 'One or several files not found.' );
+    assert( all(cellfun( filetest, files )), 'One or several files not found (please use absolute paths).' );
     
     T = parse_options(options, fileparts(files{1})); % default output dir with target file
     S = parse_settings(varargin{:});
@@ -64,10 +72,12 @@ function cmd = jmx_compile( files, options, varargin )
     if T.cpp11
         S = append(S,'flag','-std=c++11');
     end
-    if T.index32
-        S = append(S,'def','JMX_32BIT');
-    else
-        S = append(S,'def','JMX_64BIT');
+    if T.jmx
+        if T.index32
+            S = append(S,'def','JMX_32BIT');
+        else
+            S = append(S,'def','JMX_64BIT');
+        end
     end
     if T.jmx || T.arma 
         S = append(S,'ipath',jmx_path('inc'));
@@ -134,10 +144,9 @@ function out = parse_options(in,filedir)
     out.cpp11 = true;
 
     % detect integer width
-    [~,maxArraySize] = computer();
-    out.index32 = maxArraySize <= pow2(31);
+    out.index32 = dk.env.is32bits();
 
-    out.optimise = false;
+    out.optimise = true;
     out.verbose = false;
     out.silent = false;
     out.debug = false;
@@ -183,14 +192,23 @@ end
 
 function s = parse_settings(varargin)
 
-    assert( mod(nargin,2) == 0, 'Inputs should be Name/Value pairs.' );
+    % turn input into k/v cell
+    args = dk.wrap(varargin);
+    n = numel(args);
+    if n==1 
+        args = dk.s2c(args{1});
+        n = numel(args);
+    end
     
-    n = nargin/2;
+    % check number of elements
+    assert( mod(n,2) == 0, 'Inputs should be Name/Value pairs.' );
+    n = n/2;
+    
+    % assign settings
     s = struct();
-    
     for i = 1:n
-        name  = varargin{2*i-1};
-        value = wrap_cell(varargin{2*i});
+        name  = args{2*i-1};
+        value = wrap_cell(args{2*i});
         assert( iscellstr(value) && ~isempty(value), 'Expected a non-empty cell of strings.' );
         
         switch lower(name)
