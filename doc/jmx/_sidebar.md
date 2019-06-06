@@ -1,29 +1,29 @@
 
 * Getting started
 
-  * [Installation](install.md)
-  * [Intro to Mex](mex.md)
-  * [Library overview](arch.md)
+  * [Installation](jmx/install)
+  * [Intro to Mex](jmx/mex)
+  * [Library overview](jmx/arch)
 
 * Common usage
 
-  * [Boilerplate](common/boilerplate.md)
-  * [Messages & exceptions](common/printing.md)
-  * [Arguments & outputs](common/args.md)
-  * [Variable types](common/types.md)
-  * [Compiling Mex files](common/compile.md)
-  * [Using Armadillo](common/armadillo.md)
-  * [Keyboard interruptions](common/interrupt.md)
+  * [Boilerplate](jmx/common/boilerplate)
+  * [Messages & exceptions](jmx/common/printing)
+  * [Arguments & outputs](jmx/common/args)
+  * [Variable types](jmx/common/types)
+  * [Compiling Mex files](jmx/common/compile)
+  * [Using Armadillo](jmx/common/armadillo)
+  * [Keyboard interruptions](jmx/common/interrupt)
 
 * Data structures
 
-  * [Arrays](data/array.md)
-  * [Cells](data/cell.md)
-  * [Structures](data/struct.md)
-  * [MAT-files](data/mat.md)
-  * [Memory management](data/memory.md)
+  * [Arrays](jmx/data/array)
+  * [Cells](jmx/data/cell)
+  * [Structures](jmx/data/struct)
+  * [MAT-files](jmx/data/mat)
+  * [Memory management](jmx/data/memory)
 
 * Contribution
 
-  * [How-to](contribute.md)
-  * [To-do list](todo.md)
+  * [How-to](jmx/contribute)
+  * [To-do list](jmx/todo)

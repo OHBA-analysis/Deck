@@ -1,40 +1,38 @@
 
 * Getting started
 
-  * [Installation](install.md)
-  * [Overview](overview.md)
+  * [Installation](install)
+  * [Overview](overview)
 
 * Deck
 
-  * [Intro](deck/index.md)
-  * [Enhancements](deck/enhance.md)
-  * [Logging](deck/logging.md)
-  * [Assertions](deck/testing.md)
-  * [Arguments](deck/options.md)
-  * [Numerics](deck/numeric/index.md)
-  * [Strings](deck/string/index.md)
-  * [Structures](deck/struct/index.md)
-  * [Time & date](deck/time/index.md)
-  * [System & path](deck/system/index.md)
-  * [Filesystem](deck/file/index.md)
-  * [Figures & GUI](deck/ui/index.md)
-  * [Plugins](deck/plugin/index.md)
-  * [Other](deck/other/index.md)
+  * [Intro](deck/index)
+  * [Enhancements](deck/enhance)
+  * [Logging](deck/logging)
+  * [Assertions](deck/testing)
+  * [Arguments](deck/options)
+  * [Numerics](deck/numeric/index)
+  * [Strings](deck/string/index)
+  * [Structures](deck/struct/index)
+  * [Time & date](deck/time/index)
+  * [System & path](deck/system/index)
+  * [Filesystem](deck/file/index)
+  * [Figures & GUI](deck/ui/index)
+  * [Plugins](deck/plugin/index)
+  * [Other](deck/other/index)
 
 * AnT
 
-  * [Intro](ant/index.md)
-  * [Arrays](ant/array/index.md)
-  * [Maths](ant/maths/index.md)
+  * [Intro](ant/index)
+  * [Arrays](ant/array/index)
+  * [Maths](ant/maths/index)
   * Images
   * Time-series
   
-* JMX
-
-  * To do
+* [JMX](jmx/index)
 
 * Development
 
-  * [Contributors](authors.md)
-  * [How-to contribute?](contribute.md)
+  * [Contributors](authors)
+  * [How-to contribute?](contribute)
   

@@ -8,3 +8,62 @@
    - Memory allocation
  - Printing to the console
 
+## In order
+
+```
+common:
+  printing + type conversion Matlab/C++
+
+makers:
+  create mxArray*
+
+setters:
+  assign mxArray* cells / fields / variables 
+
+sequence: (cf memory)
+  define Vector, Matrix and Volume
+  + forward declare Struct and Cell
+
+getters:
+  wrap const mxArray* into previous containers
+  memory is ReadOnly by default, Matlab variants with _rw suffix
+  + forward declare get_struct / get_cell
+
+creator:
+  abstract class with methods mkvec/mkmat/etc using makers
+  relies on: mxArray* _creator_assign( <key>, mxArray* )
+
+extractor:
+  abstract class with methods getnum/getvec/etc using getters
+  relies on: const mxArray* _extractor_get( <key> )
+
+mapping:
+  wrapper around unordered map (string -> mxArray*)
+  implements Creator and Extractor patterns with string keys
+  + derive MAT and Struct classes
+
+forward:
+  definition of getters + creator + extractor
+  definition of Cell implementing Creator + Extractor patterns with index keys
+
+args:
+  wrapper around Mex function inputs
+  implements Creator + Extractor patterns with index keys
+  simplifies getting inputs / creating outputs
+
+```
+
+On the side:
+```
+redirect:
+  redirecting cout to mexPrintf
+
+memory:
+  ReadOnly, Matlab (mxCalloc) and Cpp (new[])
+
+
+display: not available yet
+  display containers to console
+  TODO: tag-dispatch for scalar handling + dispCell/dispStruct
+
+```
