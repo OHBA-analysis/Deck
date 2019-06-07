@@ -1,4 +1,4 @@
-function c = jh()
+function c = jh(name)
 %
 % My collection of colors
 %
@@ -28,9 +28,11 @@ function c = jh()
     c.teal    = [0,0.5,0.5];
     c.azure   = [0,0.22,0.66];
     c.royal   = [0,0.14,0.4];
-    c.oxford  = [0,0.13,0.28];
     c.ink     = [0,0.19,0.33];
     c.bottle  = [0,0.25,0.25];
+    
+    c.oxford  = [0,13,28]/100;
+    c.winred  = [51,12,17]/100;
     
     c.red     = [1,0.11,0];
     c.carmine = [1,0,0.22];
@@ -45,6 +47,10 @@ function c = jh()
     c.cyan    = m(5,:);
     c.blue    = [0,0.3,1];
     c.sky     = m(6,:);
+    
+    if nargin > 0
+        c = c.(name);
+    end
     
 end
 

@@ -27,6 +27,9 @@ function [popt,fopt,fface] = linefill_options(varargin)
         case 'bluered'
             popt = colors.teal;
             fopt = colors.brick;
+        case 'win'
+            popt = colors.oxford;
+            fopt = colors.winred;
     end
     
     % convert options to cells
@@ -40,7 +43,7 @@ function [popt,fopt,fface] = linefill_options(varargin)
     
     if isnumeric(fopt)
         assert( numel(fopt)==3, 'Color vector should be 1x3.' );
-        fopt = struct( 'LineWidth', 1, 'EdgeColor', fopt, 'FaceAlpha', 0.65 );
+        fopt = struct( 'LineWidth', 1, 'EdgeColor', fopt, 'FaceAlpha', 0.75 );
     elseif iscell(fopt)
         fopt = struct(fopt{:});
     end
