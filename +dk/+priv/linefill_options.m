@@ -43,7 +43,7 @@ function [popt,fopt,fface] = linefill_options(varargin)
     
     if isnumeric(fopt)
         assert( numel(fopt)==3, 'Color vector should be 1x3.' );
-        fopt = struct( 'LineWidth', 1, 'EdgeColor', fopt, 'FaceAlpha', 0.75 );
+        fopt = struct( 'LineWidth', 1, 'EdgeColor', fopt, 'FaceAlpha', 0.85 );
     elseif iscell(fopt)
         fopt = struct(fopt{:});
     end
@@ -51,7 +51,7 @@ function [popt,fopt,fface] = linefill_options(varargin)
     
     % ensure that the face color is set
     fedge = dk.struct.get( fopt, 'EdgeColor', fdef );
-    fface = rgb2hsv(fedge) .* [1,0.9,1];
+    fface = hsv2rgb(rgb2hsv(fedge) .* [1,0.9,1]);
     
     % extract struct values to cell
     popt = dk.struct.to_cell(popt);
