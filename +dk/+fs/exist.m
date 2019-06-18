@@ -61,7 +61,7 @@ function y = exist( name, kind )
             
         case {'mexfile','mex'}
             [~,~,y] = fileparts(which(name));
-            y = ~isempty(strfind(y,'.mex'));
+            y = ~isempty(strfind(y,'.mex')); %#ok
             
         case 'class'
             y = (e == 8);
