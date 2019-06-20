@@ -11,7 +11,7 @@ function y = matrix( x, n )
 
     if nargin < 2, n=[]; end
 
-    y = isnumeric(x) && ismatrix(x);
+    y = (isnumeric(x) || islogical(x)) && ismatrix(x);
     
     switch numel(n)
         case 0
