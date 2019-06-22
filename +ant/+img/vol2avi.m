@@ -1,14 +1,14 @@
-function vol2mp4( filename, volume, fps, callback )
+function vol2avi( filename, volume, fps, callback )
 %
-% ant.img.vol2mp4( filename, volume, fps=30, callback=dk.forward )
+% ant.img.vol2avi( filename, volume, fps=30, callback=dk.forward )
 %
-% Create video with MPEG-4 format from slices of input volume.
+% Create video with AVI format from slices of input volume.
 % Volume can be a cell of images, or a 3D/4D array of images.
 %
 % Callback can be specified to optionally process slices before 
 % writing to video stream (e.g. to ensure they are RGB images).
 %
-% See also: ant.img.vol2slices, ant.img.vol2avi
+% See also: ant.img.vol2slices, ant.img.vol2mp4
 %
 % JH
 
@@ -16,7 +16,7 @@ function vol2mp4( filename, volume, fps, callback )
     if nargin < 4, callback = @dk.forward; end
     
     % open movie file
-    writer = VideoWriter( dk.str.xset(filename,'mp4'), 'MPEG-4' );
+    writer = VideoWriter( dk.str.xset(filename,'avi'), 'Motion JPEG AVI' );
     writer.FrameRate = fps;
     writer.open();
     
