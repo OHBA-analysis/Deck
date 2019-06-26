@@ -11,5 +11,5 @@ source "$JH_ROOT/inc/scriptutils.sh" || { echo "jh lib not sourced"; exit 1; }
 Pattern=$1
 shift
 
-fstr "$Pattern" --include={*.m,*.py,*.cpp,*.h,*.hpp} --exclude-dir={_dev,_old,docs,gui,public} "$@"
+fstr "$Pattern" --include={*.m,*.py,*.cpp,*.h,*.hpp} --exclude-dir={_dev,_old,docs,gui,public,armadillo-code} "$@"
 
