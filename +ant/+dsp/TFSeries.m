@@ -212,6 +212,25 @@ classdef TFSeries < handle
             
         end
         
+        function s = mask(self,tmask,smask)
+        %
+        % mask( tmask, smask )
+        %
+        % Return a TFSeries object (or change in-place) with masked time-course and signals.
+        %
+            
+            if nargin < 3, smask=1:self.ns; end
+            if nargin < 2 || isempty(tmask), tmask=1:self.nt; end
+            
+            if nargout == 0
+                self.time = self.time(tmask);
+                self.vals = self.vals(tmask,smask);
+            else
+                s = ant.dsp.TFSeries( self.time(tmask), self.vals(tmask,smask), self.freq, self.pnorm );
+            end
+            
+        end
+        
         function self = resample(self,fs,tol)
         %
         % resample( fs, tol=0.1 )
@@ -396,41 +415,6 @@ classdef TFSeries < handle
         end
         function [s,t,w] = adaptive_synchrony(self,varargin)
             [s,t,w] = self.adaptive_prop('synchrony',varargin{:});
-        end
-        
-        function data = summary( self, method, varargin )
-        %
-        % data = summary( method, nosc, burn=0, ovr=0.5 )
-        %
-        % Summary given PSD and adaptive connectivity stats.
-        % Output is a structure with fields:
-        %   freq  copied from self.freq
-        %   swin  processed from adaptive parameters
-        %    psd  PSD computed on a sliding window
-        %     fc  mean, sdev, skew of FC matrices across windows
-        %         also contains the FC matrix computed on the full timecourse
-        %
-            
-            swin = adaptive_swin(varargin{:});
-            tidx = find( self.time >= (self.time(1)+swin(3)) );
-            to_matrix = @(x)ant.mat.col2sym(x,true);
-            
-            % sliding average PSD 
-            [p.vals,p.time] = self.sliding_psd([],swin);
-            
-            % stats across adaptive sliding window
-            fc = ant.math.stat( self.sliding_connectivity( method, swin ), 2 );
-            fc.mean = to_matrix(fc.mean);
-            fc.sdev = to_matrix(fc.sdev);
-            fc.skew = to_matrix(fc.skew);
-            fc.full = self.connectivity(method,tidx); %#ok
-            
-            % wrap up
-            data.freq = self.freq;
-            data.swin = swin;
-            data.psd  = p;
-            data.fc   = fc;
-            
         end
         
         % plot spectrogram
