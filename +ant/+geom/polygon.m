@@ -1,6 +1,6 @@
 function x = polygon(n,len)
 %
-% x = ant.gm.polygon(n,len=[])
+% x = ant.geom.polygon(n,len=[])
 %
 % Return coordinates of regular polygon with n vertices.
 % By default, the side-length is such that the polygon fits within a circle of radius 1.

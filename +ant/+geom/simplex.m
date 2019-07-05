@@ -1,6 +1,6 @@
 function S = simplex( d, demean )
 %
-% S = ant.gm.simplex( d, demean=false )
+% S = ant.geom.simplex( d, demean=false )
 %
 % Create a unit simplex in dimension d.
 % If demean is true, the centre of the simplex is put at 0.
