@@ -103,7 +103,7 @@ classdef TFDistribution < handle
         function match = band_match(self,b)
             f = self.freq;
             if self.ismultiband
-                match = cellfun( @(x) nst.util.band_overlap(x,b), f ) > 0.95;
+                match = cellfun( @(x) dk.call(2,@ant.util.band_overlap,x,b), f ) > 0.95;
             else
                 match = (f >= b(1)) & (f <= b(2));
             end
@@ -355,7 +355,7 @@ classdef TFDistribution < handle
             % line-plot for multiband, image for wavelet analysis
             if self.ismultiband
                 plot( t, p );
-                bname = nst.util.band2name(f);
+                bname = ant.util.band2name(f);
                 xlabel('Time (sec)'); ylabel(name); legend(bname{:}); 
             else
                 arg = dk.obj.kwArgs({'xlabel','Time (sec)','ylabel','Frequency (Hz)','clabel',name}).merge(varargin{:});
@@ -383,7 +383,7 @@ classdef TFDistribution < handle
                     error('Bad number of inputs.');
             end
             if self.ismultiband
-                bname = nst.util.band2name(f);
+                bname = ant.util.band2name(f);
                 nst.ui.util.violin(p,bname); 
                 %xlabel('Frequency Band (Hz)'); 
             else

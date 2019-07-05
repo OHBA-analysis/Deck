@@ -6,7 +6,7 @@ function [f,input] = filter_parse( input )
 %
 % STRING INPUT:
 %
-%   Processed using either nst.util.eeg_bands, or assuming that it is a string 
+%   Processed using either ant.util.eeg_bands, or assuming that it is a string 
 %   representation of a numerical format (see below).
 %
 % NUMERICAL INPUT:
@@ -21,14 +21,14 @@ function [f,input] = filter_parse( input )
 %   Field 'type' with value in: lowpass, highpass, bandstop, bandpass
 %   Field 'freq' with an UNSIGNED numerical format (see above).
 %
-% See also: nst.util.eeg_bands
+% See also: ant.util.eeg_bands
 %
 % JH
 
     if ischar(input)
         
         % get eeg bands
-        eeg = nst.util.eeg_bands();
+        eeg = ant.util.eeg_bands();
         
         switch input
             
