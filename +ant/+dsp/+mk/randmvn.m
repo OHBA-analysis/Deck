@@ -12,6 +12,6 @@ function ts = randmvn(ns,tlen,fs,mu,Sigma)
     nt = numel(t);
     v = mvnrnd( mu, Sigma, nt );
     
-    ts = ant.dsp.TimeSeries(t,v);
+    ts = ant.TimeSeries(t,v);
  
 end

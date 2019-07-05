@@ -22,7 +22,7 @@ classdef SlidingWindow < handle
         
         % Clear contents
         function clear(self)
-            self.ts    = ant.dsp.TimeSeries();
+            self.ts    = ant.TimeSeries();
             self.curw  = 0;
             self.wsize = 0;
             self.wburn = 0;
@@ -59,7 +59,7 @@ classdef SlidingWindow < handle
             if nargin < 4, convert = true; end
             
             % parse time-series
-            % assert( isa(ts,'ant.dsp.TimeSeries'), 'Bad input.' );
+            % assert( isa(ts,'ant.TimeSeries'), 'Bad input.' );
             self.ts = ts;
             
             % convert to number of timesteps
@@ -126,7 +126,7 @@ classdef SlidingWindow < handle
         
         % Get a timeseries object corresp. to the current window
         function tsobj = get_timeseries(self)
-            tsobj = ant.dsp.TimeSeries( self.time(), self.vals() );
+            tsobj = ant.TimeSeries( self.time(), self.vals() );
         end
         
     end

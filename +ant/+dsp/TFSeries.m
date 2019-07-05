@@ -240,7 +240,7 @@ classdef TFSeries < handle
         % Arguments are forwarded to ant.dsp.do.filter
         %
             
-            mag = ant.dsp.TimeSeries( self.time, abs(self.vals) );
+            mag = ant.TimeSeries( self.time, abs(self.vals) );
             mag = ant.dsp.do.filter(mag,varargin{:});
             phi = angle(self.vals);
             
@@ -268,7 +268,7 @@ classdef TFSeries < handle
         
         function s = rem_before(self,t)
             if nargout == 0
-                tmsk = self.time >= t; % >= is consistent with ant.dsp.TimeSeries
+                tmsk = self.time >= t; % >= is consistent with ant.TimeSeries
                 self.time = self.time(tmsk);
                 self.vals = self.vals(tmsk,:);
                 s = self;

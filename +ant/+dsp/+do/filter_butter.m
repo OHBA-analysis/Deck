@@ -50,6 +50,6 @@ function ts_out = filter_butter( type, ts_in, freq, varargin )
     end
     
     % create output time-series
-    ts_out = ant.dsp.TimeSeries( ts_in.time, v );
+    ts_out = ant.TimeSeries( ts_in.time, v );
 
 end

@@ -17,6 +17,6 @@ function ts = randu(ns,tlen,fs,lo,up)
     v = dk.bsx.mul( rand( nt, ns ), up-lo );
     v = dk.bsx.add( v, lo );
     
-    ts = ant.dsp.TimeSeries(t,v);    
+    ts = ant.TimeSeries(t,v);    
 
 end

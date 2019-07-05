@@ -33,7 +33,7 @@ function ts_out = ft_bandstop( ts_in, fband, varargin )
             s = ifftshift(bsxfun( @times, s, f ));
             s = real(ifft(s));
             
-            ts_out = ant.dsp.TimeSeries( ts_in.time, s(1:nt,:) );
+            ts_out = ant.TimeSeries( ts_in.time, s(1:nt,:) );
             return;
             
         case 'firws'
@@ -56,7 +56,7 @@ function ts_out = ft_bandstop( ts_in, fband, varargin )
             error('[ant.dsp.ft_bandstop] Unsupported filter type "%s".',type);
     end
     
-    ts_out = ant.dsp.TimeSeries( ts_in.time, ...
+    ts_out = ant.TimeSeries( ts_in.time, ...
         ant.priv.ft_filter( ts_in.vals, hfilt, order, opt.get('instability_fix','default') ) ...
     );
 

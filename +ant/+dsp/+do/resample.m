@@ -58,6 +58,6 @@ function ts_out = resample( ts_in, varargin )
     if nargout == 0
         ts_in.assign( time, vals );
     else
-        ts_out = ant.dsp.TimeSeries(time,vals); 
+        ts_out = ant.TimeSeries(time,vals); 
     end
 end

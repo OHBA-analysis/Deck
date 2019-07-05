@@ -45,7 +45,7 @@ classdef TimeSeries < handle
         
         % Clone
         function ts = clone(self)
-            ts = ant.dsp.TimeSeries();
+            ts = ant.TimeSeries();
             ts.copy( self );
         end
         
@@ -79,7 +79,7 @@ classdef TimeSeries < handle
                     if ischar(varargin{1})
                         self.unserialise(varargin{1});
                         return;
-                    else %isstruct(varargin{1}) || isa(varargin{1},'ant.dsp.TimeSeries')
+                    else %isstruct(varargin{1}) || isa(varargin{1},'ant.TimeSeries')
                         t = varargin{1}.time;
                         v = varargin{1}.vals;
                     end
@@ -128,14 +128,14 @@ classdef TimeSeries < handle
         % Concatenation
         function ts = horzcat(self,varargin)
             ts = dk.mapfun( @(x) x.vals, varargin, false );
-            ts = ant.dsp.TimeSeries( self.time, horzcat(self.vals,ts{:}) );
+            ts = ant.TimeSeries( self.time, horzcat(self.vals,ts{:}) );
         end
         
         function ts = vertcat(self,varargin)
             t = dk.mapfun( @(x) x.time, varargin, false );
             v = dk.mapfun( @(x) x.vals, varargin, false );
             
-            ts = ant.dsp.TimeSeries( vertcat( self.time, t{:} ), vertcat( self.vals, v{:} ) );
+            ts = ant.TimeSeries( vertcat( self.time, t{:} ), vertcat( self.vals, v{:} ) );
             dk.assert('w', ts.is_analytic(), 'The concatenated time-series is not analytic!' );
         end
         
@@ -177,7 +177,7 @@ classdef TimeSeries < handle
         
         function ts = loadobj(in)
             if isstruct(in)
-                ts = ant.dsp.TimeSeries();
+                ts = ant.TimeSeries();
                 ts.unserialise(in);
             else
                 warning('Unknown serialised TimeSeries format.');
@@ -186,7 +186,7 @@ classdef TimeSeries < handle
         end
         
         function ts = load(filename)
-            ts = ant.dsp.TimeSeries(filename);
+            ts = ant.TimeSeries(filename);
         end
         
     end
@@ -247,7 +247,7 @@ classdef TimeSeries < handle
                 self.vals = new_vals;
                 self.time = new_time;
             else
-                ts = ant.dsp.TimeSeries( new_time, new_vals );
+                ts = ant.TimeSeries( new_time, new_vals );
             end
         end
         
@@ -261,7 +261,7 @@ classdef TimeSeries < handle
                 self.vals = new_vals;
                 self.time = query_t;
             else
-                ts = ant.dsp.TimeSeries( query_t, new_vals );
+                ts = ant.TimeSeries( query_t, new_vals );
             end
         end
         
@@ -291,7 +291,7 @@ classdef TimeSeries < handle
                 self.vals = new_vals;
                 self.time = new_time;
             else
-                ts = ant.dsp.TimeSeries( new_time, new_vals );
+                ts = ant.TimeSeries( new_time, new_vals );
             end
         end
         
@@ -314,7 +314,7 @@ classdef TimeSeries < handle
                 self.vals = new_vals;
                 self.time = new_time;
             else
-                ts = ant.dsp.TimeSeries( new_time, new_vals );
+                ts = ant.TimeSeries( new_time, new_vals );
             end
         end
         function ts = downsample(self,varargin)
@@ -323,7 +323,7 @@ classdef TimeSeries < handle
                 self.vals = new_vals;
                 self.time = new_time;
             else
-                ts = ant.dsp.TimeSeries( new_time, new_vals );
+                ts = ant.TimeSeries( new_time, new_vals );
             end
         end
         
@@ -337,7 +337,7 @@ classdef TimeSeries < handle
         
         % Average timecourse
         function ts = average(self)
-            ts = ant.dsp.TimeSeries( self.time, nanmean(self.vals,2) );
+            ts = ant.TimeSeries( self.time, nanmean(self.vals,2) );
         end
         
         % Energy
@@ -403,7 +403,7 @@ classdef TimeSeries < handle
             if nargout == 0
                 self.vals = self.vals(:,sel);
             else
-                ts = ant.dsp.TimeSeries( self.time, self.vals(:,sel) );
+                ts = ant.TimeSeries( self.time, self.vals(:,sel) );
             end
         end
         function ts = select_times(self,sel)
@@ -411,7 +411,7 @@ classdef TimeSeries < handle
                 self.time = self.time(sel);
                 self.vals = self.vals(sel,:);
             else
-                ts = ant.dsp.TimeSeries( self.time(sel), self.vals(sel,:) );
+                ts = ant.TimeSeries( self.time(sel), self.vals(sel,:) );
             end
         end
         
@@ -443,11 +443,11 @@ classdef TimeSeries < handle
         
         % Reorder signals
         function ts = reorder(self,order)
-            assert( dk.num.isperm(order), '[ant.dsp.TimeSeries] Expected a permutation in input.' );
+            assert( dk.num.isperm(order), '[ant.TimeSeries] Expected a permutation in input.' );
             if nargout == 0
                 self.vals = self.vals(:,order);
             else
-                ts = ant.dsp.TimeSeries( self.time, self.vals(:,order) );
+                ts = ant.TimeSeries( self.time, self.vals(:,order) );
             end
         end
         
@@ -528,7 +528,7 @@ classdef TimeSeries < handle
         % Regress an input time-course out of the current time-series
         function ts = regress(self,x)
             
-            if isa(x,'ant.dsp.TimeSeries'), x=x.vals; end
+            if isa(x,'ant.TimeSeries'), x=x.vals; end
             
             [xr,xc] = size(x);
             assert( (xr == self.nt) && (xc == 1), 'Bad input size.' );
@@ -555,7 +555,7 @@ classdef TimeSeries < handle
         % Note: adapted from FieldTrip
         function ts = denoise(self,ref)
             
-            if isa(ref,'ant.dsp.TimeSeries'), ref=ref.vals; end
+            if isa(ref,'ant.TimeSeries'), ref=ref.vals; end
             
             % demean both
             ref = dk.bsx.sub( ref, mean(ref,2) );
@@ -639,7 +639,7 @@ function out = make_output( narg, ts, vals )
         ts.vals = vals;
         out = ts;
     else
-        out = ant.dsp.TimeSeries( ts.time, vals );
+        out = ant.TimeSeries( ts.time, vals );
     end
 
 end

@@ -40,7 +40,7 @@ classdef MVAR < handle
             t = 0 : (1/fs) : tlen;
             v = ant.priv.mvar_sim( self.w, self.A, self.C, numel(t) );
             v = dk.bsx.add( v, self.m );
-            ts = ant.dsp.TimeSeries( t, v );
+            ts = ant.TimeSeries( t, v );
         end
 
     end

@@ -47,14 +47,15 @@ function dist = violin( data, varargin )
     assert( nd > 0, 'Empty dataset in input.' );
 
     % parse options
-    opt_width = opt.get('width',0.7);
-    opt_label = opt.get('label',1:nd);
-    opt_theme = opt.get('theme','jh');
-    opt_range = opt.get('range',[]);
-    opt_kern  = opt.get('kernel','normal');
-    opt_supp  = opt.get('support',[]);
-    opt_npts  = opt.get('numpts',51);
-    opt_wght  = opt.get('weights',[]);
+    opt_width       = opt.get('width',0.7);
+    opt_label       = opt.get('label',1:nd);
+    opt_maxlabel    = opt.get('maxlabel',30);
+    opt_theme       = opt.get('theme','jh');
+    opt_range       = opt.get('range',[]);
+    opt_kernel      = opt.get('kernel','normal');
+    opt_support     = opt.get('support',[]);
+    opt_npts        = opt.get('numpts',51);
+    opt_weights     = opt.get('weights',[]);
 
     % convert label to string
     if isnumeric(opt_label)
@@ -62,6 +63,12 @@ function dist = violin( data, varargin )
     end
     assert( iscellstr(opt_label), 'Labels should either be numeric or a cellstring.' );
     assert( numel(opt_label) == nd, 'There should be one label per column.' );
+    
+    % set x-ticks
+    step = ceil(nd / opt_maxlabel);
+    xtick = ceil(opt_width) * ((1:nd) - 0.5);
+    xtick = xtick( 1:step:nd );
+    opt_label = opt_label( 1:step:nd );
     
     % colors used for drawing
     colors = dk.color.jh();
@@ -79,34 +86,31 @@ function dist = violin( data, varargin )
     % process ksdensity options
     if isempty(opt_range)
         if dk.chkmver(2016)
-            ksarg = { [], 'NumPoints', opt_npts, 'Kernel',opt_kern };
+            ksarg = { [], 'NumPoints', opt_npts, 'Kernel',opt_kernel };
         else
-            ksarg = { [], 'npoints', opt_npts, 'Kernel',opt_kern };
+            ksarg = { [], 'npoints', opt_npts, 'Kernel',opt_kernel };
         end
     else
-        ksarg = { linspace( opt_range(1), opt_range(2), opt_npts ), 'Kernel', opt_kern };
+        ksarg = { linspace( opt_range(1), opt_range(2), opt_npts ), 'Kernel', opt_kernel };
     end
-    if ~isempty(opt_supp)
-        ksarg = [ ksarg, {'Support', opt_supp} ];
+    if ~isempty(opt_support)
+        ksarg = [ ksarg, {'Support', opt_support} ];
     end
 
     % compute and draw distributions
     dist = cell(1,nd);
-    xtic = ceil(opt_width) * (0.5 + (0:nd-1));
-
     q99 = -Inf;
     q01 =  Inf;
 
     for i = 1:nd
-        
-        if ~isempty(opt_wght)
-            w = getcol(opt_wght,i);
+        if ~isempty(opt_weights)
+            w = getcol(opt_weights,i);
             %w = w / min(nonzeros(w));
             [dist{i},v] = density_estimation( getcol(data,i), [ ksarg, {'Weights', w} ] );
         else
             [dist{i},v] = density_estimation( getcol(data,i), ksarg );
         end
-        plot_distribution( dist{i}, xtic(i), opt_width, theme );
+        plot_distribution( dist{i}, xtick(i), opt_width, theme );
 
         q99 = max( q99, prctile(v,99) );
         q01 = min( q01, prctile(v,1) );
@@ -118,9 +122,11 @@ function dist = violin( data, varargin )
 
     % prevent drawing over, and set tick labels
     hold off; ylim([q01 q99]);
-    set(gca,'xtick',xtic,'xticklabel',opt_label);
+    set( gca, 'xtick', xtick, 'xticklabel', opt_label );
+    
+    % if label strings are long, rotate them
     if mean(cellfun( @length, opt_label )) > 5
-        set(gca,'xticklabelrotation',55);
+        set( gca, 'xticklabelrotation', 60 );
     end
 
     % concatenate distributions as a struct array

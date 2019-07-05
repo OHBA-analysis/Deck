@@ -2,7 +2,7 @@ function [wtimes,wframes] = win_times( ts_in, varargin )
     
     % if input is a time vector, make it a time-series (that's a bit hacky)
     if isnumeric(ts_in) && isvector(ts_in)
-        ts_in = ant.dsp.TimeSeries( ts_in, ts_in );
+        ts_in = ant.TimeSeries( ts_in, ts_in );
     end
     
     % configure sliding window

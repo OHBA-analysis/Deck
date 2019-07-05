@@ -1,4 +1,4 @@
-classdef TFDistribution < handle
+classdef TFSpectrum < handle
 %
 % Spectral aggregate.
 %
@@ -16,7 +16,7 @@ classdef TFDistribution < handle
     
     methods
         
-        function self = TFDistribution(varargin)
+        function self = TFSpectrum(varargin)
             self.clear();
             if nargin > 0
                 self.assign(varargin{:});
@@ -113,7 +113,7 @@ classdef TFDistribution < handle
         function obj = band_select(self,b)
             match = self.band_match(b);
             if nargout > 0
-                obj = ant.dsp.TFDistribution(self.sig(match));
+                obj = ant.dsp.TFSpectrum(self.sig(match));
             else
                 self.sig = self.sig(match);
             end
@@ -147,7 +147,7 @@ classdef TFDistribution < handle
         end
         
         function self = load(self,filename)
-            dk.disp('[ant.dsp.TFDistribution] Loading file "%s"...',filename);
+            dk.disp('[ant.dsp.TFSpectrum] Loading file "%s"...',filename);
             self.unserialise(load(filename));
         end
         
@@ -156,7 +156,7 @@ classdef TFDistribution < handle
         
         function x = loadobj(in)
             if isstruct(in)
-                x = ant.dsp.TFDistribution();
+                x = ant.dsp.TFSpectrum();
                 x.unserialise(in);
             else
                 warning('Unknown serialised Aggregate format.');
@@ -384,10 +384,10 @@ classdef TFDistribution < handle
             end
             if self.ismultiband
                 bname = ant.util.band2name(f);
-                nst.ui.util.violin(p,bname); 
+                dk.ui.violin(p,'label',bname); 
                 %xlabel('Frequency Band (Hz)'); 
             else
-                nst.ui.util.violin(p,f); 
+                dk.ui.violin(p,'label',f); 
                 xlabel('Frequency (Hz)'); axis tight;
             end
         end
@@ -419,7 +419,7 @@ classdef TFDistribution < handle
                 otherwise
                     error('Bad number of inputs.');
             end
-            nst.ui.util.violin(p,c); 
+            dk.ui.violin(p,'label',c); 
             xlabel('Channel'); axis tight;
         end
         

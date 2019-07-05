@@ -9,8 +9,8 @@ function [env,phi,frq] = ansig( ts )
 % JH
 
     [env,phi,frq] = ant.ts.ansig( ts.vals, ts.fs(true) );
-    env = ant.dsp.TimeSeries( ts.time, dk.bsx.add(env,ts.mean) );
-    phi = ant.dsp.TimeSeries( ts.time, phi );
-    frq = ant.dsp.TimeSeries( ts.time, frq );
+    env = ant.TimeSeries( ts.time, dk.bsx.add(env,ts.mean) );
+    phi = ant.TimeSeries( ts.time, phi );
+    frq = ant.TimeSeries( ts.time, frq );
 
 end

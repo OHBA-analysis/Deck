@@ -21,7 +21,7 @@ function tf = hilbert( ts, band, npts, force )
 %
 % The output type depends on the number of bands in input:
 %   - for a single-band input, the ouput is of type ant.dsp.TFSeries
-%   - for a multi-band input, the output is of type ant.dsp.TFDistribution
+%   - for a multi-band input, the output is of type ant.dsp.TFSpectrum
 %
 % See also: ant.dsp.TFSeries, ant.ts.ansig, ant.priv.ssig_downsample
 %
@@ -66,7 +66,7 @@ function tf = hilbert( ts, band, npts, force )
     if nb == 1
         tf = tf{1}; 
     else
-        tf = ant.dsp.TFDistribution(tf);
+        tf = ant.dsp.TFSpectrum(tf);
     end 
     
 end

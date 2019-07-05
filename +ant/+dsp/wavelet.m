@@ -76,7 +76,7 @@ function tf = wavelet( ts, freq, npts, force )
     if nf == 1
         tf = tf{1};
     else
-        tf = ant.dsp.TFDistribution(tf);
+        tf = ant.dsp.TFSpectrum(tf);
     end
     
 end
