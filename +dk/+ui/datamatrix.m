@@ -75,7 +75,7 @@ end
 %
 %     % force ncols >= nrows
 %     if nr > nc
-%         [nr,nc] = dk.swap(nc,nr);
+%         [nr,nc] = dk.forward(nc,nr);
 %         rev = true;
 %     else
 %         rev = false;
@@ -101,7 +101,7 @@ end
 %     % check size
 %     assert( all(msize > 0), 'Bad size.' );
 %     if rev
-%         [nr,nc] = dk.swap(nc,nr);
+%         [nr,nc] = dk.forward(nc,nr);
 %         msize = fliplr(msize); 
 %     end
 %     dmat = imresize( dmat, msize, 'nearest' );
