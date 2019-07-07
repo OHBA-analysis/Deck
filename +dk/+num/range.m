@@ -72,6 +72,14 @@ function [bounds,rtype] = range( x, rtype, bounds )
             case -1
                 rtype = 'neg';
         end
+    else
+        if abs(lo+hi) < eps
+            rtype = 'ctr';
+        elseif abs(hi) < eps
+            rtype = 'neg';
+        elseif abs(lo) < eps
+            rtype = 'pos';
+        end
     end
     
     % set color-scale
