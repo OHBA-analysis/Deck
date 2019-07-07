@@ -11,7 +11,7 @@
   * [Struct, cell, string](deck/ctn/index)
   * [Assertion, logging](deck/log/index)
   * [System, path, file](deck/sys/index)
-  * [Figure, color, UI](deck/ui/index)
+  * [Figure, colour, UI](deck/ui/index)
   * [Numerics](deck/num/index)
   * [Time & date](deck/time/index)
 

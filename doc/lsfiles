@@ -6,7 +6,7 @@ List files in given folder into columns of specified or adaptive width.
 EXAMPLE
 -------
 
-    $ ./lsfiles ../+dk -C 20 -L 80 -x README.md -x realpath
+    $ ./lsfiles ../+dk -C 20 -L 80 -x README.md realpath
 
 assert.m            formatmv.m          load.m              savehd.m            
 bytesize.m          forward.m           log.m               swap.m              
@@ -26,17 +26,25 @@ import math
 import argparse 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser('my-lscol')
+    parser = argparse.ArgumentParser('lsfiles')
 
-    parser.add_argument( 'folder', help='Folder to list' )
-    parser.add_argument( '-f', '--pad-factor', help='Padding factor', default=1.2, type=float )
+    parser.add_argument( '-d', '--folder', help='Folder to list', default='.' )
+    parser.add_argument( '-f', '--files', help='Manually specify list of files', nargs='+', default=[] )
+
     parser.add_argument( '-C', '--column-width', help='Force column width', default=0, type=int )
     parser.add_argument( '-L', '--line-width', help='Maximum line-width', default=120, type=int )
-    parser.add_argument( '-x', '--exclude', help='Exclude specified filenames', default=[], action='append' )
+    parser.add_argument( '-x', '--exclude', help='Exclude specified filenames', nargs='+', default=[] )
+
+    parser.add_argument( '--pad-factor', help='Padding factor', default=1.2, type=float )    
+    parser.add_argument( '--prefix', help='Prepend string to each line', default='' )
+    parser.add_argument( '--suffix', help='Append string to each line', default='' )
     args = parser.parse_args()
 
-    with os.scandir(args.folder) as it:
-        flist = [ f.name for f in it if f.is_file() ]
+    if args.files:
+        flist = args.files 
+    else:
+        with os.scandir(args.folder) as it:
+            flist = [ f.name for f in it if f.is_file() ]
 
     flist = [ f for f in sorted(flist) if f not in args.exclude ]
     nfile = len(flist)
@@ -60,5 +68,5 @@ if __name__ == '__main__':
     #print( '%d x %d (=%d)' % (nrow, ncol, nfile) )
 
     for r in range(nrow):
-        print(''.join( item[r:nfile:nrow] ))
+        print( args.prefix + ''.join( item[r:nfile:nrow] ) + args.suffix )
     

@@ -112,6 +112,12 @@ Documentation is [here](deck/sys/index).
 +dk/
     here.m              path.m              
 
++env/
+    AbstractManager.m   SystemPath.m        filtpath.m          is64bits.m          
+    Library.m           clearpath.m         home.m              ld_name.m           
+    Path.m              computername.m      hostname.m          path_flag.m         
+    Runtime.m           desktop.m           is32bits.m          require.m
+
 +fs/
     File.m              exist.m             ls.m                safename.m          
     InputFile.m         gets.m              lsdir.m             search.m            
@@ -120,15 +126,9 @@ Documentation is [here](deck/sys/index).
     chkdir.m            isfile.m            match.m             
     chkfile.m           islink.m            puts.m              
     dirname.m           iterlines.m         realpath.m
-
-+env/
-    AbstractManager.m   SystemPath.m        filtpath.m          is64bits.m          
-    Library.m           clearpath.m         home.m              ld_name.m           
-    Path.m              computername.m      hostname.m          path_flag.m         
-    Runtime.m           desktop.m           is32bits.m          require.m
 ```
 
-## Figure, color, UI
+## Figure, colour, UI
 
 Documentation is [here](deck/ui/index).
 
