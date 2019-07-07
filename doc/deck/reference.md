@@ -37,12 +37,12 @@ Documentation is [here](deck/util/index).
     chkmver.m           getopt.m            notify.m            tostr.m             
     compare.m           gridfit.m           save.m              trywait.m           
     countunique.m       grouplabel.m        savehd.m            
-    formatmv.m          groupunique.m       tocol.m 
+    formatmv.m          groupunique.m       tocol.m             
 
 +util/
     array2cpp.m         bytefmt.m           func_ismember.m     path2name.m         
     array2str.m         email.m             func_neq.m          timeit.m            
-    bool2yn.m           func_eq.m           numcores.m          vec2str.m 
+    bool2yn.m           func_eq.m           numcores.m          vec2str.m      
 ```
 
 ## Functional programming
@@ -52,13 +52,13 @@ Documentation is [here](deck/fprog/index).
 ```
 +dk/
     call.m              forward.m           mapfun.m            reduce.m            
-    deal.m              kvfun.m             pass.m              swap.m 
+    deal.m              kvfun.m             pass.m              reverse.m 
 
 +bsx/
     add.m               geq.m               lt.m                sub.m               
     and.m               gt.m                mul.m               
     dot.m               ldiv.m              or.m                
-    eq.m                leq.m               rdiv.m
+    eq.m                leq.m               rdiv.m 
 
 ```
 
@@ -68,13 +68,13 @@ Documentation is [here](deck/ctn/index).
 
 ```
 +dk/
-    c2s.m               s2c.m               unwrap.m            wrap.m
+    c2s.m               s2c.m               unwrap.m            wrap.m              
 
 +str/
     Template.m          join.m              singlespaces.m      xrem.m              
     capfirst.m          lstrip.m            startswith.m        xrep.m              
     capwords.m          numbers.m           strip.m             xset.m              
-    endswith.m          rstrip.m            to_substruct.m 
+    endswith.m          rstrip.m            to_substruct.m      
 
 +struct/
     array.m             filter.m            merge.m             to_cell.m           
@@ -91,13 +91,13 @@ Documentation is [here](deck/log/index).
 ```
 +dk/
     assert.m            disp.m              log.m               verb.m              
-    debug.m             info.m              reject.m            warn.m
+    debug.m             info.m              reject.m            warn.m              
 
 +is/
     boolean.m           integer.m           rgb.m               string.m            
     empty.m             matrix.m            square.m            struct.m            
     even.m              number.m            squareneg.m         vector.m            
-    fhandle.m           odd.m               squarepos.m 
+    fhandle.m           odd.m               squarepos.m         
 
 +logger/
     Logger.m            del.m               list.m              
@@ -116,7 +116,7 @@ Documentation is [here](deck/sys/index).
     AbstractManager.m   SystemPath.m        filtpath.m          is64bits.m          
     Library.m           clearpath.m         home.m              ld_name.m           
     Path.m              computername.m      hostname.m          path_flag.m         
-    Runtime.m           desktop.m           is32bits.m          require.m
+    Runtime.m           desktop.m           is32bits.m          require.m           
 
 +fs/
     File.m              exist.m             ls.m                safename.m          
@@ -137,21 +137,21 @@ Documentation is [here](deck/ui/index).
     act.m               interp.m            rdb2.m              wjet.m              
     bgr.m               jet.m               rwb.m               
     cold.m              jh.m                rwb2.m              
-    hot.m               matlab.m            show.m
+    hot.m               matlab.m            show.m              
 
 +color/
     hex2rgb.m           palette.m           sepia.m             tone.m              
     jh.m                proc.m              shade.m             
-    mix.m               rgb2hex.m           tint.m
+    mix.m               rgb2hex.m           tint.m              
 
 +fig/
     export.m            new.m               recenter.m          size.m              
     maximise.m          position.m          rescale.m           tile.m              
-    movetoscreen.m      print.m             resize.m 
+    movetoscreen.m      print.m             resize.m            
 
 +screen/
     centre.m            height.m            size.m              
-    count.m             info.m              width.m
+    count.m             info.m              width.m             
 
 +ui/
     alphashape.m        datamatrix.m        mesh.m              sphere.m            
@@ -160,9 +160,9 @@ Documentation is [here](deck/ui/index).
     axesgrid.m          fill.m              quiver.m            triangulation.m     
     circle.m            ginput.m            ring.m              violin.m            
     colorbar.m          ginput_surf.m       scatter.m           wheel.m             
-    convhull.m          lights.m            sdplot.m
+    convhull.m          lights.m            sdplot.m            
 
-+widgets/
++widget/
     FrameStack.m        MultiTab.m          SelectBox.m         menu_3Dview.m       
     ImageBox.m          PropertyEditor.m    Slider.m            menu_ginput.m
 ```
@@ -187,7 +187,7 @@ Documentation is [here](deck/time/index).
 ```
 +time/
     Timer.m             duration2string.m   seconds2duration.m  
-    datestr.m           sec2str.m
+    datestr.m           sec2str.m 
 ```
 
 ## Other
@@ -200,15 +200,15 @@ Documentation for:
 ```
 +ds/
     BinaryTree.m        DataArray.m         Mapping.m           SplitTree.m         
-    Cell.m              LinkedList.m        Matrix.m 
+    Cell.m              LinkedList.m        Matrix.m            Tree.m              
 
 +obj/
     DataStore.m         List.m              kwArgs.m            
-    Grid.m              Reference.m
+    Grid.m              Reference.m         
 
 +json/
     Array.m             Object.m            read.m              
     Caret.m             decode.m            typeid.m            
-    Format.m            encode.m            write.m 
+    Format.m            encode.m            write.m
 ```
 
