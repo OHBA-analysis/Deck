@@ -1,4 +1,4 @@
 
-# The `ant` module
+# The analysis toolbox: `ant`
 
-`ant` stands for Analysis Toolbox.
+Lots of good stuff

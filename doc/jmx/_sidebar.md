@@ -1,9 +1,10 @@
 
-* Getting started
+* Library `jmx`
 
+  * [Home](jmx/index)
   * [Installation](jmx/install)
   * [Intro to Mex](jmx/mex)
-  * [Library overview](jmx/arch)
+  * [Architecture](jmx/arch)
 
 * Common usage
 

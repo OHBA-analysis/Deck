@@ -2,37 +2,25 @@
 * Getting started
 
   * [Installation](install)
+  * [About](about)
+  * [Contribute](contribute)
+
+* Documentation
+
   * [Overview](overview)
+  * [Deck](deck/index)
+  * [AnT](ant/index)
+  * [JMX](jmx/index)
 
-* Deck
+* Tutorials
 
-  * [Intro](deck/index)
-  * [Enhancements](deck/enhance)
-  * [Logging](deck/logging)
-  * [Assertions](deck/testing)
-  * [Arguments](deck/options)
-  * [Numerics](deck/numeric/index)
-  * [Strings](deck/string/index)
-  * [Structures](deck/struct/index)
-  * [Time & date](deck/time/index)
-  * [System & path](deck/system/index)
-  * [Filesystem](deck/file/index)
-  * [Figures & GUI](deck/ui/index)
-  * [Plugins](deck/plugin/index)
-  * [Other](deck/other/index)
-
-* AnT
-
-  * [Intro](ant/index)
-  * [Arrays](ant/array/index)
-  * [Maths](ant/maths/index)
-  * Images
-  * Time-series
-  
-* [JMX](jmx/index)
-
-* Development
-
-  * [Contributors](authors)
-  * [How-to contribute?](contribute)
-  
+ * [Key/value arguments](tuto/kwargs)
+ * [Searching for files](tuto/file-search)
+ * [Customised logging](tuto/logging)
+ * [Figures & colours](tuto/figures)
+ * [Point-clouds](tuto/point-clouds)
+ * [Images](tuto/images)
+ * [Time-series](tuto/time-series)
+ * [Design matrices](tuto/design-matrix)
+ * [Writing Mex files](tuto/mex)
+ 

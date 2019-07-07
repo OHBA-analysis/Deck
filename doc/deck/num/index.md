@@ -1,5 +1,5 @@
 
-# Numerical methods
+# Numerics
 
 ```
 dk.num.*
