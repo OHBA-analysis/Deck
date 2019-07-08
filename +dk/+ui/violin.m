@@ -64,12 +64,6 @@ function dist = violin( data, varargin )
     assert( iscellstr(opt_label), 'Labels should either be numeric or a cellstring.' );
     assert( numel(opt_label) == nd, 'There should be one label per column.' );
     
-    % set x-ticks
-    step = ceil(nd / opt_maxlabel);
-    xtick = ceil(opt_width) * ((1:nd) - 0.5);
-    xtick = xtick( 1:step:nd );
-    opt_label = opt_label( 1:step:nd );
-    
     % colors used for drawing
     colors = dk.color.jh();
     switch lower(opt_theme)
@@ -102,6 +96,7 @@ function dist = violin( data, varargin )
     q99 = -Inf;
     q01 =  Inf;
 
+    xtick = ceil(opt_width) * ((1:nd) - 0.5);
     for i = 1:nd
         if ~isempty(opt_weights)
             w = getcol(opt_weights,i);
@@ -119,6 +114,11 @@ function dist = violin( data, varargin )
     % adjust y-axis limits
     q99 = 1.2*q99;
     q01 = 0.8*q01;
+    
+    % adapt x-ticks
+    step = ceil(nd / opt_maxlabel);
+    xtick = xtick( 1:step:nd );
+    opt_label = opt_label( 1:step:nd );
 
     % prevent drawing over, and set tick labels
     hold off; ylim([q01 q99]);

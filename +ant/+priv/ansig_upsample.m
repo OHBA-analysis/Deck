@@ -1,4 +1,4 @@
-function varargout = ssig_upsample( varargin )
+function varargout = ansig_upsample( varargin )
 %
 % [time,mag,phi] = upsample_ssig( time, mag, phi, fs )
 % [time,vals] = upsample_ssig( time, vals, fs )

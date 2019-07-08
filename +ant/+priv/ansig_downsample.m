@@ -1,4 +1,4 @@
-function varargout = ssig_downsample( varargin )
+function varargout = ansig_downsample( varargin )
 %
 % [time,mag,phi] = downsample_ssig( time, mag, phi, fs )
 % [time,vals] = downsample_ssig( time, vals, fs )
