@@ -17,7 +17,7 @@ function dF = gradient( F, x, h )
 % dF: if F is scalar (ie for m = 1), dF is the numeric gradient of F
 %     otherwise (ie for m > 1), dF is the numeric Jacobian of F
 %
-% Contact: jhadida [at] fmrib.ox.ac.uk
+% JH
 
     if nargin < 3, h = 1e-6; end
 
@@ -30,8 +30,8 @@ function dF = gradient( F, x, h )
     if nh == 1, h = h*eye(nx);
     else        h = diag(h); end
     
-    xa = bsxfun( @plus , x, h );
-    xb = bsxfun( @minus, x, h );
-    dF = bsxfun( @rdivide, F(xa)-F(xb), 2*diag(h)' );
+    xa = dk.bsx.add( x, h );
+    xb = dk.bsx.sub( x, h );
+    dF = dk.bsx.rdiv( F(xa)-F(xb), 2*diag(h)' );
     
 end

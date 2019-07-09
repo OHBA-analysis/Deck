@@ -1,54 +1,41 @@
-function [lmin,lmax] = extrema( x, inc_endpoints, strict )
+function [lmin,lmax] = extrema( x, t )
 %
-% [lmin,lmax] = ant.ts.extrema( data, inc_endpoints=false, strict=false )
+% [lmin,lmax] = ant.ts.extrema( x, thresh=0 )
 %
-% This function is a fast local extrema finder (returns indices).
-% In the case of plateau in the data, the function returns the index of the _first_ point.
-% If nargout == 0, a figure is opened, displaying the extrema.
+% Quick local extrema finder.
+% Returns indices of local minima/maxima separately.
 %
-% Example:
+% The algorithm first attempts to find extrema in the interior of x,
+% i.e. with first and last point excluded. If no extremum is found, 
+% then the index of the min or max value across the entire signal is
+% returned instead; e.g. for a constant signal, lmin=lmax=1.
 %
-%   data = [25 8 15 5 5 10 10 10 3 1 20 7];
-%   ant.ts.extrema(data);
+% Differences smaller than input threshold are ignored.
 %
 % JH
 
-    if nargin < 2, inc_endpoints = false; end
-    if nargin < 3, strict = false; end
-    assert( isvector(x) && isnumeric(x), 'Input data should be a numeric vector.' );
-    if strict
-        comp = @(x) x < 0;
-    else
-        comp = @(x) x <= 0;
-    end
+    if nargin < 2, t=0; end
+    assert( isvector(x), 'This function only accepts single-schannel time-courses as vectors.' );
+
+    % exclude first and last point
+    dx = diff(x(:));
+    zc = dx(1:end-1) .* dx(2:end) <= 0; % zero-crossing
+    le = zc .* dx(1:end-1); % backward-derivative at zero-crossing
     
-    dx = diff(x(:),1,1);
+    lmin = 1+find( le < -t );
+    lmax = 1+find( le >  t );
     
-    if inc_endpoints
-        zc = [comp(dx(1:end-1) .* dx(2:end)); 1];
-        le = [ -dx(1); zc .* dx ];
-    else
-        zc = [comp(dx(1:end-1) .* dx(2:end)); 0];
-        le = [ 0; zc .* dx ];
-    end
+    % prevent empty outputs
+    if isempty(lmin), [~,lmin] = min(x); end
+    if isempty(lmax), [~,lmax] = max(x); end
     
-    lmin = find( le < 0 );
-    lmax = find( le > 0 );
-    
-    if nargout == 0 
+    % show result for debug
+    if nargout == 0
         
-        figure(); n = numel(x);
-        
-        plot( 1:n, x ); hold on;
-        plot( lmin, x(lmin), 'bo' );
-        plot( lmax, x(lmax), 'ro' ); hold off;
-        
-        title('Showing local extrema');
-        L = {'Data'};
-        if ~isempty(lmin), L{end+1}='Local min'; end
-        if ~isempty(lmax), L{end+1}='Local max'; end
-        legend(L{:});
+        plot( x, 'k-', 'LineWidth', 2 ); hold on;
+        plot( lmin, x(lmin), 'b^' ); 
+        plot( lmax, x(lmax), 'rv' ); hold off
         
     end
-    
+
 end

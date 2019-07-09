@@ -112,10 +112,10 @@ classdef TFSpectrum < handle
         % return only signals matching input frequency band (or modify current object)
         function obj = band_select(self,b)
             match = self.band_match(b);
-            if nargout > 0
-                obj = ant.dsp.TFSpectrum(self.sig(match));
-            else
+            if nargout == 0
                 self.sig = self.sig(match);
+            else
+                obj = ant.dsp.TFSpectrum(self.sig(match));
             end
         end
         

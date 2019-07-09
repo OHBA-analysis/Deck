@@ -16,7 +16,7 @@ function [y, ty]  = upsample( x, tx, fs, method )
     assert( newdt <= dt, 'Requested sampling rate is lower than current one, use ant.ts.downsample instead.' );
     
     % interpolate
-    ty = colon( tx(1), newdt, tx(end) )';
+    ty = transpose( tx(1) : newdt : tx(end) );
     y  = interp1( tx, x, ty, method );
     
 end

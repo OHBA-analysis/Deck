@@ -1,9 +1,9 @@
-classdef Spectrum < ant.priv.SpectralProperties
+classdef FourierSpectrum < ant.priv.SpectralProperties
 %
 % Compute the power spectral density using various methods (Fourier, Welch, Multi-taper).
 % Use as:
 %
-%   ant.dsp.Spectrum( ts, method, options... )
+%   ant.dsp.FourierSpectrum( ts, method, options... )
 %
 % where
 %   methods: fourier, welch, multitaper
@@ -26,7 +26,7 @@ classdef Spectrum < ant.priv.SpectralProperties
 
     methods
 
-        function self = Spectrum(varargin)
+        function self = FourierSpectrum(varargin)
             self.clear();
             if nargin > 0
                 self.assign(varargin{:});
@@ -46,7 +46,7 @@ classdef Spectrum < ant.priv.SpectralProperties
         end
 
         function sp = clone(self)
-            sp = ant.dsp.Spectrum();
+            sp = ant.dsp.FourierSpectrum();
             sp.copy(self);
         end
 

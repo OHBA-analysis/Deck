@@ -243,9 +243,9 @@ classdef TFSeries < handle
             if abs(fs - self.fs) <= tol
                 dk.info( '[ant.dsp.TFSeries:resample] Already at the required sampling rate.' );
             elseif fs <= self.fs
-                [self.time,self.vals] = ant.priv.ssig_downsample( self.time, self.vals, fs );
+                [self.time,self.vals] = ant.priv.ansig_downsample( self.time, self.vals, fs );
             else
-                [self.vals,self.time] = ant.priv.ssig_upsample( self.vals, self.time, fs );
+                [self.vals,self.time] = ant.priv.ansig_upsample( self.vals, self.time, fs );
             end
         end
         
@@ -325,7 +325,7 @@ classdef TFSeries < handle
         function [f,t] = dphase(self,varargin)
             [f,t] = self.phase(varargin{:});
             h = t(2)-t(1);
-            f = ant.ts.diff(f,h)/(2*pi);
+            f = ant.ts.diff(f,1/h)/(2*pi);
         end
         
         function [o,t] = phase_offset(self,varargin)

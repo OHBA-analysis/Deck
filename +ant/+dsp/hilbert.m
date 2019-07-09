@@ -23,7 +23,7 @@ function tf = hilbert( ts, band, npts, force )
 %   - for a single-band input, the ouput is of type ant.dsp.TFSeries
 %   - for a multi-band input, the output is of type ant.dsp.TFSpectrum
 %
-% See also: ant.dsp.TFSeries, ant.ts.ansig, ant.priv.ssig_downsample
+% See also: ant.dsp.TFSeries, ant.ts.ansig, ant.priv.ansig_downsample
 %
 % JH
 
@@ -82,7 +82,7 @@ function [time,vals] = do_transform( ts, prefilt, fs )
     
     % downsample (complex values)
     if fs > 0
-        [time,vals,phi] = ant.priv.ssig_downsample( time, vals, phi, fs );
+        [time,vals,phi] = ant.priv.ansig_downsample( time, vals, phi, fs );
     end
     vals = vals .* exp(1i*phi);
     

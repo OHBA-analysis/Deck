@@ -29,25 +29,37 @@ function varargout = ansig( x, fs )
     
     if nargin < 2, fs=1; end
 
-    sig = hilbert(dk.bsx.sub( x, mean(x,1) ));
+    [sig,env] = antran(x);
     
     switch nargout
         case 0
             figure;
-            [x,y] = pol2cart( angle(sig), abs(sig) );
+            [x,y] = pol2cart( angle(sig), env );
             plot( x, y, 'k-' );
             title('Complex analytic signal');
             axis equal; grid on;
+            
         case 1
-            varargout = {sig};
+            varargout = {env.*sig};
+            
         case 2
             % compute envelope and phase
-            varargout = { abs(sig), unwrap( angle(sig), [], 1 ) };
+            varargout = { env, angle(sig) };
+            
         case 3
             % estimate frequency only if required
-            phi = unwrap( angle(sig), [], 1 );
-            frq = ant.ts.diff( phi, 1/fs ) / (2*pi);
-            varargout = { abs(sig), phi, frq };
+            phi = angle(sig);
+            x = cos(phi);
+            y = sin(phi);
+            frq = x .* ant.ts.diff( y, fs ) - y .* ant.ts.diff( x, fs );
+            frq = max( frq, 0 ) / (2*pi);
+            varargout = { env, phi, frq };
     end
 
+end
+
+function [sig,env] = antran(x)
+    x = dk.bsx.sub( x, mean(x,1) );
+    [~,env] = ant.ts.envelope(abs(x));
+    sig = hilbert(x./max(eps,env));
 end
