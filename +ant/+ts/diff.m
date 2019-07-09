@@ -1,6 +1,6 @@
-function [dx,ck] = diff( x, h, dim, horizon, tangency )
+function [dx,ck] = diff( x, fs, dim, horizon, tangency )
 %
-% [dx,ck] = ant.ts.diff( x, h, dim, horizon=4, tangency=4 )
+% [dx,ck] = ant.ts.diff( x, fs, dim, horizon=4, tangency=4 )
 %
 % Numerical differentiation of sampled sequence.
 %
@@ -8,7 +8,7 @@ function [dx,ck] = diff( x, h, dim, horizon, tangency )
 %     t = linspace(-2,13,400); 
 %     h = t(2)-t(1); 
 %     x = sin(t); 
-%     y = ant.ts.diff( x, h );
+%     y = ant.ts.diff( x, 1/h );
 %     plot(t,x,t,y);
 %
 % Reference: 
@@ -22,7 +22,7 @@ function [dx,ck] = diff( x, h, dim, horizon, tangency )
         % first non-singleton dimension
         dim = ant.nsdim(x);
     end
-    if nargin < 2, h=1; end
+    if nargin < 2, fs=1; end
 
     N = 2*horizon+1;
     M = horizon;
@@ -42,12 +42,10 @@ function [dx,ck] = diff( x, h, dim, horizon, tangency )
                 case 5
                     ck = [42,48,27,8,1]/512;
                 otherwise
-                    error('General formula for second-order tangency not implemented yet.');
-                    % TODO: use generalised binomial coefficients..
                     m = (N-3)/2;
                     ck = zeros(1,M);
                     for k = 1:M
-                        ck(k) = ( nchoosek(2*m,m-k+1) - nchoosek(2*m,m-k-1) )/pow2(2*m+1);
+                        ck(k) = ( binomial(2*m,m-k+1) - binomial(2*m,m-k-1) )/pow2(2*m+1);
                     end
             end
             
@@ -71,7 +69,7 @@ function [dx,ck] = diff( x, h, dim, horizon, tangency )
     end
     
     % weights of derivation filter
-    ck = [-fliplr(ck),0,ck]/h; 
+    ck = [-fliplr(ck),0,ck]*fs; 
     
     % reshape input data as a matrix with dim as first dimension
     [dx,rev] = ant.mat.squash( x, dim ); 
@@ -83,4 +81,13 @@ function [dx,ck] = diff( x, h, dim, horizon, tangency )
     % reshape data to the original size
     dx = ant.mat.unsquash(dx,rev); 
 
+end
+
+function b = binomial(n,k)
+    % cf comment: http://www.holoborodko.com/pavel/numerical-methods/numerical-derivative/smooth-low-noise-differentiators/#comment-7533
+    if k < 0
+        b = 0;
+    else
+        b = nchoosek(n,k);
+    end
 end

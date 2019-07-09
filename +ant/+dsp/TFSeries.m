@@ -325,7 +325,7 @@ classdef TFSeries < handle
         function [f,t] = dphase(self,varargin)
             [f,t] = self.phase(varargin{:});
             h = t(2)-t(1);
-            f = ant.ts.diff(f,h)/(2*pi);
+            f = ant.ts.diff(f,1/h)/(2*pi);
         end
         
         function [o,t] = phase_offset(self,varargin)

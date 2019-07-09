@@ -4,9 +4,9 @@ function den = periodogram( ts, method, varargin )
 %
 % Compute Fourier spectral density using specified method, and plot the result.
 % The method defaults to 'pwelch' if the input signal has more than 2000 timepoints.
-% Additional arguments are forwarded to ant.dsp.Spectrum.plot
+% Additional arguments are forwarded to ant.dsp.FourierSpectrum.plot
 %
-% See also: ant.dsp.Spectrum
+% See also: ant.dsp.FourierSpectrum
 %
 % JH
 
@@ -18,7 +18,7 @@ function den = periodogram( ts, method, varargin )
         end
     end
 
-    den = ant.dsp.Spectrum(ts,method);
+    den = ant.dsp.FourierSpectrum(ts,method);
     arg = [{'parent',gca},varargin];
     den.plot(arg{:});
 

@@ -33,7 +33,7 @@ function vals = phaserand( vals )
     else
         
         % randomise all apart from DC
-        random_idx = [0;ones(nt-1,1)];
+        random_idx = [false;true(nt-1,1)];
         fourier(random_idx,:) = fourier(random_idx,:) .* exp( 1i * 2*pi*rand(nt-1,ns) );
         
     end

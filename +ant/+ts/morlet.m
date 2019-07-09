@@ -30,7 +30,7 @@ function [out,scale] = morlet( vals, fs, freq )
     omega = 1:fix(nt/2);
     omega = 2*pi*df * [0,omega,-omega( fix((nt-1)/2):-1:1 )]'; % wavenumbers (column)
     
-    % Morlet wavelet Fourier transform
+    % Fourier transform of Morlet wavelet
     dw = 2*pi*df; % wave step
     nw = numel(omega);
     

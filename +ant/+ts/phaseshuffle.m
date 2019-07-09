@@ -37,7 +37,7 @@ function vals = phaseshuffle( vals )
     else
         
         % randomise all apart from DC
-        random_idx = [0;ones(nt-1,1)];
+        random_idx = [false;true(nt-1,1)];
         coef_phase = angle(fourier(random_idx,:));
         for i = 1:ns
             fourier(random_idx,i) = abs(fourier(random_idx,i)) .* exp( 1i * coef_phase(randperm(nt-1),i) );

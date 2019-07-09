@@ -1,4 +1,4 @@
-classdef TimeSeries < ant.priv.Signal
+classdef TimeSeries < handle
 % Time-units in SECONDS.
 % Rows of vals correspond to observations, columns to variables.
 %   ie, each column is a different signal/channel/variable.
@@ -7,6 +7,14 @@ classdef TimeSeries < ant.priv.Signal
         time;
         vals;
     end
+    properties (Transient,Dependent)
+        n_times, n_signals; % long names
+        tspan; % time-span
+    end
+    properties (Transient,Dependent,Hidden)
+        nt, ns; % short names
+    end
+    
     
     %-------------------
     % Instance methods
@@ -19,6 +27,9 @@ classdef TimeSeries < ant.priv.Signal
             self.assign(varargin{:});
         end
         end
+        
+        function y = is_empty(self), y = self.nt == 0; end
+        function y = is_real (self), y = isreal(self.vals); end
         
         % Clear
         function clear(self)
@@ -38,9 +49,74 @@ classdef TimeSeries < ant.priv.Signal
             ts.copy( self );
         end
         
+        % Dimensions
+        function n = get.nt(self), n = size(self.time,1); end % num of timesteps
+        function n = get.ns(self), n = size(self.vals,2); end % num of signals
+        
+        function n = get.n_times  (self), n = self.nt; end
+        function n = get.n_signals(self), n = self.ns; end
+        
+        function Dt = timespan(self)
+            Dt = self.time(end) - self.time(1);
+        end
+        function tf = timeframe(self)
+            tf = [self.t_start, self.t_end];
+        end
+        
+        function Dt = get.tspan(self), Dt = self.timespan(); end
+        function t = t_start(self), t = self.time(1); end
+        function t = t_end(self), t = self.time(end); end
+        
+        function [vmin,vmax] = extrema(self)
+            [vmin,vmax] = ant.stat.extrema(self.vals(:));
+        end
+        
+        % Assign members
+        function assign(self,varargin)
+            
+            switch nargin
+                case 2
+                    if ischar(varargin{1})
+                        self.unserialise(varargin{1});
+                        return;
+                    else %isstruct(varargin{1}) || isa(varargin{1},'ant.TimeSeries')
+                        t = varargin{1}.time;
+                        v = varargin{1}.vals;
+                    end
+                case 3
+                    t = varargin{1};
+                    v = varargin{2};
+                otherwise
+                    error('Expected one (structure with fields time, vals) or two (time and value arrays) inputs.');
+            end
+            
+            [v,t] = dk.formatmv(v,t);
+            assert( numel(t) > 1, 'There should be more than one time-point.' );
+            assert( isnumeric(v), 'Values should be numeric.' );
+            
+            self.time = t(:);
+            self.vals = v;
+        end
+        
         % Cast values to a different type
         function cast(self,type)
             self.vals = cast( self.vals, type );
+        end
+        
+        % Return members as a struct or struct-array
+        function out = to_struct(self,as_array)
+            
+            if nargin < 2, as_array=false; end
+            if as_array
+                out = dk.struct.repeat( {'time','vals'}, 1, self.ns );
+                for i = 1:self.ns
+                    out(i).time = self.time;
+                    out(i).vals = sels.vals(:,i);
+                end
+            else
+                out = struct( 'time', self.time, 'vals', self.vals );
+            end
+            
         end
         
         % Comparison
@@ -63,35 +139,6 @@ classdef TimeSeries < ant.priv.Signal
             dk.assert('w', ts.is_analytic(), 'The concatenated time-series is not analytic!' );
         end
         
-        function self = assign( self, varargin )
-
-            switch nargin
-                case 2
-                    if ischar(varargin{1})
-                        % load from file
-                        self.unserialise(varargin{1});
-                        return;
-                    else
-                        % assume that input has fields time/vals
-                        t = varargin{1}.time;
-                        v = varargin{1}.vals;
-                    end
-                case 3
-                    t = varargin{1};
-                    v = varargin{2};
-                otherwise
-                    error('Expected one or two inputs.');
-            end
-
-            [v,t] = dk.formatmv(v,t,'vertical');
-            assert( numel(t) > 1, 'There should be more than one time-point.' );
-            assert( isnumeric(v), 'Values should be numeric.' );
-
-            self.time = t;
-            self.vals = v;
-
-        end
-        
     end
     
     
@@ -99,22 +146,6 @@ classdef TimeSeries < ant.priv.Signal
     % I/O
     %--------
     methods    
-        
-        % Return properties as a struct or struct-array
-        function out = to_struct(self,as_array)
-            
-            if nargin < 2, as_array=false; end
-            if as_array
-                out = dk.struct.repeat( {'time','vals'}, 1, self.ns );
-                for i = 1:self.ns
-                    out(i).time = self.time;
-                    out(i).vals = sels.vals(:,i);
-                end
-            else
-                out = struct( 'time', self.time, 'vals', self.vals );
-            end
-            
-        end
         
         function x = serialise(self,filename)
             x.version = '1.0';
@@ -166,6 +197,49 @@ classdef TimeSeries < ant.priv.Signal
     %-------------------
     methods
         
+        % sampling rate
+        function dt = dt(self,check)
+            if nargin < 2, check=false; end
+            if check
+                [chk,dt] = self.is_arithmetic();
+                assert( chk, 'Timestep is not regular.' );
+            else
+                dt = abs(self.time(2)-self.time(1));
+            end
+        end
+        
+        function fs = fs(self,check)
+            if nargin < 2, check=false; end
+            fs = 1/self.dt(check);
+        end
+        
+        function n = numsteps(self,t,check)
+            if nargin < 3, check=false; end
+            n = round( t / self.dt(check) );
+        end
+        
+        % Analytic if all timesteps are greater than epsilon
+        function [yes,dt] = is_analytic(self)
+            dt = diff(self.time);
+            dt = sign(dt(1)) * dt;
+            yes = all( dt > eps );
+        end
+        
+        % Arithmetic if all timesteps are almost equal
+        function [yes,dt] = is_arithmetic(self,rtol)
+            if nargin < 2, rtol = 1e-6; end
+            [yes,dt] = self.is_analytic();
+            dt = mean(dt);
+            yes = yes && max(dt)/dt <= 1+rtol;
+        end
+        
+        % Find dt that fits an integer number of steps in the current time-interval.
+        % Output dt is smaller or equal to input dt.
+        function [dt,nsteps] = closest_dt(self,dt)
+            nsteps = ceil( self.tspan / dt );
+            dt     = self.tspan / (nsteps - 1);
+        end
+        
         % Resample the time-courses using Matlab's function resample
         function ts = make_arithmetic(self)
             [new_vals,new_time] = ant.ts.resample( self.vals, self.time );
@@ -188,6 +262,18 @@ classdef TimeSeries < ant.priv.Signal
                 self.time = query_t;
             else
                 ts = ant.TimeSeries( query_t, new_vals );
+            end
+        end
+        
+        % Interpolate at given timestep (can be useful for fast upsampling)
+        function ts = interpolate_dt(self,dt,method)
+            if nargin < 3, method = 'pchip'; end
+            
+            query_t = self.time(1) : dt : self.time(end);
+            if nargout == 0
+                self.interpolate(query_t,method);
+            else
+                ts = self.interpolate(query_t,method);
             end
         end
         
@@ -249,26 +335,6 @@ classdef TimeSeries < ant.priv.Signal
     %------------------------------------
     methods
         
-        % Implement inherited masking
-        function ts = mask_k(self,tidx)
-            m = self.tidx2mask(tidx);
-            if nargout == 0
-                self.time = self.time(m);
-                self.vals = self.vals(m,:);
-            else
-                ts = ant.TimeSeries( self.time(m), self.vals(m,:) );
-            end
-        end
-        
-        function ts = mask_s(self,sidx)
-            m = self.sidx2mask(sidx);
-            if nargout == 0
-                self.vals = self.vals(:,m);
-            else
-                ts = ant.TimeSeries( self.time, self.vals(:,m) );
-            end
-        end
-        
         % Average timecourse
         function ts = average(self)
             ts = ant.TimeSeries( self.time, nanmean(self.vals,2) );
@@ -286,9 +352,94 @@ classdef TimeSeries < ant.priv.Signal
         
         % Mean and sdev
         function m = mean(self), m = nanmean( self.vals, 1 ); end
-        function s = sdev(self), s = nanstd( self.vals, [], 1 ); end
-        function s = std(self), s = self.sdev;  end
-        function v = var(self), v = var( self.vals, [], 1, 'omitnan' );  end
+        function s = sdev(self), s = nanstd ( self.vals, [], 1 ); end
+        function s = std (self), s = self.sdev;  end
+        function v = var (self), v = var( self.vals, [], 1, 'omitnan' );  end
+        
+        % Time masks
+        function m = tmask_lt(self,cut), m = self.time < cut; end
+        function m = tmask_gt(self,cut), m = self.time > cut; end
+        
+        function m = tmask_leq(self,cut), m = self.time <= cut; end
+        function m = tmask_geq(self,cut), m = self.time >= cut; end
+        
+        % Remove the k first/last samples
+        function ts = pop_front(self,k)
+            if nargout == 0
+                self.remove_times(1:k);
+            else
+                ts = self.remove_times(1:k);
+            end
+        end
+        function ts = pop_back(self,k)
+            k = self.nt-k;
+            if nargout == 0
+                self.select_times(1:k);
+            else
+                ts = self.select_times(1:k);
+            end
+        end
+        
+        % Remove timepoints after/before a certain time
+        function ts = rem_before(self,tval)
+            m = self.tmask_lt(tval);
+            if nargout == 0
+                self.remove_times(m);
+            else
+                ts = self.remove_times(m);
+            end
+        end
+        function ts = rem_after(self,tval)
+            m = self.tmask_gt(tval);
+            if nargout == 0
+                self.remove_times(m);
+            else
+                ts = self.remove_times(m);
+            end
+        end
+        
+        % Select a subset of signals or timepoints (in-place if no output)
+        function ts = select_signals(self,sel)
+            if nargout == 0
+                self.vals = self.vals(:,sel);
+            else
+                ts = ant.TimeSeries( self.time, self.vals(:,sel) );
+            end
+        end
+        function ts = select_times(self,sel)
+            if nargout == 0
+                self.time = self.time(sel);
+                self.vals = self.vals(sel,:);
+            else
+                ts = ant.TimeSeries( self.time(sel), self.vals(sel,:) );
+            end
+        end
+        
+        % Remove a subset of signals or timepoints (in-place if no output)
+        function ts = remove_signals(self,sel)
+            if islogical(sel)
+                sel = ~sel;
+            else
+                sel = setdiff( 1:self.ns, sel );
+            end
+            if nargout == 0
+                self.select_signals(sel);
+            else
+                ts = self.select_signals(sel);
+            end
+        end
+        function ts = remove_times(self,sel)
+            if islogical(sel)
+                sel = ~sel;
+            else
+                sel = setdiff( 1:self.nt, sel );
+            end
+            if nargout == 0
+                self.select_times(sel);
+            else
+                ts = self.select_times(sel);
+            end
+        end
         
         % Reorder signals
         function ts = reorder(self,order)
@@ -300,16 +451,34 @@ classdef TimeSeries < ant.priv.Signal
             end
         end
         
+        % Time-window
+        function ts = window(self,kfirst,klast)
+            m = kfirst:klast;
+            if nargout == 0
+                self.select_times(m);
+            else
+                ts = self.select_times(m);
+            end
+        end
+        function ts = time_window(self,tstart,tend)
+            m = self.tmask_geq(tstart) & self.tmask_leq(tend);
+            if nargout == 0
+                self.select_times(m);
+            else
+                ts = self.select_times(m);
+            end
+        end
+        
         % Burn a certain amount of time at the start
         function ts = burn(self,duration)
             assert( duration > 0, 'Durations should be positive.' );
             assert( duration < self.timespan, 'Duration is longer than the timecourse!' );
             
-            t = self.time(1) + duration;
+            m = self.tmask_lt( self.time(1) + duration );
             if nargout == 0
-                self.from(t);
+                self.remove_times(m);
             else
-                ts = self.from(t);
+                ts = self.remove_times(m);
             end
         end
         
@@ -334,15 +503,20 @@ classdef TimeSeries < ant.priv.Signal
         % (x - mu) / sigma (in-place if no output)
         function ts = normalise(self)
             v = dk.bsx.sub( self.vals, self.mean );
-            v = dk.bsx.rdiv( v, max(eps,self.std) );
+            v = dk.bsx.rdiv( v, self.std );
             
             ts = make_output( nargout, self, v );
         end
         
-        % Compute the numerical derivative of the signal
-        function ts = derive(self)
-            v = ant.ts.diff( self.vals, self.fs(true) );
-            ts = make_output( nargout, self, v );
+        % Re-reference the cross-signal average with respect to a subset of signals.
+        % Note: adapted from FieldTrip
+        function ts = rereference(self,ref)
+            
+            if nargin < 2, ref = 1:self.ns; end
+            ref = dk.torow(ref);
+            mu  = nanmean( self.vals(:,ref), 2 );
+            v   = dk.bsx.sub( self.vals, mu );
+            ts  = make_output( nargout, self, v );
         end
         
         % Smooth time-courses using median filter
@@ -377,24 +551,13 @@ classdef TimeSeries < ant.priv.Signal
             ts = make_output( nargout, self, v );
         end
         
-        % Re-reference the cross-signal average with respect to a subset of signals
-        % Note: adapted from FieldTrip
-        function ts = recentre(self,ref)
-            
-            if nargin < 2, ref = 1:self.ns; end
-            ref = dk.torow(ref);
-            mu  = nanmean( self.vals(:,ref), 2 );
-            v   = dk.bsx.sub( self.vals, mu );
-            ts  = make_output( nargout, self, v );
-        end
-        
         % Denoise by regressing out a reference time-course
         % Note: adapted from FieldTrip
         function ts = denoise(self,ref)
             
             if isa(ref,'ant.TimeSeries'), ref=ref.vals; end
             
-            % recentre both
+            % demean both
             ref = dk.bsx.sub( ref, mean(ref,2) );
             dat = dk.bsx.sub( self.vals, mean(self.vals,2) );
             
@@ -422,6 +585,14 @@ classdef TimeSeries < ant.priv.Signal
             b = c * x' * self.vals; %#ok
             v = self.vals - x*b;
             
+            ts = make_output( nargout, self, v );
+        end
+        
+        % Compute the numerical derivative of the signal
+        function ts = derive(self)
+            [ari,dt] = self.is_arithmetic();
+            assert( ari, 'Cannot differentiate irregular time-series.' );
+            v = ant.ts.diff( self.vals, 1/dt );
             ts = make_output( nargout, self, v );
         end
         

@@ -1,9 +1,10 @@
 function [frq,dfc] = fourier( vals, fs, npts )
-% FOURIER_TRANSFORM computes the Fast Fourier Transform of a given time-series.
-% Fo real inputs, the positive spectrum is returned with correctly scaled amplitude/power.
+%
+% Computes the Fast Fourier Transform of a given time-series.
+% For real inputs, the positive spectrum is returned with correctly scaled amplitude/power.
 % For complex inputs, the full spectrum centered around frequency 0 is returned.
 % 
-% [freq,amp,phi] = fourier_transform(time,vals[,npts])
+% [freq,amp,phi] = ant.ts.fourier( vals, fs [,npts] )
 %
 % Inputs:
 %
@@ -23,16 +24,18 @@ function [frq,dfc] = fourier( vals, fs, npts )
 %
 % References:
 %   https://en.wikipedia.org/wiki/Discrete_Fourier_transform
+%
+% JH
 
     assert( ismatrix(vals), 'Input values should be a matrix.' );
     
     % assume a unitary frequency if it is omitted
-    if nargin < 2, fs = 1; end;
+    if nargin < 2, fs = 1; end
     
     % if fixed-size transform is not required, take the number of time-points by default
     if nargin < 3, npts = size(vals,1); end
     
-    assert( isscalar(fs) && fs > 0, 'Sampling frequency should be a positive scalar.' );
+    assert( isscalar(fs) && fs > eps, 'Sampling frequency should be a positive scalar.' );
     assert( isscalar(npts), 'Transform size should be scalar.' );
     assert( npts >= size(vals,1), 'Transform size should be greater than the number of timepoints.' );
     

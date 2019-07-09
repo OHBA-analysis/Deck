@@ -6,7 +6,7 @@ function [y, ty]  = downsample( x, tx, fs, win )
 %
 % JH
 
-    PREC = @(a,b) floor(log10(max(a,b))) - floor(log10(abs( a-b )));
+    PREC = @(a,b) floor(log10(max(a,b))) - floor(log10(abs(a-b)));
     
     if nargin < 4, win = 'hamming'; end
     
@@ -57,7 +57,7 @@ function [y, ty]  = downsample( x, tx, fs, win )
     y = [x(1,:); ant.mex.sliding_dot( x, wy, wstep ); xlast];
     
     % interpolate to final precision
-    ty = colon( tx(1), 1/fs, tx(end) )';
+    ty = transpose( tx(1) : (1/fs) : tx(end) );
     y  = interp1( t, y, ty, 'pchip' );
     
 end
