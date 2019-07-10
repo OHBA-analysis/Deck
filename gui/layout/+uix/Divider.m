@@ -1,4 +1,4 @@
-classdef Divider < hgsetget
+classdef ( Hidden ) Divider < matlab.mixin.SetGet
     %uix.Divider  Draggable divider
     %
     %  d = uix.Divider() creates a divider.
@@ -6,8 +6,8 @@ classdef Divider < hgsetget
     %  d = uix.Divider(p1,v1,p2,v2,...) creates a divider and sets
     %  specified property p1 to value v1, etc.
     
-    %  Copyright 2009-2014 The MathWorks, Inc.
-    %  $Revision: 1065 $ $Date: 2014-10-30 17:40:04 +0000 (Thu, 30 Oct 2014) $
+    %  Copyright 2009-2016 The MathWorks, Inc.
+    %  $Revision: 1601 $ $Date: 2018-05-01 10:22:53 +0100 (Tue, 01 May 2018) $
     
     properties( Dependent )
         Parent % parent
@@ -44,14 +44,18 @@ classdef Divider < hgsetget
             % Create control
             control = matlab.ui.control.UIControl( ...
                 'Style', 'checkbox', 'Internal', true, ...
-                'Enable', 'inactive', 'DeleteFcn', @obj.onDeleted );
+                'Enable', 'inactive', 'DeleteFcn', @obj.onDeleted,...
+                'Tag', 'uix.Divider' );
             
             % Store control
             obj.Control = control;
             
             % Set properties
-            if nargin > 0
-                set( obj, varargin{:} );
+            try
+                uix.set( obj, varargin{:} )
+            catch e
+                delete( obj )
+                e.throwAsCaller()
             end
             
             % Force update
@@ -70,8 +74,8 @@ classdef Divider < hgsetget
             %delete  Destructor
             
             control = obj.Control;
-            if isgraphics( control ) && ~strcmp( control, 'BeingDeleted' )
-                control.delete()
+            if isgraphics( control ) && strcmp( control.BeingDeleted, 'off' )
+                delete( control )
             end
             
         end % destructor
@@ -248,8 +252,14 @@ classdef Divider < hgsetget
             %  tf = d.isMouseOver(wmd) tests whether the WindowMouseData
             %  wmd is consistent with the mouse pointer being over the
             %  divider d.
+            %
+            %  This method returns false for dividers that are being
+            %  deleted.
             
-            tf = obj.Control == eventData.HitObject;
+            tf = isvalid( obj ); % initialize
+            for ii = 1:numel( obj )
+                tf(ii) = tf(ii) && obj(ii).Control == eventData.HitObject;
+            end
             
         end % isMouseOver
         

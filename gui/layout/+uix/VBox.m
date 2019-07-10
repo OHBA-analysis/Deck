@@ -8,8 +8,8 @@ classdef VBox < uix.Box
     %
     %  See also: uix.HBox, uix.Grid, uix.VButtonBox, uix.VBoxFlex
     
-    %  Copyright 2009-2014 The MathWorks, Inc.
-    %  $Revision: 1077 $ $Date: 2015-03-19 16:44:14 +0000 (Thu, 19 Mar 2015) $
+    %  Copyright 2009-2016 The MathWorks, Inc.
+    %  $Revision: 1594 $ $Date: 2018-03-28 02:27:52 +1100 (Wed, 28 Mar 2018) $
     
     properties( Access = public, Dependent, AbortSet )
         Heights % heights of contents, in pixels and/or weights
@@ -31,13 +31,12 @@ classdef VBox < uix.Box
             %  b = uix.VBox(p1,v1,p2,v2,...) sets parameter p1 to value v1,
             %  etc.
             
-            % Call superclass constructor
-            obj@uix.Box()
-            
             % Set properties
-            if nargin > 0
-                uix.pvchk( varargin )
-                set( obj, varargin{:} )
+            try
+                uix.set( obj, varargin{:} )
+            catch e
+                delete( obj )
+                e.throwAsCaller()
             end
             
         end % constructor
@@ -113,6 +112,9 @@ classdef VBox < uix.Box
     methods( Access = protected )
         
         function redraw( obj )
+            %redraw  Redraw
+            %
+            %  c.redraw() redraws the container c.
             
             % Compute positions
             bounds = hgconvertunits( ancestor( obj, 'figure' ), ...
@@ -134,27 +136,15 @@ classdef VBox < uix.Box
             % Set positions
             children = obj.Contents_;
             for ii = 1:numel( children )
-                child = children(ii);
-                child.Units = 'pixels';
-                if isa( child, 'matlab.graphics.axis.Axes' )
-                    switch child.ActivePositionProperty
-                        case 'position'
-                            child.Position = positions(ii,:);
-                        case 'outerposition'
-                            child.OuterPosition = positions(ii,:);
-                        otherwise
-                            error( 'uix:InvalidState', ...
-                                'Unknown value ''%s'' for property ''ActivePositionProperty'' of %s.', ...
-                                child.ActivePositionProperty, class( child ) )
-                    end
-                else
-                    child.Position = positions(ii,:);
-                end
+                uix.setPosition( children(ii), positions(ii,:), 'pixels' )
             end
             
         end % redraw
         
         function addChild( obj, child )
+            %addChild  Add child
+            %
+            %  c.addChild(d) adds the child d to the container c.
             
             % Add to sizes
             obj.Heights_(end+1,:) = -1;
@@ -166,6 +156,9 @@ classdef VBox < uix.Box
         end % addChild
         
         function removeChild( obj, child )
+            %removeChild  Remove child
+            %
+            %  c.removeChild(d) removes the child d from the container c.
             
             % Remove from sizes
             tf = obj.Contents_ == child;
