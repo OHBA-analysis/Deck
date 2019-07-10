@@ -1,9 +1,13 @@
-classdef FourierSpectrum < ant.priv.SpectralProperties
+classdef FourierSpectrum < ant.priv.Spectrum
 %
-% Compute the power spectral density using various methods (Fourier, Welch, Multi-taper).
-% Use as:
+% Compute power spectral density using various methods (Fourier, Welch, Multi-taper).
+% This class is used mainly for display.
 %
-%   ant.dsp.FourierSpectrum( ts, method, options... )
+%
+% USAGE
+% -----
+%
+%   ant.dsp.FourierSpectrum( ts, method, options... ).plot( ... )
 %
 % where
 %   methods: fourier, welch, multitaper
@@ -11,6 +15,9 @@ classdef FourierSpectrum < ant.priv.SpectralProperties
 %          fourier: no options
 %            welch: window-length (tspan/4), overlap (0.5)
 %       multitaper: n-windows (4)
+%
+%
+% See also: pwelch, pmtm, ant.ts.fourier, ant.dsp.FourierTransform
 %
 % JH
 
@@ -39,21 +46,24 @@ classdef FourierSpectrum < ant.priv.SpectralProperties
             self.psd = [];
         end
 
-        function copy(self,other)
+        function self = copy(self,other)
             self.ts  = other.ts;
             self.frq = other.frq;
             self.psd = other.psd;
         end
 
         function sp = clone(self)
-            sp = ant.dsp.FourierSpectrum();
-            sp.copy(self);
+            sp = ant.dsp.FourierSpectrum().copy(self);
         end
 
+        
+        % Dependent properties
         function n = get.nf(self), n = numel(self.frq); end % num of frequencies (single-sided)
         function n = get.ns(self), n = size(self.psd,2); end % num of signals
         function f = get.df(self), f = self.frq(2)-self.frq(1); end % frequency step
 
+        
+        % Assign from time-series
         function assign(self,ts,method,varargin)
 
             if nargin < 3 || isempty(method)
@@ -86,12 +96,9 @@ classdef FourierSpectrum < ant.priv.SpectralProperties
             end
 
         end
-
-    end
-
-    methods
-
-        % Inherited from SpectralProperties
+        
+        
+        % Inherited from parent
         function f = proxy_frq(self)
             f = self.frq;
         end
@@ -100,6 +107,7 @@ classdef FourierSpectrum < ant.priv.SpectralProperties
             p = self.psd;
             p = bsxfun( @rdivide, p, sum(p,1) );
         end
+
 
         function fig = plot(self,varargin)
         %
@@ -174,7 +182,6 @@ classdef FourierSpectrum < ant.priv.SpectralProperties
             ant.img.show( out, 'positive', true, ...
                 'xlabel', 'Frequency (Hz)', 'ylabel', 'Signal', 'clabel', 'PSD' );
             xlim( opt.flim );
-            
         
         end
 
@@ -254,5 +261,5 @@ end
 
 function vals = preproc(ts)
     vals = bsxfun( @minus, ts.vals, ts.mean );
+    %vals = detrend( ts.vals );
 end
-

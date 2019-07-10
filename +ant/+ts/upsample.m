@@ -1,6 +1,6 @@
-function [y, ty]  = upsample( x, tx, fs, method )
+function [y, ty] = upsample( x, tx, fs, method )
 %
-% [y, ty] = ant.ts.upsample( x, tx, fs, method=pchip )
+% [y,ty] = ant.ts.upsample( x, tx, fs, method=pchip )
 %
 % Upsample a time-series using interpolation.
 %

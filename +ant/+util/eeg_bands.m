@@ -36,11 +36,7 @@ function b = eeg_bands( varargin )
     if nargin > 0
         
         % either pass band-names as a cell-array of strings, or as individual inputs
-        if nargin == 1 && iscellstr(varargin{1})
-            names = varargin{1};
-        else
-            names = varargin;
-        end
+        names = dk.wrap(varargin);
         
         % select the required bands
         b = dk.mapfun( @(x) b.(lower(x)), names, false );

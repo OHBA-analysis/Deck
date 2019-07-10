@@ -1,6 +1,9 @@
 classdef TFSpectrum < handle
 %
-% Spectral aggregate.
+% ant.dsp.TFSpectrum( tfs )
+% ant.dsp.TFSpectrum( tfs1, tfs2, ... )
+%
+% Collection of TFSeries objects.
 %
 % See also: ant.dsp.TFSeries
 %
@@ -27,16 +30,8 @@ classdef TFSpectrum < handle
             self.sig = {};
         end
         
-         % dimensions
+         % dependent properties
         function n = get.nf(self), n = numel(self.sig); end
-        
-        function y = get.ismultiband(self)
-            if self.nf
-                y = self.sig{1}.isband;
-            else
-                y = false;
-            end
-        end
         
         function n = get.ns(self)
             if self.nf
@@ -46,39 +41,39 @@ classdef TFSpectrum < handle
             end
         end
         
+        function y = get.ismultiband(self)
+            if self.nf
+                y = self.sig{1}.isband;
+            else
+                y = false;
+            end
+        end
+        
         % time/frequency info
         function s = signal(self,k)
             s = self.sig{k}; 
         end
         function t = tframe(self) 
-            t = dk.mapfun( @(x) x.tframe, self.sig );
+            t = dk.mapfun( @(x) x.tframe, self.sig, false );
         end
-        function f = freq(self,centre)
-            if nargin < 2, centre=false; end
-            if self.ismultiband
-                f = dk.mapfun( @(x) x.freq, self.sig, false );
-                if centre, f = cellfun( @mean, f ); end
-            else
-                f = cellfun( @(x) x.freq, self.sig );
-            end
+        function f = freq(self)
+            f = dk.mapfun( @(x) x.freq, self.sig, ~self.ismultiband );
         end
-        
-        % burn-in
-        function rem_before(self,t)
-            n = self.nf;
-            for i = 1:n
-                self.sig{i}.rem_before(t);
-            end
+        function f = cenfrq(self)
+            f = dk.mapfun( @(x) x.cenfrq, self.sig, true );
+        end
+        function x = dt(self)
+            x = dk.mapfun( @(x) x.dt, self.sig, true );
+        end
+        function x = fs(self)
+            x = dk.mapfun( @(x) x.fs, self.sig, true );
         end
         
         % assign spectral signals
         function self = assign(self,varargin)
             
             % get input
-            input = varargin;
-            if numel(input) == 1 && iscell(input{1})
-                input = input{1};
-            end
+            input = dk.wrap(varargin);
             
             % clear contents if empty
             if isempty(input)
@@ -88,35 +83,17 @@ classdef TFSpectrum < handle
             
             % check inputs
             assert( all(cellfun( @(x) isa(x,'ant.dsp.TFSeries'), input )), ...
-                'Input should be a cell of Signal objects.' );
+                'Input should be a cell of TFSeries objects.' );
             
-            t = dk.mapfun( @(x) x.time(1), input, true );
-            n = numel(t);
-            assert( all(diff(t)==0), 'Start times should be equal.' );
+            % sanity checks
+            chk = dk.mapfun( @(x) [x.time(1), x.ns, numel(x.freq)], input, false );
+            chk = vertcat(chk{:});
+            assert( all(diff(chk,1,1) == 0), 'Shape or time-course mismatch between inputs.' );
             
             % assign input
+            n = numel(input);
             self.sig = reshape( input, [1 n] );
             
-        end
-        
-        % return logical mask for signals matching input frequency band (1x2 vector)
-        function match = band_match(self,b)
-            f = self.freq;
-            if self.ismultiband
-                match = cellfun( @(x) dk.call(2,@ant.util.band_overlap,x,b), f ) > 0.95;
-            else
-                match = (f >= b(1)) & (f <= b(2));
-            end
-        end
-        
-        % return only signals matching input frequency band (or modify current object)
-        function obj = band_select(self,b)
-            match = self.band_match(b);
-            if nargout == 0
-                self.sig = self.sig(match);
-            else
-                obj = ant.dsp.TFSpectrum(self.sig(match));
-            end
         end
         
     end
@@ -132,6 +109,7 @@ classdef TFSpectrum < handle
         end
         
         function self = unserialise(self,x)
+            if ischar(x), x=dk.load(x); end
             switch x.version
             case '0.1'
                 self.sig = x.sig;
@@ -148,7 +126,7 @@ classdef TFSpectrum < handle
         
         function self = load(self,filename)
             dk.disp('[ant.dsp.TFSpectrum] Loading file "%s"...',filename);
-            self.unserialise(load(filename));
+            self.unserialise(filename);
         end
         
     end
@@ -171,216 +149,169 @@ classdef TFSpectrum < handle
     %------------------
     methods
         
-        % estimate resampled timepoints
-        function t = resampled_time(self,fs)
+        % burn-in
+        function burn(self,tlen)
+            n = self.nf;
+            for i = 1:n
+                self.sig{i}.burn(tlen);
+            end
+        end
+        
+        % return logical mask for signals matching input frequency band (1x2 vector)
+        function match = band_match(self,b)
+            f = self.freq;
+            if self.ismultiband
+                match = cellfun( @(x) dk.call(2,@ant.util.band_overlap,x,b), f ) > 0.95;
+            else
+                match = (f >= b(1)) & (f <= b(2));
+            end
+        end
+        
+        % return only signals matching input frequency band (or modify current object)
+        function obj = band_select(self,b)
+            match = self.band_match(b);
+            if nargout == 0
+                self.sig = self.sig(match);
+            else
+                obj = ant.dsp.TFSpectrum(self.sig(match));
+            end
+        end
+        
+        % return band names with specified format
+        function name = band_names(self,varargin)
+            assert( self.ismultiband, 'This method is for multiband spectra only.' );
+            name = ant.util.band2name( self.freq, varargin{:} );
+        end
+        
+        % estimate common timecourse across signals
+        function t = common_tc(self,fs)
             t = self.tframe;
             t = vertcat(t{:});
             t = [max(t(:,1)), min(t(:,2))];
-            t = t(1):1/fs:t(2);
+            t = transpose(t(1):1/fs:t(2));
         end
         
-        % estimate resampled property across frequencies
-        % valid names are:
+        % resample property on common timecourse across signals:
         %
         %   psd
         %   amplitude
         %   magnitude
         %   phase
-        %   dphase
+        %   ifreq
         %   phase_offset
         %   synchrony
         %
-        function [p,t,f] = resample(self,name,fs,red)
+        function [p,t,f] = property(self,name,fs,red)
             
             if nargin < 4, red = @(x) x; end
             name = lower(name);
             
             % output timepoints
-            t = self.resampled_time(fs);
+            t = self.common_tc(fs);
             f = self.freq;
             
             % iterate on each signal to interpolate the PSD
             n = self.nf;
-            p = cell( 1, n );
+            p = cell(1,n);
             for k = 1:n
-                [sp,st] = self.sig{k}.(name);
+                [sp,st] = feval( name, self.sig{k} );
                 p{k} = ant.ts.resample( red(sp), st, t );
             end
             
         end
         
-        % average magnitude/phase across frequencies
-        function [m,p,t] = average(self,fs)
+        % efficiently average property across signals
+        function [p,t,c] = xfpropavg(self,name,fs) 
             
-            if nargin < 2, fs = self.sig{1}.fs; end
-            
-            n = self.nf;
-            t = self.resampled_time(fs);
-            m = 0;
-            p = 0;
-            
-            for k = 1:n
-                [a,b,c] = self.sig{k}.polar();
-                m = m + ant.ts.resample(a, c, t);
-                p = p + ant.ts.resample(b, c, t);
-            end
-            m = m / n;
-            p = p / n;
-            
-        end
-        
-        % average resampled property across frequencies
-        function [p,t,c] = xfmean(self,varargin) 
-            
-            [q,t] = self.resample(varargin{:});
+            [q,t] = self.property(name,fs);
             
             % don't concatenate it in 3D (not memory efficient)
             n = numel(q);
-            p = q{1}; % time x signal
+            p = q{1}/n; % time x signal
             c = 1:size(p,2);
             
-            for i = 2:n
-                p = p + q{i};
+            for k = 2:n
+                p = p + q{k}/n;
             end
-            p = p / n;
+            
+        end
+        function [p,t,f] = xcpropavg(self,name,fs)
+            [p,t,f] = self.property( name, fs, @(x) mean(x,2) );
+            p = horzcat(p{:});
+        end
+        
+        % efficiently average magnitude/phase across signals
+        function [m,p,t] = xfsigavg(self,fs)
+            
+            n = self.nf;
+            t = self.common_tc(fs);
+            fun = @(x) ant.ts.resample( x.vals, x.time, t )/n;
+            
+            s = fun( self.sig{1} );
+            for k = 2:n
+                s = s + fun( self.sig{k} );
+            end
+            
+            m = abs(s);
+            p = angle(s);
             
         end
         
         % PSD statistics on an adaptive sliding window
-        function stat = psd_stats( self, varargin )
+        function stat = psdstat( self, varargin )
             
             n = self.nf;
             stat = cell(1,n);
             
-            for i = 1:n
-                [p,~,s] = self.sig{i}.adaptive_psd( [], varargin{:} );
+            for k = 1:n
                 
-                % average PSD across timepoints for each channel
+                % average PSD within each window
+                [p,~,w] = self.sig{k}.adaptive_psd( @(x) mean(x,1), varargin{:} );
+                
+                % PSD stats across windows for each channel
                 p = ant.stat.summary( p, 1 );
-                p.swin = s;
-                p.freq = self.sig{i}.freq;
-                stat{i} = p;
+                p.swin = w;
+                p.freq = self.sig{k}.freq;
+                stat{k} = p;
+                
             end
             
             % convert to struct-array
             stat = [stat{:}];
-            
-        end
-        
-        % Functional connectivity stats
-        function [stat,tc] = connectivity_stats( self, method, varargin )
-            
-            n = self.nf;
-            stat = cell(1,n);
-            tc = cell(1,n);
-            to_matrix = @(x) ant.mat.col2sym(x,true);
-            
-            for i = 1:n
-                [fc,t,s] = self.sig{i}.adaptive_connectivity( method, varargin{:} );
-                
-                % average connectivity across edges for each window
-                x.time = t;
-                x.vals = mean(fc,1)';
-                tc{i} = x;
-                
-                % average connectivity across windows for each edge
-                fc = ant.stat.summary( fc, 2 );
-                fc.swin = s;
-                fc.freq = self.sig{i}.freq;
-                fc.mean = to_matrix(fc.mean);
-                fc.sdev = to_matrix(fc.sdev);
-                fc.skew = to_matrix(fc.skew);
-                
-                stat{i} = fc;
-            end
-            
-            % convert to struct-array
-            stat = [stat{:}];
-            tc = [tc{:}];
-            
-        end
-        
-        % Coherence-weighted connectivity stats
-        function [stat,tc] = cwcorr_stats( self, norm, dsl, varargin )
-            
-            n = self.nf;
-            stat = cell(1,n);
-            tc = cell(1,n);
-            to_matrix = @(x) ant.mat.col2sym(x,true);
-            
-            for i = 1:n
-                [fc,t,s] = self.sig{i}.adaptive_cwcorr( norm, dsl, varargin{:} );
-                
-                % average connectivity across edges for each window
-                x.time = t;
-                x.vals = mean(fc,1)';
-                tc{i} = x;
-                
-                % average connectivity across windows for each edge
-                fc = ant.stat.summary( fc, 2 );
-                fc.swin = s;
-                fc.freq = self.sig{i}.freq;
-                fc.mean = to_matrix(fc.mean);
-                fc.sdev = to_matrix(fc.sdev);
-                fc.skew = to_matrix(fc.skew);
-                
-                stat{i} = fc;
-            end
-            
-            % convert to struct-array
-            stat = [stat{:}];
-            tc = [tc{:}];
             
         end
         
     end
     
     %------------------
-    % SUMMARY
+    % PLOTTING
     %------------------
     methods
         
-        function data = summary( self, varargin )
-            data = dk.mapfun( @(x) x.summary(varargin{:}), self.sig, false );
-            data = [data{:}];
-        end
-        
-        % cross-channel PSD plot
+        % cross-channel property plot
         function [t,f,p] = xcplot(self,name,fs,varargin)
             
-            % average PSD across channels for each frequency
-            [p,t,f] = self.resample(name, fs, @(x) mean(x,2) );
-            p = [p{:}];
+            % average property across channels for each frequency
+            [p,t,f] = self.xcpropavg(name,fs);
             
             % line-plot for multiband, image for wavelet analysis
             if self.ismultiband
-                plot( t, p );
                 bname = ant.util.band2name(f);
+                plot( t, p );
                 xlabel('Time (sec)'); ylabel(name); legend(bname{:}); 
             else
-                arg = dk.obj.kwArgs({'xlabel','Time (sec)','ylabel','Frequency (Hz)','clabel',name}).merge(varargin{:});
-                ant.img.show( {t,f,p}, arg );
+                ant.img.show( {t,f,p}, 'xlabel', 'Time (sec)', 'ylabel', 'Frequency (Hz)', ...
+                    'clabel', name, varargin{:} );
             end
             
         end
         function xcdist(self,varargin)
-            switch nargin
-                case 2
-                    x = varargin{1}; % struct
-                    p = x.p;
-                    f = x.f;
-                case 3
-                    name = varargin{1};
-                    if ischar(name)
-                        fs = varargin{2};
-                        [p,~,f] = self.resample(name, fs, @(x) mean(x,2) );
-                        p = [p{:}];
-                    else
-                        p = name;
-                        f = varargin{2};
-                    end
-                otherwise
-                    error('Bad number of inputs.');
+            assert( nargin==3, 'Expected {name,fs} or {p,f}.' );
+            if ischar(varargin{1})
+                [p,~,f] = self.xcpropavg( varargin{:} );
+            else
+                p = varargin{1};
+                f = varargin{2};
             end
             if self.ismultiband
                 bname = ant.util.band2name(f);
@@ -392,32 +323,22 @@ classdef TFSpectrum < handle
             end
         end
         
-        % cross-frequency PSD plot
+        % cross-frequency property plot
         function [t,c,p] = xfplot(self,name,fs,varargin)
             
             % if used with positive properties, set 'positive', true
-            [p,t,c] = self.xfmean(name,fs);
-            arg = dk.obj.kwArgs({'xlabel','Time (sec)','ylabel','Signal #','clabel',name}).merge(varargin{:});
-            ant.img.show( {t,c,p}, arg );
+            [p,t,c] = self.xfpropavg(name,fs);
+            ant.img.show( {t,c,p}, 'xlabel', 'Time (sec)', 'ylabel', 'Channel', ...
+                'clabel', name, varargin{:} );
             
         end
         function xfdist(self,varargin)
-            switch nargin
-                case 2
-                    x = varargin{1}; % struct
-                    p = x.p;
-                    c = x.c;
-                case 3
-                    name = varargin{1};
-                    if ischar(name)
-                        fs = varargin{2};
-                        [p,~,c] = self.xfmean(name,fs);
-                    else
-                        p = name;
-                        c = varargin{2};
-                    end
-                otherwise
-                    error('Bad number of inputs.');
+            assert( nargin==3, 'Expected {name,fs} or {p,c}.' );
+            if ischar(varargin{1})
+                [p,~,c] = self.xfpropavg( varargin{:} );
+            else
+                p = varargin{1};
+                c = varargin{2};
             end
             dk.ui.violin(p,'label',c); 
             xlabel('Channel'); axis tight;

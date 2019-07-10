@@ -1,8 +1,8 @@
-function [y, ty]  = downsample( x, tx, fs, win )
+function [y, ty] = downsample( x, tx, fs, win )
 %
-% [y, ty] = ant.ts.downsample( x, tx, fs, win=hamming )
+% [y,ty] = ant.ts.downsample( x, tx, fs, win=hamming )
 %
-% Downsample a time-series using sliding-window.
+% Downsample a time-series using moving average.
 %
 % JH
 
@@ -13,10 +13,12 @@ function [y, ty]  = downsample( x, tx, fs, win )
     [x,tx] = dk.formatmv(x,tx,'vertical');
     
     % make sure input is sampled arithmetically
-    dt = diff(tx);
-    assert( all(dt > eps), 'Input is non-analytic.' );
-    assert( (max(dt)/mean(dt) -1) <= 1e-3, 'Input time-step is not steady.' );
-    dt = mean(dt);
+    [ari,dt] = ant.priv.is_arithmetic(tx,1e-3);
+    if ~ari
+        dk.info('[ant.ts.downsample] Input is not regular, fallback to Matlab implementation.');
+        [y,ty] = ant.ts.resample( x, tx, fs );
+        return;
+    end
     
     % check that fs is greater than current sampling rate
     newdt = 1/fs;

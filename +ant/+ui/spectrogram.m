@@ -14,23 +14,9 @@ function [p,t,f] = spectrogram( ts, freq, fs, sigma, varargin )
     if nargin < 4 || isempty(sigma), sigma=0; end
     if nargin < 3 || isempty(fs), fs=100; end
 
-    PROP = 'psd';
-    METH = 'resample';
-    
-    % computation method
-    switch METH
-        
-        case 'manual'
-            tf = ant.dsp.wavelet( ts, freq, fs, true );
-            p = dk.mapfun( @(x) mean(x.(PROP),2), tf.sig, false );
-            f = tf.freq;
-            t = tf.sig{1}.time;
-            
-        case 'resample'
-            tf = ant.dsp.wavelet( ts, freq );
-            [p,t,f] = tf.resample( PROP, fs, @(x) mean(x,2) );
-        
-    end
+    % compute average PSD across channels for each frequency
+    tf = ant.dsp.wavelet( ts, freq );
+    [p,t,f] = tf.property( 'psd', fs, @(x) mean(x,2) );
     
     % concatenate and smooth PSD
     p = horzcat( p{:} );

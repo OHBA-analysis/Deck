@@ -1,4 +1,17 @@
-classdef FourierTransform < ant.priv.SpectralProperties
+classdef FourierTransform < ant.priv.Spectrum
+%
+% Compute Fourier coefficients using the DFT.
+% This class is used to compute all sorts of spectral features in the toolbox.
+%
+% USAGE
+% -----
+%
+%   [lo,up] = ant.dsp.FourierTransform(ts).power_band();
+%
+%   
+% See also: ant.ts.fourier, ant.priv.Spectrum
+%
+% JH
 
     properties
         frq; % frequency
@@ -9,22 +22,22 @@ classdef FourierTransform < ant.priv.SpectralProperties
         nf, ns, df;
 
         % short names
-        amp, nrg, psd, phi;
+        amp, psd, phi;
 
         % Long names
         frequency;
         amplitude;
-        energy;
         phase;
+        energy;
+        power;
 
     end
 
     %-------------------
-    % Instance methods
+    % Main methods
     %-------------------
     methods
 
-        % Constructor
         function self = FourierTransform(varargin)
             self.clear();
             if nargin > 0
@@ -32,22 +45,18 @@ classdef FourierTransform < ant.priv.SpectralProperties
             end
         end
 
-        % Clear
         function clear(self)
             self.frq = [];
             self.dfc = [];
         end
 
-        % Copy
-        function copy(self,s)
+        function self = copy(self,s)
             self.frq = s.frq;
             self.dfc = s.dfc;
         end
 
-        % Clone
         function s = clone(self)
-            s = ant.dsp.FourierTransform();
-            s.copy( self );
+            s = ant.dsp.FourierTransform().copy(self);
         end
 
 
@@ -56,17 +65,17 @@ classdef FourierTransform < ant.priv.SpectralProperties
         function n = get.ns(self), n = size(self.psd,2); end % num of signals
         function f = get.df(self), f = self.frq(2)-self.frq(1); end % frequency step
 
-        function p = get.phi (self), p = unwrap(angle(self.dfc)); end
-        function x = get.psd (self), x = self.nrg / self.df; end
-        function e = get.nrg (self), e = abs(self.dfc).^2; end
-        function a = get.amp (self), a = abs(self.dfc); end
-
-        function p = get.phase     (self), p = self.phi; end
-        function e = get.energy    (self), e = self.nrg; end
-        function a = get.amplitude (self), a = self.amp; end
         function f = get.frequency (self), f = self.frq; end
+        function p = get.phase     (self), p = angle(self.dfc); end
+        function a = get.amplitude (self), a = abs(self.dfc); end
+        function e = get.energy    (self), e = self.amplitude.^2; end
+        function e = get.power     (self), e = self.energy / self.df; end
 
+        function p = get.phi (self), p = self.phase; end
+        function x = get.psd (self), x = self.power; end
+        function a = get.amp (self), a = self.amplitude; end
 
+        
         % Assign from time-series
         function assign(self,ts,demean)
 
@@ -87,7 +96,7 @@ classdef FourierTransform < ant.priv.SpectralProperties
         end
         
         
-        % Inherited from SpectralProperties
+        % Inherited from parent
         function f = proxy_frq(self)
             f = self.frq;
         end

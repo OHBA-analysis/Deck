@@ -1,28 +1,24 @@
-classdef TFSeries < handle
+classdef TFSeries < ant.priv.Signal
 %
-% ant.dsp.TFSeries()
+% ant.dsp.TFSeries( time, vals, freq, pnorm=1 )
 %
 % Time-frequency objects store the spectral contents (typically complex-valued) produced
 % by time-frequency analysis, for instance:
 %   ant.dsp.wavelet
-%   ant.dsp.hilebrt
+%   ant.dsp.hilbert
 %
 % The properties are:
 %    time  Vector of timepoints
 %    vals  Complex-valued matrix with spectrum for each time-course
 %    freq  Either a scalar (wavelet) or a 1x2 band vector (hilbert)
-%   pnorm  Normalisation scalar used to compute power density.
+%   pnorm  Normalisation scalar used to compute power density
 % 
 %
 % Methods available fall into several categories:
 %
-%   FORMAT: cartesian, polar
-%   TRANSFORM: resample, filter, smooth
+%       FORMAT: cartesian, polar
+%    TRANSFORM: resample, filter, smooth
 %   PROPERTIES: psd, amplitude, magnitude, phase, dphase, phase_offset, synchrony
-%   CONNECTIVITY: connectivity, edge_connectivity, cwcorr
-%
-% + sliding and adaptive variants
-% + summary method
 %
 % See comments for more details about how to call these various methods.
 %
@@ -36,38 +32,40 @@ classdef TFSeries < handle
     end
     
     properties (Transient,Dependent)
-        nt, ns, dt, fs, cenfrq, isband;
+        cenfrq, isband;
     end
     
     methods
         
         function self = TFSeries(varargin)
             self.clear();
-            if nargin > 0
-                self.assign(varargin{:});
+            switch nargin 
+                case 0 % nothing to do
+                case 1
+                    self.unserialise(varargin{1});
+                otherwise
+                    self.assign(varargin{:});
             end
         end
         
         function clear(self)
-            
             self.time = [];
             self.vals = [];
             self.freq = [];
             self.pnorm = 1;
-            
         end
         
-        function n = get.nt(self), n = numel(self.time); end
-        function n = get.ns(self), n = size(self.vals,2); end
-        function t = get.dt(self), t = mean(diff(self.time)); end
-        function f = get.fs(self), f = 1/self.dt; end
+        function s = clone(self)
+            s = ant.dsp.TFSeries( self.time, self.vals, self.freq, self.pnorm );
+        end
+        
+        
+        % Dependent properties
         function f = get.cenfrq(self), f = mean(self.freq); end
         function y = get.isband(self), y = numel(self.freq)==2; end
         
-        function t = tframe(self)
-            t = [self.time(1),self.time(end)];
-        end
         
+        % Assignment from time-series
         function self = assign(self,time,vals,freq,pnorm)
             
             if nargin < 5, pnorm=1; end
@@ -82,10 +80,6 @@ classdef TFSeries < handle
             self.freq = freq;
             self.pnorm = pnorm;
             
-        end
-        
-        function s = clone(self)
-            s = ant.dsp.TFSeries( self.time, self.vals, self.freq, self.pnorm );
         end
         
     end
@@ -115,10 +109,10 @@ classdef TFSeries < handle
             for i = 1:n
                 x.(p{i}) = self.(p{i});
             end
-            x.vals = single(x.vals); % reduce size
         end
         
         function self = unserialise(self,x)
+            if ischar(x), x=dk.load(x); end
             switch x.version
             case '0.1'
                 [p,n] = self.get_props();
@@ -126,7 +120,6 @@ classdef TFSeries < handle
                     self.(p{i}) = x.(p{i});
                 end
             end
-            self.vals = double(self.vals); % expand
         end
         
         function self = save(self,filename)
@@ -139,7 +132,7 @@ classdef TFSeries < handle
         
         function self = load(self,filename)
             dk.disp('[ant.dsp.TFSeries] Loading file "%s"...',filename);
-            self.unserialise(load(dk.str.xset(filename,'mat')));
+            self.unserialise(filename);
         end
         
     end
@@ -147,8 +140,7 @@ classdef TFSeries < handle
         
         function x = loadobj(in)
             if isstruct(in)
-                x = ant.dsp.TFSeries();
-                x.unserialise(in);
+                x = ant.dsp.TFSeries(in);
             else
                 warning('Unknown serialised Signal format.');
                 x = in;
@@ -164,10 +156,40 @@ classdef TFSeries < handle
     %   polar()
     %   smooth( polar=true )
     %   resample( fs )
-    %   filter( -10 )
+    %   magfilt( -10 )
     %
     %------------------
     methods
+        
+        % implement inherited masking
+        function ts = mask_k(self,tidx)
+            m = self.tidx2mask(tidx);
+            if nargout == 0
+                self.time = self.time(m);
+                self.vals = self.vals(m,:);
+            else
+                ts = ant.dsp.TFSeries( self.time(m), self.vals(m,:), self.freq, self.pnorm );
+            end
+        end
+        
+        function ts = mask_s(self,sidx)
+            m = self.sidx2mask(sidx);
+            if nargout == 0
+                self.vals = self.vals(:,m);
+            else
+                ts = ant.dsp.TFSeries( self.time, self.vals(:,m), self.freq, self.pnorm );
+            end
+        end
+        
+        % Reorder signals
+        function ts = reorder(self,order)
+            assert( dk.num.isperm(order), '[ant.dsp.TFSeries] Expected a permutation in input.' );
+            if nargout == 0
+                self.vals = self.vals(:,order);
+            else
+                ts = ant.dsp.TFSeries( self.time, self.vals(:,order), self.freq, self.pnorm );
+            end
+        end
         
         function [x,y,t] = cartesian(self)
         %
@@ -185,49 +207,21 @@ classdef TFSeries < handle
         %
         
             m = abs(self.vals);
-            p = unwrap(angle(self.vals),[],1);
+            p = angle(self.vals);
             t = self.time;
         end
         
-        function self = smooth(self,polar,varargin)
+        function self = smooth(self,varargin)
         %
-        % self = smooth( polar=true, varargin )
+        % self = smooth( varargin )
         %
         % Use Matlab's smooth function to smooth the spectral time-courses.
-        % If polar=true, the function is applied separately to the magnitude and phase.
         % Additional arguments are forwarded to smooth.
         %
-        % See also: smooth
+        % See also: ant.ts.smooth
         %
         
-            if nargin < 2 || isempty(polar), polar=true; end
-            
-            if polar
-                mag = smooth( self.time, abs(self.vals), varargin{:} );
-                phi = smooth( self.time, unwrap(angle(self.vals),[],1), varargin{:} );
-                self.vals = mag .* exp( 1i*phi );
-            else
-                self.vals = smooth( self.time, self.vals, varargin{:} );
-            end
-            
-        end
-        
-        function s = mask(self,tmask,smask)
-        %
-        % mask( tmask, smask )
-        %
-        % Return a TFSeries object (or change in-place) with masked time-course and signals.
-        %
-            
-            if nargin < 3, smask=1:self.ns; end
-            if nargin < 2 || isempty(tmask), tmask=1:self.nt; end
-            
-            if nargout == 0
-                self.time = self.time(tmask);
-                self.vals = self.vals(tmask,smask);
-            else
-                s = ant.dsp.TFSeries( self.time(tmask), self.vals(tmask,smask), self.freq, self.pnorm );
-            end
+            self.vals = ant.ts.smooth( self.vals, self.time, varargin{:} );
             
         end
         
@@ -240,27 +234,30 @@ classdef TFSeries < handle
         %
         
             if nargin < 3, tol=0.1; end
-            if abs(fs - self.fs) <= tol
+            curfs = self.fs;
+            
+            if abs(fs - curfs) <= tol
                 dk.info( '[ant.dsp.TFSeries:resample] Already at the required sampling rate.' );
-            elseif fs <= self.fs
+            elseif fs <= curfs
                 [self.time,self.vals] = ant.priv.ansig_downsample( self.time, self.vals, fs );
             else
-                [self.vals,self.time] = ant.priv.ansig_upsample( self.vals, self.time, fs );
+                [self.time,self.vals] = ant.priv.ansig_upsample( self.time, self.vals, fs );
             end
+            
         end
         
-        function self = filter(self,varargin)
+        function self = magfilt(self,varargin)
         %
-        % self = filter( string, options... )
-        % self = filter( numeric, options... )
-        % self = filter( struct, options... )
+        % self = magfilt( string, options... )
+        % self = magfilt( numeric, options... )
+        % self = magfilt( struct, options... )
         %
         % Filter the magnitude of the spectral time-courses.
-        % Arguments are forwarded to ant.dsp.do.filter
+        % Arguments are forwarded to nst.dsp.do.filter
         %
             
-            mag = ant.TimeSeries( self.time, abs(self.vals) );
-            mag = ant.dsp.do.filter(mag,varargin{:});
+            mag = nst.dsp.TimeSeries( self.time, abs(self.vals) );
+            mag = nst.dsp.do.filter(mag,varargin{:});
             phi = angle(self.vals);
             
             self.vals = mag.vals .* exp( 1i*phi );
@@ -271,32 +268,21 @@ classdef TFSeries < handle
     
     
     %------------------
-    % ANALYSIS
+    % FEATURES
     %
     %   Format [x,t] = property( idx )
     %       psd
     %       amplitude
     %       magnitude
     %       phase
-    %       dphase
+    %       ifreq
     %       phase_offset
     %       synchrony
     %
     %------------------
     methods
         
-        function s = rem_before(self,t)
-            if nargout == 0
-                tmsk = self.time >= t; % >= is consistent with ant.TimeSeries
-                self.time = self.time(tmsk);
-                self.vals = self.vals(tmsk,:);
-                s = self;
-            else
-                s = self.clone();
-                s.rem_before(t);
-            end
-        end
-        
+        % features
         function [p,t] = psd(self,tidx)
             if nargin < 2, tidx=1:self.nt; end
             t = self.time(tidx);
@@ -304,8 +290,9 @@ classdef TFSeries < handle
             p = p .* conj(p) / self.pnorm;
         end
         
-        function [a,t] = amplitude(self,varargin)
-            [a,t] = self.psd(varargin{:});
+        function [a,t] = amplitude(self,tidx)
+            if nargin < 2, tidx=1:self.nt; end
+            [a,t] = self.psd(tidx);
             a = sqrt(a);
         end
         
@@ -318,29 +305,28 @@ classdef TFSeries < handle
         function [p,t] = phase(self,tidx)
             if nargin < 2, tidx=1:self.nt; end
             t = self.time(tidx);
-            p = unwrap( angle(self.vals(tidx,:)), [], 1 );
+            p = angle(self.vals(tidx,:));
         end
         
-        % normalised derivative of the phase (instantaneous frequency estimate)
-        function [f,t] = dphase(self,varargin)
-            [f,t] = self.phase(varargin{:});
+        % instantaneous frequency estimate (normalised derivative of the phase)
+        function [f,t] = ifreq(self,tidx)
+            if nargin < 2, tidx=1:self.nt; end
+            [f,t] = self.phase(tidx);
             h = t(2)-t(1);
-            f = ant.ts.diff(f,1/h)/(2*pi);
+            f = ant.priv.phase2freq(f,1/h);
         end
         
-        function [o,t] = phase_offset(self,varargin)
-        %
-        % At each timepoint, difference with the average phase across TCs.
-        %
-        
-            [o,t] = self.phase(varargin{:});
-            
+        % at each timepoint, difference with the average phase across TCs
+        function [o,t] = phase_offset(self,tidx)
+            if nargin < 2, tidx=1:self.nt; end
+            [o,t] = self.phase(tidx);
             o = dk.bsx.sub( o, mean(o,2) );
             o = atan2( cos(o), sin(o) );
         end
         
-        function [s,t] = synchrony(self,varargin)
-            [s,t] = self.phase(varargin{:});
+        function [s,t] = synchrony(self,tidx)
+            if nargin < 2, tidx=1:self.nt; end
+            [s,t] = self.phase(tidx);
             s = abs(mean( exp( 1i*s ), 2 ));
         end
         
@@ -397,7 +383,7 @@ classdef TFSeries < handle
         
         % varargin = nosc[cycles], burn[sec], ovr[ratio] (cf adaptive_win)
         function [x,t,w] = adaptive_prop(self,name,rfun,varargin)
-            w = adaptive_swin(self.cenfrq,varargin{:});
+            w = ant.priv.win_adaptive(self.cenfrq,varargin{:});
             [x,t] = self.sliding_prop(name,rfun,w);
         end
         
@@ -438,16 +424,4 @@ classdef TFSeries < handle
         
     end
     
-end
-
-function swin = adaptive_swin(cenfrq,nosc,burn,ovr)
-
-    if nargin < 3, burn=0; end
-    if nargin < 4, ovr=0.5; end
-    
-    assert( burn >= 0, 'Burn-in should be non-negative.' );
-    assert( (ovr >= 0) && (ovr < 1), 'Overlap should be in [0,1).' );
-    
-    swin = [ nosc/cenfrq, (1-ovr)*nosc/cenfrq, burn ];
-
 end

@@ -1,10 +1,13 @@
 function [y, ty] = resample( x, tx, fs, method )
 %
-% [y, ty] = ant.ts.resample( x, tx, fs=[], method=pchip )
+% [y,ty] = ant.ts.resample( x, tx, fs=[], method=pchip )
 %
-%   Wrapper for Matlab's resample function. 
+%   Wrapper for Matlab's resample function, accepting complex-valued inputs.
 %   We demean/remean the input and use non-extrapolating method (pchip) by default.
 %   Note that if input fs is empty, this method resamples the input at equally spaced points.
+%
+%
+% See also: resample
 %
 % JH
 

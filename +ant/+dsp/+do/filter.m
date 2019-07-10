@@ -4,17 +4,20 @@ function [ts_out,filt] = filter( ts_in, filt, varargin )
 % [ts_out,filt] = filter( ts_in, filt, options... )
 %
 % Filter input time-courses using FIR filter.
-% Main option is:
 %
-%   processor
-%       nst, default: use ant.dsp.do.filter_butter
-%       fieldtrip, ft: use ant.dsp.do.ft_*
+% OPTIONS
+% -------
 %
-% If filter_butter is used, then the additional options are defined:
+%   processor   choose the filtering routines used
+%                       ant, deck: ant.dsp.do.filter_butter
+%                   fieldtrip, ft: ant.dsp.do.ft_*
 %
-%   order: the order of the Butterworth filter (default: 15)
-%   tol: the safety margin at the border of relative frequencies (default: 1e-2)
+% For the Deck processor, additional options are:
+%
+%   order       order of the Butterworth filter (default: 15)
+%   tol         safety margin at the border of relative frequencies (default: 1e-2)
 % 
+%
 % See also: ant.priv.filter_parse, ant.dsp.do.filter_butter, ant.dsp.do.ft_*
 %
 % JH
@@ -34,7 +37,7 @@ function [ts_out,filt] = filter( ts_in, filt, varargin )
     end
     
     % select processor
-    switch lower(opt.get( 'processor', 'nsl' ))
+    switch lower(opt.get( 'processor', 'deck' ))
         case {'fieldtrip','ft'}
         proc = struct(...
             'lp', @ant.dsp.do.ft_lowpass,  ...
@@ -42,7 +45,7 @@ function [ts_out,filt] = filter( ts_in, filt, varargin )
             'bp', @ant.dsp.do.ft_bandpass, ...
             'bs', @ant.dsp.do.ft_bandstop  ...
         );
-        case {'nsl','nst','default'}
+        case {'deck','ant','default'}
         proc = struct(...
             'lp', @(t,f,varargin) ant.dsp.do.filter_butter('lp',t,f,varargin{:}), ...
             'hp', @(t,f,varargin) ant.dsp.do.filter_butter('hp',t,f,varargin{:}), ...

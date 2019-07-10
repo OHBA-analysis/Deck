@@ -1,5 +1,8 @@
 classdef Signal < handle
-    
+%
+% Abstract base class for time-series like objects.
+%
+
     properties (Abstract)
         time;
         vals;
@@ -7,7 +10,7 @@ classdef Signal < handle
     
     properties (Transient,Dependent)
         n_times, n_signals; % long names
-        tspan; % time-span
+        tspan, tframe;
     end
     
     properties (Transient,Dependent,Hidden)
@@ -32,13 +35,6 @@ classdef Signal < handle
         function y = is_forward(self), y = self.time(end) > self.time(1); end
         function y = is_backward(self), y = ~self.is_forward(); end
         
-        function Dt = timespan(self)
-            Dt = abs(self.time(end) - self.time(1));
-        end
-        function tf = timeframe(self)
-            tf = [self.time(1), self.time(end)];
-        end
-        
         % Dimensions
         function n = get.nt(self), n = size(self.time,1); end % num of timesteps
         function n = get.ns(self), n = size(self.vals,2); end % num of signals
@@ -46,7 +42,8 @@ classdef Signal < handle
         function n = get.n_times  (self), n = self.nt; end
         function n = get.n_signals(self), n = self.ns; end
         
-        function Dt = get.tspan(self), Dt = self.timespan(); end
+        function Dt = get.tspan(self), Dt = abs(self.time(end) - self.time(1)); end
+        function Dt = get.tframe(self), Dt = [self.time(1), self.time(end)]; end
         
     end
     
@@ -57,18 +54,16 @@ classdef Signal < handle
     methods
         
         % Analytic if all timesteps are greater than epsilon
-        function [yes,dt] = is_analytic(self)
-            dt = diff(self.time);
-            dt = sign(dt(1)) * dt;
-            yes = all( dt > eps );
+        function [yes,dif] = is_analytic(self)
+            dif = diff(self.time);
+            dif = sign(dif(1)) * dif;
+            yes = all( dif > eps );
         end
         
         % Arithmetic if all timesteps are almost equal
         function [yes,dt] = is_arithmetic(self,rtol)
             if nargin < 2, rtol = 1e-6; end
-            [yes,dt] = self.is_analytic();
-            dt = mean(dt);
-            yes = yes && max(dt)/dt <= 1+rtol;
+            [yes,dt] = ant.priv.is_arithmetic(self.time,rtol);
         end
         
         % Sampling rate
@@ -108,9 +103,9 @@ classdef Signal < handle
     end
     
     
-    %------------- 
-    % Time masking
-    %-------------
+    %--------------------- 
+    % Time/channel masking
+    %---------------------
     methods (Hidden)
         
         % convert indices to logical masks
@@ -147,11 +142,21 @@ classdef Signal < handle
         end
         
         % logical time masks
-        function m = tmask_lt(self,cut), m = self.time < cut; end
-        function m = tmask_gt(self,cut), m = self.time > cut; end
+        function m = tmask_lt(self,cut,rel)
+            if nargin < 3, rel=false; end
+            if rel, cut = self.time(1) + cut; end
+            assert( cut>=self.time(1) && cut<=self.time(end), 'Timepoint out of frame.' );
+            m = self.time < cut; 
+        end
+        function m = tmask_gt(self,cut,rel)
+            if nargin < 3, rel=false; end
+            if rel, cut = self.time(1) + cut; end
+            assert( cut>=self.time(1) && cut<=self.time(end), 'Timepoint out of frame.' );
+            m = self.time > cut; 
+        end
         
-        function m = tmask_leq(self,cut), m = self.time <= cut; end
-        function m = tmask_geq(self,cut), m = self.time >= cut; end
+        function m = tmask_leq(self,varargin), m = ~self.tmask_gt(varargin{:}); end
+        function m = tmask_geq(self,varargin), m = ~self.tmask_lt(varargin{:}); end
         
     end
     methods
@@ -234,8 +239,7 @@ classdef Signal < handle
         % Remove timepoints after/before a certain time
         function ts = from(self,tval,rel)
             if nargin < 3, rel=false; end
-            if rel, tval = tval + self.time(1); end
-            m = self.tmask_geq(tval);
+            m = self.tmask_geq(tval,rel);
             if nargout == 0
                 self.mask_k(m);
             else
@@ -244,8 +248,7 @@ classdef Signal < handle
         end
         function ts = after(self,tval,rel)
             if nargin < 3, rel=false; end
-            if rel, tval = tval + self.time(1); end
-            m = self.tmask_gt(tval);
+            m = self.tmask_gt(tval,rel);
             if nargout == 0
                 self.mask_k(m);
             else
@@ -254,8 +257,7 @@ classdef Signal < handle
         end
         function ts = before(self,tval,rel)
             if nargin < 3, rel=false; end
-            if rel, tval = tval + self.time(1); end
-            m = self.tmask_lt(tval);
+            m = self.tmask_lt(tval,rel);
             if nargout == 0
                 self.mask_k(m);
             else
@@ -264,8 +266,7 @@ classdef Signal < handle
         end
         function ts = until(self,tval,rel)
             if nargin < 3, rel=false; end
-            if rel, tval = tval + self.time(1); end
-            m = self.tmask_leq(tval);
+            m = self.tmask_leq(tval,rel);
             if nargout == 0
                 self.mask_k(m);
             else
@@ -277,6 +278,25 @@ classdef Signal < handle
                 self.mask_t(tstart,tend);
             else
                 ts = self.mask_t(tstart,tend);
+            end
+        end
+        
+        % for added convenience
+        function ts = window(self,tstart,tlen,rel)
+            if nargin < 4, rel=false; end
+            if rel, tstart = self.time(1) + tstart; end
+            tend = tstart + tlen;
+            if nargout == 0
+                self.between( tstart, tend );
+            else
+                ts = self.between( tstart, tend );
+            end
+        end
+        function ts = burn(self,tlen)
+            if nargout == 0
+                self.from(tlen,true);
+            else
+                ts = self.from(tlen,true);
             end
         end
         
@@ -306,6 +326,7 @@ classdef Signal < handle
         % remove_times          xmask_k
         % window                between_k
         % time_window           between
+        % burn                  burn
         
     end
     

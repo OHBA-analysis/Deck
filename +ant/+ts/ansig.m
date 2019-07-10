@@ -29,7 +29,15 @@ function varargout = ansig( x, fs )
     
     if nargin < 2, fs=1; end
 
-    [sig,env] = antran(x);
+    % compute analytic transform on real inputs
+    if isreal(x)
+        [sig,env] = antran(x);
+        
+    % otherwise, assume analytic signal is given
+    else
+        sig = x;
+        env = abs(sig);
+    end
     
     switch nargout
         case 0
@@ -49,17 +57,17 @@ function varargout = ansig( x, fs )
         case 3
             % estimate frequency only if required
             phi = angle(sig);
-            x = cos(phi);
-            y = sin(phi);
-            frq = x .* ant.ts.diff( y, fs ) - y .* ant.ts.diff( x, fs );
-            frq = max( frq, 0 ) / (2*pi);
+            frq = ant.priv.phase2freq( phi, fs );
             varargout = { env, phi, frq };
     end
 
 end
 
+% analytic transform with symmetric enveloping
 function [sig,env] = antran(x)
+
     x = dk.bsx.sub( x, mean(x,1) );
     [~,env] = ant.ts.envelope(abs(x));
     sig = hilbert(x./max(eps,env));
+    
 end

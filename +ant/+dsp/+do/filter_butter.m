@@ -5,18 +5,21 @@ function ts_out = filter_butter( type, ts_in, freq, varargin )
 % Filter input timecourse using Butterworth filter.
 % Input type should be one of: lp (low), hp (high), bp (bandpass), bs (bandstop)
 %
-% OPTIONS:
+%
+% OPTIONS
+% -------
+%
 %     tol  Safety margin at the border of (0,1) for relative frequencies.
 %          This is to prevent numerical instabilities (default: 1e-2).
 %   order  Initial order of the filter (default: 15).
 %          If instability is detected, the filter will be recursively split into
 %          sequential filters of lower degrees.
 %
+%
 % See also: ant.priv.filter_split
 % 
 % JH
 
-    % parse options
     opt = dk.obj.kwArgs(varargin{:});
     
     % frequency information
@@ -26,7 +29,7 @@ function ts_out = filter_butter( type, ts_in, freq, varargin )
     % options
     tol   = opt.get('tol',   1e-2 ); % safety margin at the border of (0,1) for relative frequencies
     order = opt.get('order', 15 );   % filter order
-    freq  = dk.num.clamp( freq/fn, [tol,1-tol] ); % make sure it's in (0,1)
+    freq  = dk.num.clamp( freq/fn, [tol,1-tol] ); % make sure it is in (0,1)
     
     function f = get_filter(ord)
         assert( ord >= 2, 'Order is too low.' ); f.o = ord;

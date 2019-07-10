@@ -100,22 +100,6 @@ classdef TimeSeries < ant.priv.Signal
     %--------
     methods    
         
-        % Return properties as a struct or struct-array
-        function out = to_struct(self,as_array)
-            
-            if nargin < 2, as_array=false; end
-            if as_array
-                out = dk.struct.repeat( {'time','vals'}, 1, self.ns );
-                for i = 1:self.ns
-                    out(i).time = self.time;
-                    out(i).vals = sels.vals(:,i);
-                end
-            else
-                out = struct( 'time', self.time, 'vals', self.vals );
-            end
-            
-        end
-        
         function x = serialise(self,filename)
             x.version = '1.0';
             x.data    = [ self.time, self.vals ];
@@ -192,47 +176,45 @@ classdef TimeSeries < ant.priv.Signal
         end
         
         % Resample at a given sampling frequency
-        %
-        % NOTE: 
-        % Matlab's resample function is not great, try using this method only when the time-series 
-        % is not arithmetically sampled. Otherwise use upsample/downsample instead.
-        %
-        function ts = resample(self,fs,method)
-            if nargin < 3, method = 'pchip'; end
-
-            [new_vals,new_time] = ant.ts.resample( self.vals, self.time, fs, method );
+        function ts = resample(self,fs,tol)
+            
+            if nargin < 3, tol=0.1; end
+            curfs = self.fs;
+            
+            if abs(fs - curfs) <= tol
+                dk.info( '[ant.TimeSeries:resample] Already at the required sampling rate.' );
+                return;
+            elseif fs <= curfs
+                [new_vals,new_time] = ant.ts.downsample( self.time, self.vals, fs );
+            else
+                [new_vals,new_time] = ant.ts.upsample( self.vals, self.time, fs );
+            end
+            
             if nargout == 0
-                self.vals = new_vals;
                 self.time = new_time;
+                self.vals = new_vals;
             else
                 ts = ant.TimeSeries( new_time, new_vals );
             end
+            
         end
         
         % Resample to a given number of points
-        function ts = resample_n(self,n,method)
-            if nargin < 3, method = 'pchip'; end
-            
+        function ts = resample_n(self,n)
             fs = (n-1) / self.tspan;
             if nargout == 0
-                self.resample(fs,method);
+                self.resample(fs);
             else
-                ts = self.resample(fs,method);
+                ts = self.resample(fs);
             end
         end
         
-        % Specific methods to up/downsample
-        function ts = upsample(self,varargin)
-            [new_vals,new_time] = ant.ts.upsample( self.vals, self.time, varargin{:} );
-            if nargout == 0
-                self.vals = new_vals;
-                self.time = new_time;
-            else
-                ts = ant.TimeSeries( new_time, new_vals );
-            end
-        end
-        function ts = downsample(self,varargin)
-            [new_vals,new_time] = ant.ts.downsample( self.vals, self.time, varargin{:} );
+        % NOTE: 
+        % Matlab's resample function is not great, try using this method only when the time-series 
+        % is not arithmetically sampled.
+        %
+        function ts = resample_fir(self,fs)
+            [new_vals,new_time] = ant.ts.resample( self.vals, self.time, fs );
             if nargout == 0
                 self.vals = new_vals;
                 self.time = new_time;
@@ -300,19 +282,6 @@ classdef TimeSeries < ant.priv.Signal
             end
         end
         
-        % Burn a certain amount of time at the start
-        function ts = burn(self,duration)
-            assert( duration > 0, 'Durations should be positive.' );
-            assert( duration < self.timespan, 'Duration is longer than the timecourse!' );
-            
-            t = self.time(1) + duration;
-            if nargout == 0
-                self.from(t);
-            else
-                ts = self.from(t);
-            end
-        end
-        
     end
     
     
@@ -345,10 +314,9 @@ classdef TimeSeries < ant.priv.Signal
             ts = make_output( nargout, self, v );
         end
         
-        % Smooth time-courses using median filter
-        function ts = smooth(self,order)
-            if nargin < 2, order = 3; end % this is Matlab's default
-            ts = make_output( nargout, self, medfilt1( self.vals, order ) );
+        % Smooth time-courses 
+        function ts = smooth(self,varargin)
+            ts = make_output( nargout, self, ant.ts.smooth( self.vals, self.time, varargin{:} ) );
         end
         
         % Regress an input time-course out of the current time-series
@@ -452,7 +420,7 @@ classdef TimeSeries < ant.priv.Signal
         % Value distribution plot
         function [D,t,v] = plot_vald(self,fs,nbins,varargin)
             if nargin < 3 || isempty(nbins), nbins=100; end
-            ncols = fix( fs*self.timespan() );
+            ncols = fix( fs*self.tspan );
             [D,t,v] = ant.ui.ts2image( self, 1, nbins, ncols );
             D = dk.bsx.rdiv( D, max(1,sum(D,1)) ); % normalise
             ant.img.show( {t,v,D}, varargin{:} );

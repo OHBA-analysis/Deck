@@ -1,21 +1,28 @@
 function ts_out = resample( ts_in, varargin )
 %
-% ts_out = resample( ts_in, Name, Value )
+% ts_out = resample( ts_in, Name/Value )
 %
-% Resample input time-series. Allowed keys are:
+%   Resample input time-series. 
 %
-%   'fs'
-%       Specify the new sampling frequency.
-%   'dt'
-%       Specify the new time-step.
-%   'npts'
-%       Specify the desired number of points in output.
-%   'win'
-%       Window used for downsampling (default: 'hamming'). See ant.ts.window
+%
+% OPTIONS
+% -------
+%
+%   fs      Specify the new sampling frequency.
+%   dt      Specify the new time-step.
+%   npts    Specify the desired number of points in output.
+%   win     Window used for downsampling (default: 'hamming', cf ant.ts.window)
+%
+%
+% NOTE
+% ----
 %
 % The resampling behaviour is different for down-sampling and up-sampling:
-%   - For down-sampling, the time-series is first up-sampled to a time-step divisble by the target time-step, and
-%     then a moving average is applied to reduce to the desired number of time-points using the specified window.
+%
+%   - For down-sampling, the time-series is first up-sampled to a time-step divisble by the 
+%     target time-step, and then a moving average is applied to reduce to the desired number 
+%     of time-points using the specified window.
+%
 %   - For up-sampling, we use ant.ts.upsample, which uses Matlab's interp1 with method 'pchip'.
 %
 %
@@ -60,4 +67,5 @@ function ts_out = resample( ts_in, varargin )
     else
         ts_out = ant.TimeSeries(time,vals); 
     end
+    
 end
