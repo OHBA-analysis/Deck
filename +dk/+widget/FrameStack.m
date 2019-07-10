@@ -4,9 +4,9 @@ classdef FrameStack < handle
 %
 % Example usage:
 %
-% frames = rand(100,100,35); 
-% fstack = dk.widget.FrameStack( figure ).set_frames(frames).select_frame(13);
-% fstack.framerate = 10; % in Hz
+%   frames = rand(100,100,35); 
+%   fstack = dk.widget.FrameStack( figure ).set_frames(frames).select_frame(13);
+%   fstack.framerate = 10; % in Hz
 %
 % JH
 
@@ -36,7 +36,7 @@ classdef FrameStack < handle
         
         function clear(self)
             self.handles   = struct();
-            self.frames    = [];
+            self.frames    = {};
             self.framerate = 1;
             self.options   = struct();
             self.playing   = false;
@@ -47,7 +47,7 @@ classdef FrameStack < handle
             if isempty(self.frames)
                 n = 0; 
             else
-                n = size(self.frames,3);
+                n = numel(self.frames);
             end
         end
         
@@ -70,11 +70,10 @@ classdef FrameStack < handle
             if nargin < 4, options = struct(); end
             if nargin < 3, framerate = 1; end
             
-            assert( isnumeric(frames) && ndims(frames)==3, 'Input frames should be a volume.' );
             assert( isnumeric(framerate) && isscalar(framerate) && framerate > eps, 'Framerate should be a positive scalar.' );
             assert( isstruct(options), 'Options should be a structure.' );
             
-            self.frames    = frames;
+            self.frames    = dk.priv.img2cell(frames);
             self.framerate = framerate;
             self.options   = options;
             
@@ -107,7 +106,7 @@ classdef FrameStack < handle
                 if self.check_handle('image') && fast 
                     
                     % replace image data in existing image handle
-                    self.handles.image.CData = self.frames(:,:,num); 
+                    self.handles.image.CData = self.frames{num}; 
                     
                 else
                     
@@ -115,9 +114,8 @@ classdef FrameStack < handle
                     self.cb_stop();
 
                     % display this image
-                    hdl = self.handles.axes;
-                    set( ancestor(hdl,'figure'), 'currentaxes', hdl );
-                    self.handles.image = ant.img.show( self.frames(:,:,num), self.options );
+                    dk.fig.select( self.handles.axes );
+                    self.handles.image = ant.img.show( self.frames{num}, self.options );
                     
                 end
                 

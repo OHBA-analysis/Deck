@@ -10,7 +10,7 @@ function y = trunc( x, n )
 % JH
     
     y = max( abs(x), eps );
-    y = 10.^( -floor(log10(y)) + n-1 );
-    y = sign(x) .* ceil( abs(x) .* y ) ./ y;
+    y = 10.^( n-1 - floor(log10(y)) );
+    y = sign(x) .* floor( abs(x) .* y ) ./ y;
     
 end

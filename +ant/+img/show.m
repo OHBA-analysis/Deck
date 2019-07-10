@@ -62,8 +62,8 @@ function [h,crange] = show( img, varargin )
     rm_bar     = opt.get('rmbar',      false );
     subpos     = opt.get('subplot',    {} );
     
-    maxwidth   = opt.get('maxwidth',   50000 );
-    maxheight  = opt.get('maxheight',  50000 );
+    maxwidth   = opt.get('maxwidth',   75000 );
+    maxheight  = opt.get('maxheight',  10000 );
     maxsize    = [ maxheight, maxwidth ];
     
     if ischar(cmap_raw)
@@ -103,7 +103,7 @@ function [h,crange] = show( img, varargin )
         [x,y,img] = ant.img.resample( img{1}, img{2}, img{3}, 'cubic' );
         
         % resize image if needed
-        img = check_size(img,maxsize);
+        img = check_size( img, maxsize );
         
         % if image was resized, adapt x and y
         [nr,nc] = size(img);
@@ -185,11 +185,10 @@ end
 function img = check_size(img,maxsize)
 
     imgsize = size(img);
-    maxsize = min( imgsize, maxsize );
-    
-    if ~all( imgsize == maxsize )
+    if any( imgsize(1:2) > maxsize )
         warning( 'Input image is too large and will be resized for display.' );
-        img = imresize( img, maxsize, 'bicubic' );
+        imgsize(1:2) = maxsize;
+        img = imresize( img, imgsize, 'bicubic' );
     end
     
 end

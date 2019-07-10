@@ -185,7 +185,7 @@ classdef TimeSeries < ant.priv.Signal
                 dk.info( '[ant.TimeSeries:resample] Already at the required sampling rate.' );
                 return;
             elseif fs <= curfs
-                [new_vals,new_time] = ant.ts.downsample( self.time, self.vals, fs );
+                [new_vals,new_time] = ant.ts.downsample( self.vals, self.time, fs );
             else
                 [new_vals,new_time] = ant.ts.upsample( self.vals, self.time, fs );
             end

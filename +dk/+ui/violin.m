@@ -4,33 +4,41 @@ function dist = violin( data, varargin )
 %
 % Violin plot (similar to boxplot, but using ksdensity to plot distributions vertically).
 %
+%
 % INPUT
+% -----
 %
-%     data  Either a nxp matrix or a 1xp cell.
-%             If a matrix, each column is a sample (ie rows are observations).
-%             If a cell, each element is vectorised and considered as a 1-d sample.
+%       data    Either a nxp matrix or a 1xp cell.
+%                 If a matrix, each column is a sample (ie rows are observations).
+%                 If a cell, each element is vectorised and considered as a 1-d sample.
 %
 %
-%    Width  Width of each distribution in the final plot, typically <1 (default: 0.7).
-%    Label  Cell-string array of label for each column (default: column numbers).
-%             Numeric inputs are converted to string.
-%    Range  Interval where distribution should be estimated (1x2 vector, default []).
-%             By default, the interval is determined automatically by ksdensity.
-%             Set the number of points with option NumPts
-%  Support  Support of the distribution as a 1x2 interval or string (default: []).
-%             See ksdensity for more information (warning: can have important effects).
-%   Kernel  One of: 'normal', 'box', 'triangle', 'epanechnikov' (default: normal).
-%   NumPts  Number of points to use for density estimation (default: 51).
-%  Weights  nxp matrix or 1xp cell with weights for each point.
-%    Theme  For now only the theme 'orange' is available.
+% OPTIONS
+% -------
+%
+%      Width    Width of each distribution in the final plot, typically <1 (default: 0.7).
+%      Label    Cell-string array of label for each column (default: column numbers).
+%                 Numeric inputs are converted to string.
+%      Range    Interval where distribution should be estimated (1x2 vector, default []).
+%                 By default, the interval is determined automatically by ksdensity.
+%                 Set the number of points with option NumPts
+%    Support    Support of the distribution as a 1x2 interval or string (default: []).
+%                 See ksdensity for more information (warning: can have important effects).
+%     Kernel    One of: 'normal', 'box', 'triangle', 'epanechnikov' (default: normal).
+%     NumPts    Number of points to use for density estimation (default: 51).
+%    Weights    nxp matrix or 1xp cell with weights for each point.
+%      Theme    For now only the theme 'orange' is available.
+%
 %
 % OUTPUT
+% ------
 %
 %     dist  Structure with fields:
 %             .x  Support of the density estimate
 %             .y  Density estimate
 %             .m  Median of the sample
 %             .a  Mean of the sample
+%
 %
 % See also: ksdensity
 %

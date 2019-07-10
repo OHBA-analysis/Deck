@@ -38,21 +38,28 @@ classdef SelectBox < handle
         end
         
         % Return the index and string of the current selection.
-        % If the UI is not open, the index is NaN and the string is empty.
+        % If the UI is not open, the index is 0 and the string is empty.
         function [idx,str] = current_selection(self)
             
-            idx = NaN; str = '';
+            idx = 0; str = '';
             
             if self.check_ui()
                 idx = self.handles.popup.Value;
                 str = self.handles.popup.String{idx};
             end
         end
+        function self = select(self,n)
+            if self.check_ui()
+                assert( n >= 1 && n <= self.n_choices, 'Bad choice index.' );
+                self.handles.popup.Value = n;
+                s = self.handles.popup.String{n};
+            end
+        end
         
         % Update the selection with the input cell-array of strings.
         function self = set_choices(self,choices)
             
-            assert( iscell(choices), 'Choices should be a cell.' );
+            assert( iscellstr(choices), 'Choices should be a cell.' );
             self.choices = choices;
             
             if self.check_ui()

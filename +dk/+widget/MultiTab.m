@@ -9,7 +9,7 @@ classdef MultiTab < handle
     end
     
     properties (Dependent)
-        ntabs;
+        ntabs, curtab;
     end
     
     methods
@@ -35,18 +35,23 @@ classdef MultiTab < handle
                 
                 v = varargin{i};
                 if isempty(v)
+                    % []: create new tab with no name (default to 'Tab %d')
                     self.add();
                 elseif ischar(v)
+                    % name: create new tab with given name
                     self.add(v);
                 elseif isstruct(v)
                     if isscalar(v)
+                        % scalar struct: create new tab with given name and data
                         self.add( v.name, v.data );
                     else
+                        % struct-array: repackage as cell, and call build again
                         assert( nargin == 2, 'Struct-array inputs should be the only argument.' );
                         v = dk.mapfun( @(x) x, v, false );
                         self.build(v{:});
                     end
                 elseif iscell(v)
+                    % {name,data}: create new tab with given name and data
                     assert( numel(v)==2 && ischar(v{1}), 'Cell inputs should be 1x2 {name,value}.' );
                     self.add( v{1}, v{2} );
                 else
@@ -65,7 +70,7 @@ classdef MultiTab < handle
             else
                 
                 % reset handles
-                self.handles.fig  = figure('name','Pipeline Analyser');
+                self.handles.fig  = figure();
                 self.handles.tabs = uix.TabPanel( 'parent', self.handles.fig );
                 
                 % save a reference to this instance in the figure data
@@ -144,7 +149,12 @@ classdef MultiTab < handle
         end
         
         % export tab as an image
-        function export(self,n)
+        function F = export(self,fname,varargin)
+            
+            assert( ischar(fname), 'Input should be a filename.' );
+            assert( self.is_open, 'Tabs need to be drawn for export.' );
+            F = dk.ui.axes2image( self.tab_handle(self.curtab), fname, varargin{:} );
+            
         end
         
     end
@@ -154,6 +164,14 @@ classdef MultiTab < handle
         
         function n = get.ntabs(self)
             n = numel(self.tab);
+        end
+        
+        function n = get.curtab(self)
+            if self.is_open
+                n = self.handles.tabs.Selection;
+            else
+                n = 0;
+            end
         end
         
         % get handle of a tab

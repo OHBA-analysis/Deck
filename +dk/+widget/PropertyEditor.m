@@ -29,6 +29,7 @@ classdef PropertyEditor < handle
         handles;
     end
     
+    
     methods
         
         function self = PropertyEditor( format, varargin )
@@ -80,7 +81,10 @@ classdef PropertyEditor < handle
         
     end
     
+    
+    %------------------------
     % define formatted fields
+    %------------------------
     methods
         
         function self = rem_field(self,field)
@@ -121,7 +125,10 @@ classdef PropertyEditor < handle
         
     end
     
+    
+    %-----------
     % ui methods
+    %-----------
     methods
         
         % create a new figure and build the property editor in it
@@ -166,7 +173,10 @@ classdef PropertyEditor < handle
         
     end
     
+    
+    %-------------
     % hidden stuff
+    %-------------
     methods (Hidden)
         
         % formatted structure to data cell

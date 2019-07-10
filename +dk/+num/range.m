@@ -39,7 +39,7 @@ function [bounds,rtype] = range( x, rtype, bounds )
     % color range
     if isempty(bounds)
         assert( ~isempty(x), 'Color range cannot be determined without data.' );
-        bounds = prctile( dk.num.filter(x), [1 99] );
+        bounds = double(prctile( single(dk.num.filter(x)), [1 99] ));
     else
         rtype = 'manual';
     end

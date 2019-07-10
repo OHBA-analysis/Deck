@@ -29,13 +29,10 @@ function varargout = ansig( x, fs )
     
     if nargin < 2, fs=1; end
 
-    % compute analytic transform on real inputs
     if isreal(x)
-        [sig,env] = antran(x);
-        
-    % otherwise, assume analytic signal is given
+        [sig,env] = antran(x); % compute analytic transform on real inputs
     else
-        sig = x;
+        sig = x; % otherwise, assume analytic signal is given
         env = abs(sig);
     end
     
@@ -66,8 +63,10 @@ end
 % analytic transform with symmetric enveloping
 function [sig,env] = antran(x)
 
-    x = dk.bsx.sub( x, mean(x,1) );
-    [~,env] = ant.ts.envelope(abs(x));
-    sig = hilbert(x./max(eps,env));
+    [lo,up] = ant.ts.envelope(x);
+    x = x - (lo+up)/2;
+    
+    env = (up-lo)/2;
+    sig = hilbert( x ./ max(eps,env) );
     
 end

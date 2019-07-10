@@ -88,7 +88,8 @@ classdef TFSpectrum < handle
             % sanity checks
             chk = dk.mapfun( @(x) [x.time(1), x.ns, numel(x.freq)], input, false );
             chk = vertcat(chk{:});
-            assert( all(diff(chk,1,1) == 0), 'Shape or time-course mismatch between inputs.' );
+            chk = diff(chk,1,1) == 0;
+            assert( all(chk(:)), 'Shape or time-course mismatch between inputs.' );
             
             % assign input
             n = numel(input);

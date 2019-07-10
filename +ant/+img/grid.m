@@ -1,4 +1,4 @@
-function grid( slices, names, samerng, varargin )
+function gobj = grid( slices, names, samerng, varargin )
 %
 % h = ant.img.grid( slices, names, samerange=false, varargin )
 %
@@ -62,9 +62,9 @@ function grid( slices, names, samerng, varargin )
     end
     
     % draw figure
-    h = gobjects(1,n);
+    gobj = gobjects(1,n);
     for i = 1:n
-        h(i) = ant.img.show( slices{i}, 'subplot', {h,w,i}, 'title', names{i}, ...
+        gobj(i) = ant.img.show( slices{i}, 'subplot', {h,w,i}, 'title', names{i}, ...
             'crange', r, 'rmbar', samerng && mod(i,w), varargin{:} );
     end
     

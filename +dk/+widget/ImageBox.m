@@ -56,12 +56,21 @@ classdef ImageBox < handle
         % 
         function self = set_images(self,data)
         
-            assert( dk.is.struct(img,{'img','name','opt'}), 'Bad input data.' );
-            self.images = data;
+            if isnumeric(data)
+                data = dk.priv.img2cell(data);
+            end
+            if iscell(data)
+                n = numel(data);
+                name = dk.mapfun( @(k) sprintf('Image %d',k), 1:n );
+                data = dk.struct.array( 'img', data, 'name', name );
+            end
+            
+            assert( dk.is.struct(data,{'img','name'},false), 'Bad input data.' );
+            self.images = dk.struct.set( data, 'opt', struct() ); % will not overwrite
             
             if self.check_handle('popup')
                 
-                self.handles.popup.String = arrayfun( @(x) x.name, self.images, 'UniformOutput', false );
+                self.handles.popup.String = dk.mapfun( @(x) x.name, self.images );
                 self.select_image(1);
                 
             end
