@@ -3,17 +3,30 @@ function tf = wavelet( ts, freq, npts, force )
 % tf = ant.dsp.wavelet( ts, freq, npts, force=false )
 %
 % Compute the time-frequency wavelet spectrum for each signal using Morlet continuous wavelets.
-% 
-% Inputs:
-%     ts  Input time-series
+%
+%
+% INPUTS
+% ------
+%
 %   freq  Frequencies at which spectral decomposition should be performed
+%         
+%
 %   npts  Number of points per oscillation (default: 0, no resampling)
+%
 %  force  Force sampling rates by reinterpreting npts (default: false)
 %
-% Outputs:
-%     tf  Signal or Aggregate object
 %
-% Note:
+% OUTPUT
+% ------
+%
+% The output type depends on the number of frqeuencies in input:
+%   - if freq is scalar, the ouput is of type ant.dsp.TFSeries
+%   - if freq is a vector, the output is of type ant.dsp.TFSpectrum
+%
+%
+% NOTES
+% -----
+%
 %   To compute the PSD timecourse estimates from the outputs, do:
 %       psd = coef .* conj(coef) / pnorm
 %
@@ -49,11 +62,14 @@ function tf = wavelet( ts, freq, npts, force )
     df = tfs / nt; % frequency step
     w0 = 6;
     
-    scale = w0 ./ (2*pi*freq(:))'; % wavelet scales (row)
+    scale = w0 ./ (2*pi*freq); % wavelet scales
     omega = 1:fix(nt/2);
-    omega = 2*pi*df * [0,omega,-omega( fix((nt-1)/2):-1:1 )]'; % wavenumbers (column)
+    omega = 2*pi*df * [0,omega,-omega( fix((nt-1)/2):-1:1 )]; % wavenumbers
     
-    % Morlet wavelet Fourier transform
+    scale = dk.torow(scale);
+    omega = dk.tocol(omega);
+    
+    % Fourier transform of Morlet wavelet 
     dw = 2*pi*df; % wave step
     nw = numel(omega);
     

@@ -4,7 +4,9 @@ function tf = hilbert( ts, band, npts, force )
 %
 % Time-frequency spectrum using Hilbert transform (analytic signal) in each input frequency band.
 %
+%
 % INPUTS
+% ------
 %
 %   band  Cell of 1x2 band-filters (see ant.dsp.do.filter).
 %         These are used to filter the input time-series, in order to obtain narrow-band 
@@ -19,9 +21,13 @@ function tf = hilbert( ts, band, npts, force )
 %         DEFAULT: false (adaptive sampling)
 %
 %
+% OUTPUT
+% ------
+%
 % The output type depends on the number of bands in input:
 %   - for a single-band input, the ouput is of type ant.dsp.TFSeries
 %   - for a multi-band input, the output is of type ant.dsp.TFSpectrum
+%
 %
 % See also: ant.dsp.TFSeries, ant.ts.ansig, ant.priv.ansig_downsample
 %
@@ -32,7 +38,7 @@ function tf = hilbert( ts, band, npts, force )
     % process input frequency bands
     is_band_filter = @(x) isnumeric(x) && numel(x)==2 && diff(x)>eps && all(x > 0);
     
-    if ~iscell(band), band = {band}; end % force it to be a cell
+    band = dk.wrap(band);
     assert( all(cellfun( is_band_filter, band )), 'Invalid band filter in input.' );
     nb = numel(band);
     
