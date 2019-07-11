@@ -21,7 +21,7 @@ function n = lnorm( X, p, dim )
         case 1
             n = sum( abs(X), dim );
         case 2
-            n = sqrt(sum( X .* conj(X), dim ));
+            n = sqrt(dot( X, conj(X), dim ));
         otherwise
             assert( isscalar(p) && dk.is.integer(p), 'Bad order p.' );
             error( 'Not implemented for p=%d', p );
