@@ -20,7 +20,7 @@ function varargout = deal(varargin)
         if iscell(arg)
             assert( numel(arg) == nargout, 'Cell-size does not match output-size.' );
             varargout = arg;
-        elseif isscalar(arg)
+        elseif isscalar(arg) || ischar(arg)
             varargout = cell(1,nargout);
             [varargout{:}] = deal(arg);
         else
