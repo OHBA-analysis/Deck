@@ -1,10 +1,9 @@
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
-[![Documentation](https://img.shields.io/badge/-documentation-yellowgreen.svg)](https://jhadida.gitlab.io/deck)
+[![Documentation](https://img.shields.io/badge/-Documentation-yellowgreen.svg)](https://jhadida.gitlab.io/deck)
 
 > **NOTE (June 2019):**
-> This toolbox has undergone a considerable restructuration; the documentation might not be up-to-date, please rely on helptext only.
-> A new, consolidated documentation is being written. The instructions below have been updated.
+> This toolbox has undergone a considerable refactoring; a [new documentation](https://jhadida.gitlab.io/deck) is being written, but in case of inconsistencies, please rely on the functions' helptext.
 
 # Deck
 
@@ -94,11 +93,10 @@ ant.compile();
 
 ## Documentation
 
-The documentation is being written on and off (sorry); but there are many helpful READMEs within the source folders themselves. 
-Go ahead and check [`+dk/+str`](https://gitlab.com/jhadida/deck/tree/master/+dk/+str) for example.
+The documentation is being written on and off; the latest version can be found [here](https://jhadida.gitlab.io/deck).
+This is by no means a comprehensive documentation, and if you find inconsistencies between helptext and documentation, please assume that **the helptext takes precedence**.
 
-If you are looking for something specific, you'll either need to guess from the names that 'such' function might be relevant, or ask someone who knows, or maybe try something at random :)
-Most functions have a helpful helptext, which should be enough to get you started (if you're a hacker, the code should also be fairly legible). 
+Most functions have a helpful helptext, which should be enough to get you started (the code should also be fairly legible). 
 To get help about a function, type `help dk.some.function` from the Matlab console. 
 If that's not helpful, and you really want to know, [open an issue](https://gitlab.com/jhadida/deck/issues) asking for documentation about that particular function.
 
