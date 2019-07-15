@@ -5,8 +5,6 @@ function [y, ty] = downsample( x, tx, fs, win )
 % Downsample a time-series using moving average.
 %
 % JH
-
-    PREC = @(a,b) floor(log10(max(a,b))) - floor(log10(abs(a-b)));
     
     if nargin < 4, win = 'hamming'; end
     
@@ -37,7 +35,7 @@ function [y, ty] = downsample( x, tx, fs, win )
     actual_fs = 1 / ( dt * ceil(newdt/dt) );
     
     % if too large, upsample to a suitable rate before downsampling
-    if PREC(actual_fs,target_fs) < 2 % the two MSD must be equal
+    if dk.num.msdeq(actual_fs,target_fs) < 2 % the two MSD must be equal
         dk.debug('[ant.ts.downsample] Upsampling before downsampling to correct for frequency discrepancy.');
         newdt  = newdt / ceil(newdt/dt);
         [x,tx] = ant.ts.upsample( x, tx, 1/newdt, 'linear' );

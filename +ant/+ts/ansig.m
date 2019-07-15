@@ -17,20 +17,21 @@ function varargout = ansig( x, fs )
 %   frq    Instantaneous frequency for each signal 
 %          Computed only if required, in cycles/unit unless fs is defined.
 %
-% If only one output is set, then the complex analytic signal is returned. That is:
-%
-%   [env,~] = ant.ts.ansig(x); % real-valued envelope returned 
-%   as = ant.ts.ansig(x); % complex-valued analytic signal returned
-%
 % If no output is collected, a new figure is opened, showing the trajectory of the analytic
-% signal in the complex plane.
+% signal in the complex plane (only works for single-channel TCs).
+%
+%
+% See also: hilbert, ant.ts.envelope
 %
 % JH
     
     if nargin < 2, fs=1; end
 
     if isreal(x)
-        [sig,env] = antran(x); % compute analytic transform on real inputs
+        % compute analytic transform on real inputs
+        [sig,env] = antran_interp(x); 
+        %[sig,env] = antran_pad(x); 
+        %[sig,env] = antran_base(x); 
     else
         sig = x; % otherwise, assume analytic signal is given
         env = abs(sig);
@@ -43,9 +44,6 @@ function varargout = ansig( x, fs )
             plot( x, y, 'k-' );
             title('Complex analytic signal');
             axis equal; grid on;
-            
-        case 1
-            varargout = {env.*sig};
             
         case 2
             % compute envelope and phase
@@ -60,8 +58,25 @@ function varargout = ansig( x, fs )
 
 end
 
-% analytic transform with symmetric enveloping
-function [sig,env] = antran(x)
+% basic Hilbert transform
+function [sig,env] = antran_base(x)
+
+    sig = hilbert(dk.bsx.sub( x, mean(x,1) ));
+    env = abs(sig);
+
+end
+
+% Hilbert transform with nfft
+function [sig,env] = antran_pad(x)
+
+    nt = nextpow2(size(x,1));
+    sig = hilbert(dk.bsx.sub( x, mean(x,1) ), 2^nt);
+    env = abs(sig);
+
+end
+
+% analytic transform with extrema-based envelope
+function [sig,env] = antran_interp(x)
 
     [lo,up] = ant.ts.envelope(x);
     x = x - (lo+up)/2;

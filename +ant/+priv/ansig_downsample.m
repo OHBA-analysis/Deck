@@ -9,6 +9,8 @@ function varargout = ansig_downsample( varargin )
 %
 % JH
 
+    RESAMPLE_RI = false;
+
     fun = @ant.ts.downsample;
     switch nargin
         case 3 % complex input
@@ -16,12 +18,22 @@ function varargout = ansig_downsample( varargin )
             fs   = varargin{3};
             assert( ~isreal(varargin{2}), 'Expected a complex-valued time-series.' );
             
-            [mag,outT] = fun( abs(varargin{2}), time, fs );
-            phi = angle(varargin{3});
-            cp = fun( cos(phi), time, fs );
-            sp = fun( sin(phi), time, fs );
+            if RESAMPLE_RI
             
-            varargout = {outT,mag.*(cp + 1i*sp)};
+                % resample real/imaginary parts
+                [outV,outT] = fun( real(varargin{2}), time, fs );
+                outV = outV + 1i*fun( imag(varargin{2}), time, fs );
+                varargout = {outT, outV};
+            else 
+                
+                % resample magnitude/angle
+                [mag,outT] = fun( abs(varargin{2}), time, fs );
+                phi = angle(varargin{2});
+                cp = fun( cos(phi), time, fs );
+                sp = fun( sin(phi), time, fs );
+                varargout = {outT,mag.*(cp + 1i*sp)};
+                
+            end
             
         case 4
             time = varargin{1};

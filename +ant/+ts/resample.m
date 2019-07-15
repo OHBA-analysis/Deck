@@ -11,6 +11,8 @@ function [y, ty] = resample( x, tx, fs, method )
 %
 % JH
 
+    RESAMPLE_RI = false;
+
     if nargin < 4, method = 'pchip'; end
     if nargin < 3, fs = []; end
     
@@ -48,15 +50,25 @@ function [y, ty] = resample( x, tx, fs, method )
         
     else
         
-        % resample magnitude and angle separately for complex signals
-        % Note: this is better than resampling real/imaginary parts
-        [y,ty] = ant.ts.resample( abs(x), tx, fs, method );
-        
-        a = angle(x);
-        ca = ant.ts.resample( cos(a), tx, fs, method );
-        sa = ant.ts.resample( sin(a), tx, fs, method );
-        
-        y = y .* ( ca + 1i*sa );
+        % Note: magnitude/angle is better than real/imaginary resampling
+        if RESAMPLE_RI
+            
+            % resample real/imaginary parts
+            [y,ty] = ant.ts.resample( real(x), tx, fs, method );
+            y = y + 1i*ant.ts.resample( imag(x), tx, fs, method );
+            
+        else
+            
+            % resample magnitude/angle
+            [y,ty] = ant.ts.resample( abs(x), tx, fs, method );
+
+            a = angle(x);
+            ca = ant.ts.resample( cos(a), tx, fs, method );
+            sa = ant.ts.resample( sin(a), tx, fs, method );
+
+            y = y .* ( ca + 1i*sa );
+            
+        end
         
     end
 

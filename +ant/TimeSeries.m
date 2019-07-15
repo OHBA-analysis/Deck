@@ -222,6 +222,15 @@ classdef TimeSeries < ant.priv.Signal
                 ts = ant.TimeSeries( new_time, new_vals );
             end
         end
+        function ts = downsample_iir(self,fs)
+            [new_vals,new_time] = ant.ts.decimate( self.vals, self.time, fs );
+            if nargout == 0
+                self.vals = new_vals;
+                self.time = new_time;
+            else
+                ts = ant.TimeSeries( new_time, new_vals );
+            end
+        end
         
     end
     
