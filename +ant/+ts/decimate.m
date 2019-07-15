@@ -11,8 +11,6 @@ function [y, ty] = decimate( x, tx, fs, order )
 %
 % JH
 
-    RESAMPLE_RI = false;
-
     if nargin < 4, order=8; end % Matlab's default
     
     [x,tx] = dk.formatmv(x,tx,'vertical');
@@ -38,16 +36,15 @@ function [y, ty] = decimate( x, tx, fs, order )
         
     else
         
-        % Note: magnitude/angle is better than real/imaginary resampling
-        if RESAMPLE_RI
+        switch ant.priv.meth_resample()
             
-            % resample real/imaginary parts
+            case 'real/imaginary'
+            
             [y,ty] = ant.ts.decimate( real(x), tx, fs, order );
             y = y + 1i*ant.ts.decimate( imag(x), tx, fs, order );
             
-        else
+            case 'modulus/argument'
             
-            % resample magnitude/angle
             [y,ty] = ant.ts.resample( abs(x), tx, fs, order );
 
             a = angle(x);
@@ -56,6 +53,8 @@ function [y, ty] = decimate( x, tx, fs, order )
 
             y = y .* ( ca + 1i*sa );
             
+            otherwise
+            error( '[bug] Unknown resampling method.' );
         end
         
     end

@@ -9,8 +9,6 @@ function varargout = ansig_downsample( varargin )
 %
 % JH
 
-    RESAMPLE_RI = false;
-
     fun = @ant.ts.downsample;
     switch nargin
         case 3 % complex input
@@ -18,13 +16,15 @@ function varargout = ansig_downsample( varargin )
             fs   = varargin{3};
             assert( ~isreal(varargin{2}), 'Expected a complex-valued time-series.' );
             
-            if RESAMPLE_RI
+            switch ant.priv.meth_resample()
             
-                % resample real/imaginary parts
+                case 'real/imaginary'
+                
                 [outV,outT] = fun( real(varargin{2}), time, fs );
                 outV = outV + 1i*fun( imag(varargin{2}), time, fs );
                 varargout = {outT, outV};
-            else 
+            
+                case 'modulus/argument'
                 
                 % resample magnitude/angle
                 [mag,outT] = fun( abs(varargin{2}), time, fs );
@@ -33,6 +33,8 @@ function varargout = ansig_downsample( varargin )
                 sp = fun( sin(phi), time, fs );
                 varargout = {outT,mag.*(cp + 1i*sp)};
                 
+                otherwise
+                error( '[bug] Unknown resampling method.' );
             end
             
         case 4

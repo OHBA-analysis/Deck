@@ -29,9 +29,16 @@ function varargout = ansig( x, fs )
 
     if isreal(x)
         % compute analytic transform on real inputs
-        [sig,env] = antran_interp(x); 
-        %[sig,env] = antran_pad(x); 
-        %[sig,env] = antran_base(x); 
+        switch ant.priv.meth_ansig()
+            case 'base'
+                [sig,env] = antran_base(x); 
+            case 'pad'
+                [sig,env] = antran_pad(x); 
+            case 'interp'
+                [sig,env] = antran_interp(x);
+            otherwise
+                error( '[bug] Unknown ansig method.' );
+        end
     else
         sig = x; % otherwise, assume analytic signal is given
         env = abs(sig);
