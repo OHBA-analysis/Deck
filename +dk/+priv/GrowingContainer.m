@@ -30,10 +30,10 @@ classdef GrowingContainer < handle
 %
 %   However, the set of methods is quite basic with just this.
 %   In most cases, you will also want to implement methods such as:
-%       k = add(x)      where x is consistent with the storage type,
-%                       and k is a vector with indices of added points.
+%       k = add(x)          where x is consistent with the storage type,
+%                           and k is a vector with indices of added points.
 %
-%       getters/setters             for particular elements
+%       getters/setters     for particular elements
 %
 % ------------------------------
 % ## Memory management
