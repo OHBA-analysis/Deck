@@ -1,4 +1,4 @@
-function [assignment,cost] = munkres(costMat)
+function [assignment,cost] = munkres(costMat, checkMat)
 % MUNKRES   Munkres Assign Algorithm 
 %
 % [ASSIGN,COST] = munkres(COSTMAT) returns the optimal assignment in ASSIGN
@@ -33,18 +33,27 @@ toc                 % about 6 seconds
 
 % version 1.0 by Yi Cao at Cranfield University on 17th June 2008
 
+if nargin < 2, checkMat = true; end
+
 assignment = false(size(costMat));
 cost = 0;
 
-costMat(costMat~=costMat)=Inf;
-validMat = costMat<Inf;
-validCol = any(validMat);
-validRow = any(validMat,2);
+if checkMat
+    costMat(costMat~=costMat)=Inf;
+    validMat = costMat<Inf;
+    validCol = any(validMat,1);
+    validRow = any(validMat,2);
 
-nRows = sum(validRow);
-nCols = sum(validCol);
+    nRows = sum(validRow);
+    nCols = sum(validCol);
+else
+    [nRows,nCols] = size(costMat);
+    validCol = true(1,nCols);
+    validRow = true(nRows,1);
+end
+
 n = max(nRows,nCols);
-if ~n
+if n == 0
     return
 end
     
