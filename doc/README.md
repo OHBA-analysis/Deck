@@ -3,6 +3,12 @@
 
 # Deck toolbox documentation
 
+> **NOTE**
+>
+> This documentation is currently a work in progress (July 25th 2019).
+> Please [browse the repository](https://gitlab.com/jhadida/deck/); use the helptext for specific functions (e.g. type `help ant.ts.fourier`); [open an issue](https://gitlab.com/jhadida/deck/issues) if you find a bug; or contact me directly if you have a question.
+
+
 Deck is a Matlab toolbox which currently contains:
 
  - a general utility module called `dk`;
