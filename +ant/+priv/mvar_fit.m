@@ -50,10 +50,10 @@ function [w, A, C, sbc, fpe, th] = mvar_fit(v, pmin, pmax, selector, no_const)
   % n: number of observations; m: dimension of state vectors
   [n,m]   = size(v);     
 
-  if (pmin ~= round(pmin) | pmax ~= round(pmax))
+  if pmin ~= round(pmin) || pmax ~= round(pmax)
     error('Order must be integer.');
   end
-  if (pmax < pmin)
+  if pmax < pmin
     error('PMAX must be greater than or equal to PMIN.')
   end
 
@@ -110,16 +110,16 @@ function [w, A, C, sbc, fpe, th] = mvar_fit(v, pmin, pmax, selector, no_const)
   R22   = R(np+1:npmax+m, npmax+1:npmax+m);
 
   % get augmented parameter matrix Aaug=[w A] if mcor=1 and Aaug=A if mcor=0
-  if (np > 0)   
-    if (mcor == 1)
+  if np > 0
+    if mcor == 1
       % improve condition of R11 by re-scaling first column
       con 	= max(scale(2:npmax+m)) / scale(1); 
       R11(:,1)	= R11(:,1)*con; 
-    end;
+    end
     Aaug = (R11\R12)';
     
     %  return coefficient matrix A and intercept vector w separately
-    if (mcor == 1)
+    if mcor == 1
       % intercept vector w is first column of Aaug, rest of Aaug is 
       % coefficient matrix A
       w = Aaug(:,1)*con;        % undo condition-improving scaling
@@ -146,7 +146,7 @@ function [w, A, C, sbc, fpe, th] = mvar_fit(v, pmin, pmax, selector, no_const)
   %      covariance matrix of the least squares estimator
   % (ii) the number of degrees of freedom of the residual covariance matrix 
   invR11 = inv(R11);
-  if (mcor == 1)
+  if mcor == 1
     % undo condition improving scaling
     invR11(1, :) = invR11(1, :) * con;
   end
@@ -209,7 +209,7 @@ function [R, scale]=arqr(v, p, mcor)
     K(:, mcor+m*(j-1)+1:mcor+m*j) = [v(p-j+1:n-j, :)];
   end
   % Add `observations' v (left hand side of regression model) to K
-  K(:,np+1:np+m) = [v(p+1:n, :)];
+  K(:,np+1:np+m) = v(p+1:n, :);
   
   % Compute regularized QR factorization of K: The regularization
   % parameter delta is chosen according to Higham's (1996) Theorem
@@ -311,5 +311,3 @@ function [sbc, fpe, logdp, np] = arord(R, m, mcor, ne, pmin, pmax)
   end
   
 end
-
-
