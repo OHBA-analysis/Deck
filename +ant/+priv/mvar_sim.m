@@ -23,11 +23,11 @@ function [v] = mvar_sim(w,A,C,n,ndisc)
   m       = size(C,1);                  % dimension of state vectors 
   p       = size(A,2)/m;                % order of process
 
-  if (p ~= round(p)) 
+  if p ~= round(p)
     error('Bad arguments.'); 
   end
 
-  if (length(w) ~= m | min(size(w)) ~= 1)
+  if length(w) ~= m || min(size(w)) ~= 1
     error('Dimensions of arguments are mutually incompatible.')
   end 
   w       = w(:)';                      % force w to be row vector
@@ -41,7 +41,7 @@ function [v] = mvar_sim(w,A,C,n,ndisc)
   
   % Discard the first ndisc time steps; if ndisc is not given as input
   % argument, use default
-  if (nargin < 5) 
+  if nargin < 5
     ndisc = 10^3; 
   end
   
@@ -91,14 +91,14 @@ function [v] = mvar_sim(w,A,C,n,ndisc)
   % Matlab's vectorization capabilities, the cases p=1 and p>1 must be
   % treated separately.
   if p==1
-    for k=2:ndisc+n+1; 
+    for k=2:ndisc+n+1
       x(1,:) = u(k-1,:)*AT;
       u(k,:) = x + randvec(k-1,:);
     end
   else
-    for k=p+1:ndisc+n+p; 
-      for j=1:p;
-	x(j,:) = u(k-j,:)*AT((j-1)*m+1:j*m,:);
+    for k=p+1:ndisc+n+p
+      for j=1:p
+        x(j,:) = u(k-j,:)*AT((j-1)*m+1:j*m,:);
       end
       u(k,:) = sum(x)+randvec(k-p,:);
     end
@@ -108,5 +108,3 @@ function [v] = mvar_sim(w,A,C,n,ndisc)
   v = u(ndisc+p+1:ndisc+n+p,:); 
 
 end
-
-

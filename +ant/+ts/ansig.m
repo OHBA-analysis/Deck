@@ -46,21 +46,22 @@ function varargout = ansig( x, fs )
     
     switch nargout
         case 0
+            assert( isvector(sig), 'Only scalar time-courses allowed for plotting.' );
             figure;
-            [x,y] = pol2cart( angle(sig), env );
-            plot( x, y, 'k-' );
-            title('Complex analytic signal');
-            axis equal; grid on;
-            
-        case 2
-            % compute envelope and phase
-            varargout = { env, angle(sig) };
+                [x,y] = pol2cart( angle(sig), env );
+                plot( x, y, 'k-' );
+                title('Complex analytic signal');
+                axis equal; grid on;
             
         case 3
             % estimate frequency only if required
             phi = angle(sig);
             frq = ant.priv.phase2freq( phi, fs );
             varargout = { env, phi, frq };
+            
+        otherwise
+            % compute envelope and phase
+            varargout = { env, angle(sig) };
     end
 
 end
