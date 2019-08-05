@@ -20,8 +20,8 @@ function a = merge( varargin )
     end
     nmerge = numel(to_merge);
 
-    assert( all(cellfun(@isstruct,to_merge,'UniformOutput',true)), 'Expected structures in input.' );
-    assert( all(diff( cellfun(@numel,to_merge,'UniformOutput',true) ) == 0), 'Struct arrays must be the same size.' );
+    assert( all(cellfun(@isstruct,to_merge)), 'Expected structures in input.' );
+    assert( all(diff(cellfun(@numel,to_merge)) == 0), 'Struct arrays must be the same size.' );
 
     if nmerge > 2
 

@@ -1,15 +1,20 @@
 function out = getopt( arg, varargin )
 %
-% out = dk.getopt( args, varargin )
+% opt = dk.getopt( args, varargin )
 %
-% Simple script to extract named options with defaults.
+%   A simple function to convert key/value arguments to a struct, 
+%   and apply default values for specific properties.
 %
-% NOTE:
+%
+% NOTE
+% ----
+%
 %   Option names are case-sensitive
 %   Duplicate input options are fine (overwrite left)
 %   Duplicate defaults cause an error
 %
-% EXAMPLE:
+% EXAMPLE
+% -------
 %
 %   function [...] = foo( a, b, c, varargin )
 %
@@ -17,7 +22,7 @@ function out = getopt( arg, varargin )
 %       disp( opt.alpha );
 %
 %
-% See also: dk.obj.kwArgs
+% See also: dk.getopt, dk.obj.kwArgs, inputParser
 % 
 % JH
 

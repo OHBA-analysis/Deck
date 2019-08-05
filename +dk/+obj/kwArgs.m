@@ -2,8 +2,8 @@ classdef kwArgs < handle
 % 
 % dk.obj.kwArgs()
 %
-% A very basic name/value pair parser for function inputs.
-% For more formal control over function inputs (including validation), checkout Matlab's inputParser.
+% A simple key/value parser object for function's arguments.
+% For more control over inputs, check Matlab's inputParser.
 %
 % By default, names are NOT case sensitive. Set the option 
 %
@@ -34,6 +34,9 @@ classdef kwArgs < handle
 %
 % Check accessed options:
 %   access_report()
+%
+%
+% See also: inputParser
 %
 % JH
 

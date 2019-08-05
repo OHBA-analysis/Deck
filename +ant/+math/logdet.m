@@ -87,7 +87,9 @@ if use_chol
 else
     [L, U, P] = lu(A);
     du = diag(U);
-    c = det(P) * prod(sign(du));
+    
+    % JH: silly to compute determinant of full permutation matrix, use sparse
+    c = det(sparse(P)) * prod(sign(du)); 
     v = log(c) + sum(log(abs(du)));
 end
 
