@@ -166,6 +166,7 @@ classdef Grid < handle
             if nargin < 4 || isempty(ca), ca='auto'; end
             [x,y] = meshgrid( self.rx, self.ry );
             z = self.reshape(z);
+            c = self.reshape(c);
             h = surf( x, y, z, c, varargin{:} );
             axis vis3d tight; grid on; caxis(ca); colorbar;
         end
