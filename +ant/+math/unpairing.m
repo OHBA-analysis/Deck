@@ -1,7 +1,9 @@
 function [i,j] = unpairing( k, method )
 %
-% Unpairing functions.
+% [i,j] = ant.math.unpairing( k, method )
 %
+% Unpairing methods:
+%   cantor, szudzik, peter, hagen
 %
 % See also: ant.math.pairing, ant.math.symunpair
 %

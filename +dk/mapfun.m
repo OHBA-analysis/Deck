@@ -1,4 +1,4 @@
-function varargout = mapfun( fun, val, unif )
+function out = mapfun( fun, val, unif )
 %
 % out = dk.mapfun( fun, val, unif=false )
 %
@@ -10,13 +10,29 @@ function varargout = mapfun( fun, val, unif )
 % JH
 
     if nargin < 3, unif=false; end
-    
-    varargout = cell(1,nargout);
+
+    out = [];
     if iscell(val)
-        [varargout{:}] = cellfun( fun, val, 'UniformOutput', unif );
+        if nargout > 0
+            out = cellfun( fun, val, 'UniformOutput', unif );
+        else
+            cellfun( fun, val, 'UniformOutput', unif );
+        end
     else
-        [varargout{:}] = arrayfun( fun, val, 'UniformOutput', unif );
+        if nargout > 0
+        	out = arrayfun( fun, val, 'UniformOutput', unif );
+        else
+            arrayfun( fun, val, 'UniformOutput', unif );
+        end
     end
+    
+% Slower version.
+%     varargout = cell(1,nargout);
+%     if iscell(val)
+%         [varargout{:}] = cellfun( fun, val, 'UniformOutput', unif );
+%     else
+%         [varargout{:}] = arrayfun( fun, val, 'UniformOutput', unif );
+%     end
     
 % Old version.
 % Branching as above is much faster than using function handles.
