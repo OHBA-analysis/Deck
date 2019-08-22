@@ -1,6 +1,9 @@
 function k = pairing( i, j, method )
 %
-% Pairing functions.
+% k = ant.math.pairing( i, j, method )
+%
+% Pairing methods:
+%   cantor, szudzik, peter, hagen
 %
 % See also: ant.math.unpairing, ant.math.sympair
 %
