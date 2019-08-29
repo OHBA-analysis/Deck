@@ -14,7 +14,7 @@ function slices = load( pattern, resize, method )
     folder = fileparts(pattern);
     nfiles = numel(files);
     slices = cell(1,nfiles);
-    dk.disp('[dk.util.load_slices] Found %d images to be loaded...',nfiles);
+    dk.print('[dk.util.load_slices] Found %d images to be loaded...',nfiles);
 
     for i = 1:nfiles
         img = imread(fullfile(folder,files(i).name));

@@ -9,7 +9,7 @@ function dk_shutdown()
         rmpath( jmxSrc, layoutSrc, layoutDoc );
         setenv( 'DECK_ROOT', '' );
         
-        dk.disp( '[Deck] Shutting down from folder "%s".', root );
+        dk.print( '[Deck] Shutting down from folder "%s".', root );
     else
         warning( 'Deck does not appear to have started.' );
     end

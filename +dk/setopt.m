@@ -1,6 +1,6 @@
 function out = setopt( out, varargin )
 %
-% opt = dk.setopt( opt )
+% opt = dk.setopt( opt, Field1, Value1, Field2, ... )
 %
 %   A simple function to assign fields in a given struct of options.
 %
@@ -9,7 +9,7 @@ function out = setopt( out, varargin )
 % ----
 %
 %   Option names are case-sensitive
-%   Duplicate fields are fine (overwrite left)
+%   Duplicate fields are fine (overwrite r2l)
 %   Cell-values do not need to be wrapped
 %
 % EXAMPLE
