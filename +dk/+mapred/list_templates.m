@@ -4,7 +4,7 @@ function L = list_templates()
     
     if nargout == 0
         L = dk.mapfun( @(x) dk.str.xrem(x.name,1), L, false );
-        dk.disp('Found %d template(s):',numel(L));
+        dk.print('Found %d template(s):',numel(L));
         cellfun( @(x) fprintf('\t%s\n',x), L );
     end
 

@@ -34,6 +34,6 @@ function [clvl,flvl] = verb( clvl, flvl )
         flvl = L.fileLevel;
     end
     
-    dk.disp( '[Deck] Verbose levels: {console: %s; file: %s}', clvl, flvl );
+    dk.print( '[Deck] Verbose levels: {console: %s; file: %s}', clvl, flvl );
 
 end

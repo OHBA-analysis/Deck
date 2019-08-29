@@ -21,7 +21,7 @@ function init( className, tplName, tplOpt, jsonOpt )
     [folder,file] = fileparts(fileName);
     if ~isempty(folder) && ~dk.fs.isdir(folder)
         dk.assert( mkdir(folder), 'Could not create folder "%s".', folder );
-        dk.disp( 'Created folder "%s".', folder );
+        dk.print( 'Created folder "%s".', folder );
     end
 
     % load templates

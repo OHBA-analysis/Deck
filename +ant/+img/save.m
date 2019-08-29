@@ -20,7 +20,7 @@ function [n,folder] = save( slices, folder, pattern )
     slices = ant.img.vol2slices(slices);
     n = numel(slices);
 
-    dk.disp('[dk.util.save_slices] Saving %d images in folder "%s"...',n,folder);
+    dk.print('[dk.util.save_slices] Saving %d images in folder "%s"...',n,folder);
     for i = 1:n
         imwrite( slices{i}, sprintf(fullfile(folder,pattern),i) );
     end

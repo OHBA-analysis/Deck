@@ -126,7 +126,7 @@ classdef TFSpectrum < handle
         end
         
         function self = load(self,filename)
-            dk.disp('[ant.dsp.TFSpectrum] Loading file "%s"...',filename);
+            dk.print('[ant.dsp.TFSpectrum] Loading file "%s"...',filename);
             self.unserialise(filename);
         end
         

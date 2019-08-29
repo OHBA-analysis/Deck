@@ -34,7 +34,7 @@ function varargout = trywait( ntry, twait, fhandle, msg )
                 dk.warn( '%s', msg );
             end
 
-            dk.disp( 'Waiting %d second(s) to retry (%d attempt(s) left).', twait, ntry );
+            dk.print( 'Waiting %d second(s) to retry (%d attempt(s) left).', twait, ntry );
             pause(twait);
         end
         

@@ -1,6 +1,6 @@
-function disp( fmt, varargin )
+function print( fmt, varargin )
 %
-% dk.disp( fmt, varargin )
+% dk.print( fmt, varargin )
 %
 % Formatted display, equivalent to:
 %   fprintf( [fmt '\n'], varargin{:} );

@@ -10,7 +10,8 @@ function z = sample( x, y, n )
 % y = humps(x); % use Matlab's humps function
 % y = y - min(y);
 % y = y / trapz(x,y); % make it a "density"
-% z = ksdensity(ant.math.sample( x, y, 1000 ),x);
+% s = ant.math.sample( x, y, 1000 );
+% z = ksdensity(s,x);
 % 
 % plot( x, y, 'k-', x, z, 'r--' );
 %
