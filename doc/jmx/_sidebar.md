@@ -2,7 +2,6 @@
 * Library `jmx`
 
   * [Home](jmx/index)
-  * [Installation](jmx/install)
   * [Intro to Mex](jmx/mex)
   * [Architecture](jmx/arch)
 

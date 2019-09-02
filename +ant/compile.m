@@ -36,7 +36,7 @@ function rebuild(p)
 
 end
 
-function files = lsx( folder, ext )
+function files = lsext( folder, ext )
     files = dk.fs.lsext( folder, ext );
     files = dk.mapfun( @(x) fullfile(folder,x), files, false );
 end
@@ -48,7 +48,7 @@ function compile_inc(p)
     opt.arma = true;
     opt.mex = false;
 
-    files = lsx( p.inc, 'cpp' );
+    files = lsext( p.inc, 'cpp' );
     dk.mapfun( @(f) jmake( p, f, opt ), files );
 end
 
@@ -62,12 +62,12 @@ function compile_src(p,names)
     if nargin > 1
         files = dk.mapfun( @(x) fullfile(p.src, dk.str.xset(x,'cpp')), names, false );
     else 
-        files = lsx( p.src, 'cpp' );
+        files = lsext( p.src, 'cpp' );
     end
     dk.mapfun( @(f) jmake( p, f, opt ), files );
 end
 
 function jmake( paths, file, opt )
-    obj = lsx( paths.bin, 'o' );
+    obj = lsext( paths.bin, 'o' );
     jmx_compile( [{file},obj], opt, 'ipath', paths.inc );
 end
