@@ -1,44 +1,91 @@
 
 # Arrays
 
-Only vectors, matrices and volumes for now.
-Basic usage: reading inputs, creating outputs, working with temporary arrays.
-Advanced usage: understanding memory management.
+JMX defines three array containers: vector, matrix and volume.
 
- - Properties
- - Accessing elements
- - Reading variables
- - Creating variables
- - Temporary arrays
- - Memory management
+## Abstract base
 
-## Properties
+The base class for all array containers depends on two template types:
+```cpp
+template <class T, class M = CppMemory<T> > class Container;
+```
+where `T` is the type of the underlying data (non-const), and `M` is the allocation type, which defaults to `CppMemory` (i.e. using `new`, see [memory management](jmx/more/memory)). 
 
-Number of elements.
-Size: vector `n`, matrix `nr,nc`, volume `nr,nc,ns`.
+The **value-type** (i.e. the type returned when accessing the data) is derived from the allocation:
+```cpp
+using value_type = typename M::value_type;
+```
+In brief, this is equal to `T` unless the allocation template is `ReadOnlyMemory`, in which case it is `const T` and the values are therefore immutable.
 
-## Accessing elements
+The following members/methods are common to all array containers:
+```cpp
+M mem; // memory allocation
 
-Either 1d sequential with `[]`, or multi-dimensional with `()`.
+index_t ndims() const;
+index_t numel() const;
+value_type& operator[] (index_t) const;
 
-## Reading variables
+value_type* memptr() const; // underlying data
+void free(); // release memory (if allocation permits)
+```
 
-Wrapping from [[ function arguments | getting-started ]], or from [[ MAT-files | mat ]].
+## Concrete containers
 
-## Creating variables
+Additional members/methods for `Vector<T,M>`:
+```cpp
+index_t length() const;
 
-Use a maker, save `mxArray` to `rhs`, and wrap using array container.
+void assign( value_type *ptr, index_t len );
+void alloc( index_t len );
+```
 
-## Temporary arrays
+Additional members/methods for `Matrix<T,M>`:
+```cpp
+index_t nrows() const;
+index_t ncols() const;
 
-Setting memory storage template parameter.
+void assign( value_type *ptr, index_t nr, index_t nc );
+void alloc( index_t nr, index_t nc );
 
-By default `ReadOnlyMemory`, but can also `CppMemory` and `MatlabMemory`.
+// specialised access
+value_type& operator() (index_t r, index_t c) const;
+```
 
-This is not the same as creating an output!
+Additional members/methods for `Volume<T,M>`:
+```cpp
+index_t nrows() const;
+index_t ncols() const;
+index_t nslabs() const;
 
-## Memory management
+void assign( value_type *ptr, index_t nr, index_t nc, index_t ns );
+void alloc( index_t nr, index_t nc, index_t ns );
 
-Data and size, allocate and free.
+// specialised access
+value_type& operator() (index_t r, index_t c, index_t s) const;
+```
 
-Make persistent manually.
+## Specialised variants
+
+As written above, the default allocation template is `CppMemory<T>`, which means that the underlying memory is managed by the standard operator `new`.
+
+For convenience, each array type also defines two specialised variants:
+```cpp
+Vector_ro<T> = Vector<T, ReadOnlyMemory<T> >; // constant value-type
+Vector_mx<T> = Vector<T, MatlabMemory<T> >; // using mxCalloc
+
+// similarly for Matrix and Volume
+```
+
+## Creating runtime variables
+
+Creating input and output arguments to Mex functions (i.e. within Matlab's own memory) has been previously described [here](jmx/basic/io).
+
+Since by default, array containers are instanciated with `CppMemory` template allocation, creating runtime arrays in practice is as simple as:
+```cpp
+Vector<T> x(len);
+Matrix<T> M(nr,nc);
+Volume<T> V(nr,nc,ns);
+```
+
+> **Note:** it is very unlikely that you will ever have to explicitly allocate a container declared with `MatlabMemory` allocation template. Use the [makers](jmx/more/maker) instead if needed.
+

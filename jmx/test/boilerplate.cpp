@@ -22,8 +22,8 @@ void mexFunction( int nargout, mxArray *out[],
     auto y = args.getvec<uint8_t>(1);
 
     auto z = args.mkstruct( 0, {"foo","bar"} );
-    z.set_value( "foo", jmx::make_string("Hello!") );
-    z.set_value( "bar", jmx::make_logical(true) );
+    z.mkstr( "foo", "Hello!" );
+    z.mkbool( "bar", true );
 }
 
 // Example call: a = boilerplate( rand(3), zeros(1,2,'uint8') )

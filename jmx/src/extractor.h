@@ -24,7 +24,7 @@ namespace jmx {
         virtual ptr_t _extractor_get( key_t k ) const =0;
 
         // forward declarations (see forward.h)
-        Struct getstruct( index_t k, index_t i=0 ); 
+        Struct getstruct( key_t k, index_t i=0 ); 
         Cell getcell( key_t k );
         
         // ----------  =====  ----------
@@ -46,6 +46,15 @@ namespace jmx {
 
         template <class T = real_t>
         inline Volume_ro<T> getvol( key_t k )  { return get_volume<T>(_extractor_get(k)); }
+
+        template <class T = real_t>
+        inline Vector_mx<T> getvec_rw( key_t k )  { return get_vector_rw<T>(_extractor_get(k)); }
+
+        template <class T = real_t>
+        inline Matrix_mx<T> getmat_rw( key_t k )  { return get_matrix_rw<T>(_extractor_get(k)); }
+
+        template <class T = real_t>
+        inline Volume_mx<T> getvol_rw( key_t k )  { return get_volume_rw<T>(_extractor_get(k)); }
 
 
         // getters with defaults

@@ -43,8 +43,8 @@ This will throw an error if the actual inputs do not match the types specified. 
 Similarly, to return a struct with fields `foo="Hello!"` and `bar=true`, you would simply write:
 ```cpp
 auto z = args.mkstruct( 0, {"foo","bar"} );
-z.set_value( "foo", jmx::make_string("Hello!") );
-z.set_value( "bar", jmx::make_logical(true) );
+z.mkstr( "foo", "Hello!" );
+z.mkbool( "bar", true );
 ```
 
 Try to write a Mex file without JMX that simply does this (retrieve two inputs, and create one output), and you will realise quickly how useful this is.

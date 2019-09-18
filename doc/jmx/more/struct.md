@@ -1,19 +1,20 @@
 
 # Structures
 
-Structures and struct-arrays supported.
+Both structures and struct-arrays supported, but working with struct-arrays is somewhat complicated right now. Structures implement the [creator/extractor interfaces](jmx/more/interface) with key-type `const char*`.
 
-## Properties
+## Usage
 
-Fieldname, number of fields, number of elements.
+```cpp
+index_t numel() const;
+index_t nfields() const;
+bool empty() const;
 
-## Accessing elements
+bool has_field( std::string name ) const;
+bool has_fields( inilst<const char*> names ) const;
+bool has_any( inilst<const char*> names ) const;
 
-Accessing using `[]` or `get_value`.
-Default values.
-
-## Reading variables
-
-## Creating variables
-
-Using the maker, `set_field` function and `set_value` method.
+int set_value( std::string name, mxArray *value ) const;
+mxArray* get_value( std::string name ) const;
+mxArray* operator[] ( std::string name ) const;
+```

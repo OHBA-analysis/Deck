@@ -18,22 +18,16 @@ namespace jmx {
     template <class T>
     struct AbstractMemory
     {
-        static_assert( ! std::is_const<T>::value, "Container type cannot be const." );
-
         T *data;
         index_t size;
 
-        void clear()
-        {
-            data = nullptr;
-            size = 0;
-        }
-
-        void assign( T* p, index_t n )
-        {
+        void assign( T* p, index_t n ) {
             data = p;
             size = n;
         }
+
+        inline void clear() { assign( nullptr, 0 ); }
+        inline T& operator[] ( index_t k ) const { return data[k]; }
 
         virtual void alloc( index_t n ) =0;
         virtual void free() =0;
@@ -42,17 +36,16 @@ namespace jmx {
     // ------------------------------------------------------------------------
     
     template <class T>
-    struct ReadOnlyMemory : public AbstractMemory<T>
+    struct ReadOnlyMemory : public AbstractMemory<const T>
     {
-        using value_type = typename std::add_const<T>::type;
+        using value_type = const T;
+        static_assert( !std::is_const<T>::value, "Allocation type cannot be const." );
 
         void alloc( index_t n )
             { JMX_THROW( "Read-only memory cannot be allocated." ); }
 
         void free()
             { JMX_THROW( "Read-only memory cannot be freed." ); }
-
-        inline value_type& operator[] ( index_t k ) const { return this->data[k]; }
     };
 
     // ------------------------------------------------------------------------
@@ -61,17 +54,15 @@ namespace jmx {
     struct MatlabMemory : public AbstractMemory<T>
     {
         using value_type = T;
+        static_assert( !std::is_const<T>::value, "Allocation type cannot be const." );
 
-        void alloc( index_t n )
-        {
+        void alloc( index_t n ) {
             this->data = static_cast<T*>( mxCalloc( n, sizeof(T) ) ); 
             this->size = n;
         }
 
         void free()
             { mxFree(this->data); this->clear(); }
-
-        inline T& operator[] ( index_t k ) const { return this->data[k]; }
     };
 
     // ------------------------------------------------------------------------
@@ -80,17 +71,15 @@ namespace jmx {
     struct CppMemory : public AbstractMemory<T>
     {
         using value_type = T;
+        static_assert( !std::is_const<T>::value, "Allocation type cannot be const." );
 
-        void alloc( index_t n )
-        {
+        void alloc( index_t n ) {
             this->data = new T[n](); 
             this->size = n;
         }
 
         void free()
             { delete[] this->data; this->clear(); }
-
-        inline T& operator[] ( index_t k ) const { return this->data[k]; }
     };
 
 }

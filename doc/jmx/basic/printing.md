@@ -1,17 +1,27 @@
 
 # Printing and display
 
-Either print to the console, or show information about containers.
+## Using `stdout` and `stderr`
 
-## Redirecting `std::cout`
+Without JMX, using `printf` or `std::cout` in Mex files will not reliably print to the Matlab console. You need to use `mexPrintf` instead.
 
-By default, using `printf` or `std::cout` will not reliably print to the Matlab console.
-You need to use `mexPrintf` if you want to be sure to see it.
+With JMX, you can use the function `jmx::println` to write formatted message with the same syntax as `printf`.
 
-We provide seamless redirection of output stream `std::cout` to the Matlab console.
+In addition, JMX provides provides stream redirections for `stdout` and `stderr`. Most often, you will want to use that throughout your program, by writing the following at the beginning of the `mexFunction`:
+```cpp
+// redirect stdout and stderr to the Matlab console
+jmx::cout_redirect();
+jmx::cerr_redirect();
+```
+Subsequent calls to `std::cout` or `std::cerr` will then be redirected to the Matlab console. 
 
-Call `cout_redirect` at the beginning of your Mex function, or instantiate `coutRedirection` in desired scope for temporary redirection.
+If, for any reason, you wish to turn off this redirection temporarily in your program, simply call these functions again:
+```cpp
+// disable stream redirection
+jmx::cout_redirect(false);
+jmx::cerr_redirect(false);
+```
 
 ## Displaying containers
 
-> Under construction, experimental and basic
+To-do

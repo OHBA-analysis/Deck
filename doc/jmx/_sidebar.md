@@ -14,6 +14,7 @@
 
 * Advanced topics
 
+  * [Create/extract](jmx/more/interface)
   * [Arrays](jmx/more/array)
   * [Cells](jmx/more/cell)
   * [Structures](jmx/more/struct)
