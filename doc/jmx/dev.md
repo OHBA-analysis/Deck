@@ -59,7 +59,7 @@ redirect:
   redirecting cout to mexPrintf
 
 memory:
-  ReadOnly, Matlab (mxCalloc) and Cpp (new[])
+  ReadOnly, Matlab (mxCalloc) and Cpp (new[]) allocators
 
 
 display: not available yet

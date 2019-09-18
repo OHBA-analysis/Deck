@@ -23,7 +23,7 @@ namespace jmx {
     }
 
     template <class K>
-    inline Struct Extractor<K>::getstruct( index_t k, index_t i ) 
+    inline Struct Extractor<K>::getstruct( key_t k, index_t i ) 
         { return get_struct( _extractor_get(k), i ); }
 
     template <class K>

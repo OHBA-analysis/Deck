@@ -1,5 +1,5 @@
 
-* Module: `dk`
+* Package: `dk`
 
   * [Home](deck/index)
   * [Reference](deck/reference)

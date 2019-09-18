@@ -1,5 +1,5 @@
 
-* Module: `ant`
+* Package: `ant`
 
   * [Home](ant/index)
   * [Reference](ant/reference)

@@ -20,6 +20,8 @@ function cmd = jmx_compile( files, options, varargin )
 %
 %   dry         false  -n         Dry-run mode (will not actually compile target files if true).
 %   cpp11       true              Set appropriate compiler flags for the C++11 standard.
+%   cpp14       false             Idem for the C++14 standard.
+%   cpp17       false             Idem for the C++17 standard.
 %   mwlapack    false             Setup paths/libs to use Matlab's BLAS/LAPACK.
 %   arma        false             Setup paths/libs to use Armadillo.
 %   jmx         true              Setup paths/libs to use JMX.
@@ -49,7 +51,13 @@ function cmd = jmx_compile( files, options, varargin )
 %   lpath               -L          Linking path
 %   ipath               -I          Include path
 %
-% Multiple definitions can be specified as a cell, e.g.:
+%
+% NOTE:
+%
+% Repeated settings are overwritten from right to left (i.e. only the last one is considered).
+% To specify multiple settings, use cells instead.
+%
+% For example, to define multiple flags:
 %   jmx_compile( ... 'def', {'FOO=5', 'BAR'} )
 %
 %
@@ -69,9 +77,19 @@ function cmd = jmx_compile( files, options, varargin )
     files = dk.mapfun( @addquotes, files, false );
     
     % apply side-effects
-    if T.cpp11
-        S = append(S,'flag','-std=c++11');
+    std = 98;
+    if T.cpp11, std = 11; end
+    if T.cpp14, std = 14; end
+    if T.cpp17, std = 17; end
+    switch std
+        case 11
+            S = append(S,'flag','-std=c++11');
+        case 14
+            S = append(S,'flag','-std=c++14');
+        case 17
+            S = append(S,'flag','-std=c++17');
     end
+    
     if T.jmx
         if T.index32
             S = append(S,'def','JMX_32BIT');
@@ -142,6 +160,8 @@ function out = parse_options(in,filedir)
     out.jmx = true;
     out.arma = false;
     out.cpp11 = true;
+    out.cpp14 = false;
+    out.cpp17 = false;
 
     % detect integer width
     out.index32 = dk.env.is32bits();

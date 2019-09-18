@@ -39,6 +39,17 @@ namespace jmx {
         if ( !status )
             r.reset();
     }
+
+    void cerr_redirect( bool status )
+    {
+        static std::unique_ptr< cerrRedirection<mexErrMsgIdAndTxt_ostream> > r;
+
+        if ( status && !r )
+            r.reset( new cerrRedirection<mexErrMsgIdAndTxt_ostream>() );
+
+        if ( !status )
+            r.reset();
+    }
     
     // ----------  =====  ----------
     

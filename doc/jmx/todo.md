@@ -1,7 +1,7 @@
 
 # Contributions Welcome
 
-Below is a to-do list. Suggestions and improvements welcome. Please [report issues](?).
+Below is a to-do list. Suggestions and improvements welcome. Please [report issues](https://gitlab.com/jhadida/deck/issues).
 
 ## Bug fixing
 
