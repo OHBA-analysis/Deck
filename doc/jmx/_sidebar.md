@@ -1,29 +1,29 @@
 
-* Library `jmx`
+* Library: `jmx`
 
   * [Home](jmx/index)
-  * [Intro to Mex](jmx/mex)
-  * [Architecture](jmx/arch)
+  * [Introduction](jmx/intro)
 
-* Common usage
+* Getting started
 
-  * [Boilerplate](jmx/common/boilerplate)
-  * [Messages & exceptions](jmx/common/printing)
-  * [Arguments & outputs](jmx/common/args)
-  * [Variable types](jmx/common/types)
-  * [Compiling Mex files](jmx/common/compile)
-  * [Using Armadillo](jmx/common/armadillo)
-  * [Keyboard interruptions](jmx/common/interrupt)
+  * [Mex files](jmx/basic/mex)
+  * [Inputs and outputs](jmx/basic/io)
+  * [Runtime variables](jmx/basic/runtime)
+  * [Printing](jmx/basic/printing)
+  * [Gotchas](jmx/basic/gotcha)
 
-* Data structures
+* Advanced topics
 
-  * [Arrays](jmx/data/array)
-  * [Cells](jmx/data/cell)
-  * [Structures](jmx/data/struct)
-  * [MAT-files](jmx/data/mat)
-  * [Memory management](jmx/data/memory)
+  * [Arrays](jmx/more/array)
+  * [Cells](jmx/more/cell)
+  * [Structures](jmx/more/struct)
+  * [MAT-files](jmx/more/mat)
+  * [Type conversion](jmx/more/type)
+  * [Using Armadillo](jmx/more/armadillo)
+  * [Memory management](jmx/more/memory)
+  * [Keyboard interruptions](jmx/more/interrupt)
 
 * Contribution
 
-  * [How-to](jmx/contribute)
+  * [Developper](jmx/dev)
   * [To-do list](jmx/todo)

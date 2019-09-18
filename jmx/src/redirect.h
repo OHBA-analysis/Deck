@@ -26,13 +26,23 @@
  */
 namespace jmx {
 
-    class mexPrintf_ostream
-        : public std::streambuf
+    class mexPrintf_ostream: public std::streambuf
     {
     protected:
 
         virtual inline std::streamsize xsputn( const char* s, std::streamsize n )
             { mexPrintf("%.*s", n, s); return n; }
+
+        virtual inline int overflow( int c = EOF )
+            { if (c != EOF) mexPrintf("%.1s", &c); return 1; }
+    };
+
+    class mexErrMsgIdAndTxt_ostream: public std::streambuf
+    {
+    protected:
+
+        virtual inline std::streamsize xsputn( const char* s, std::streamsize n )
+            { mexErrMsgIdAndTxt("JMX::Error", "%.*s", n, s); return n; }
 
         virtual inline int overflow( int c = EOF )
             { if (c != EOF) mexPrintf("%.1s", &c); return 1; }
@@ -63,9 +73,33 @@ namespace jmx {
             { std::cout.rdbuf( m_backup ); }
     };
 
+    template <class B = mexErrMsgIdAndTxt_ostream>
+    class cerrRedirection
+    {
+    public:
+
+        typedef B buffer_type;
+
+        cerrRedirection()
+            { enable(); }
+        ~cerrRedirection()
+            { disable(); }
+
+    protected:
+
+        std::streambuf *m_backup;
+        buffer_type m_buf;
+
+        inline void enable()
+            { m_backup = std::cerr.rdbuf( &m_buf ); }
+        inline void disable()
+            { std::cerr.rdbuf( m_backup ); }
+    };
+
     // ------------------------------------------------------------------------
 
     void cout_redirect( bool status=true );
+    void cerr_redirect( bool status=true );
 
 }
 

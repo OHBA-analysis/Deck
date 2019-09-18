@@ -1,5 +1,5 @@
 
-# Working with arrays
+# Matrices and arrays
 
 ```
 dk.getelem

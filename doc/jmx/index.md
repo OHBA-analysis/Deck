@@ -1,7 +1,7 @@
 
 # Mex library
 
-This library lives in the folder `jmx`, which is added to the path when calling `dk_startup()`.
+JMX is a lightweight C++ library which greatly simplifies working with Mex files in Matlab.
 
-Building the library can be done using `jmx_build()`, but you will only need to do this if you want to compile your own Mex files.
-Calling `ant.compile()` (to compile the Mex files inside `ant`) automatically rebuilds JMX at every call.
+It is used in the Mex functions implemented in the [Ant package](ant/index) for instance, which can be compiled by calling `ant.compile()` from the Matlab console.
+The sources are located in folder `jmx/`, which is added to the path when calling `dk_startup()`. 
