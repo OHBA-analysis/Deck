@@ -27,9 +27,13 @@ namespace jmx {
         { return get_struct( _extractor_get(k), i ); }
 
     template <class K>
-    inline Struct Creator<K>::mkstruct( key_t k, inilst<const char*> fields ) {
-        return Struct( _creator_assign(k, make_struct( fields, 1, 1 )) );
+    inline Struct Creator<K>::mkstruct( key_t k, inilst<const char*> fields, index_t nr, index_t nc ) {
+        return Struct( _creator_assign(k, make_struct( fields, nr, nc )) );
     }
+
+    template <class K>
+    inline Struct Creator<K>::mkstruct( key_t k, inilst<const char*> fields )
+        { return mkstruct(k,fields,1,1); }
     
     // ------------------------------------------------------------------------
     

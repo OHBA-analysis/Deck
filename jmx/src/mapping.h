@@ -108,7 +108,7 @@ namespace jmx {
     class Struct : public AbstractMapping
     {
     public:
-        
+
         Struct()
             { clear(); }
         Struct( const mxArray* ms, index_t index = 0 )
@@ -122,8 +122,23 @@ namespace jmx {
             return set_field( const_cast<mxArray*>(mstruct), name, value );
         }
 
-        inline index_t  numel   () const { return mxGetNumberOfElements(mstruct); }
+        // for struct-arrays
+        Struct& select( index_t k );
+
+        inline Struct& select( index_t r, index_t c ) {
+            JMX_ASSERT( is_matrix(), "Struct-array is not 2d." )
+            return select( r + nrows()*c );
+        }
+
+        inline bool is_scalar() const { return numel()==1; }
+        inline bool is_matrix() const { return ndims()==2; }
+        inline bool is_array() const { return numel() > 1; }
+
         inline index_t  nfields () const { return mxGetNumberOfFields(mstruct); }
+        inline index_t  numel   () const { return mxGetNumberOfElements(mstruct); }
+        inline index_t  ndims   () const { return mxGetNumberOfDimensions(mstruct); }
+        inline index_t  nrows   () const { return mxGetM(mstruct); }
+        inline index_t  ncols   () const { return mxGetN(mstruct); }
         inline bool     empty   () const { return numel() == 0; }
         inline bool     valid   () const { return mstruct && mxIsStruct(mstruct); }
         inline operator bool    () const { return valid() && !empty(); }

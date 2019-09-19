@@ -16,8 +16,8 @@
 
   * [Create/extract](jmx/more/interface)
   * [Arrays](jmx/more/array)
-  * [Cells](jmx/more/cell)
   * [Structures](jmx/more/struct)
+  * [Cells](jmx/more/cell)
   * [MAT-files](jmx/more/mat)
   * [Type conversion](jmx/more/type)
   * [Using Armadillo](jmx/more/armadillo)

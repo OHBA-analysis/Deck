@@ -1,14 +1,14 @@
 
 # Inputs and Outputs
 
-Initialise JMX's argument wrapper at the beginning of your `mexFunction`:
+The JMX argument wrapper should be initialised at the beginning of your `mexFunction` like so:
 ```cpp
 auto args = jmx::Arguments( nargout, out, nargin, in );
 args.verify( 2, 1, usage ); // for example, 2 inputs and 1 output
 ```
 
-Below is a list of methods that you can use to retrieve inputs, or create outputs.
-For more details, this wrapper implements the [creator/extractor interfaces](jmx/more/interface) with key-type `index_t`.
+Below is a list of methods that can be used to retrieve inputs, or create outputs.
+For more details, note that this wrapper implements the [creator/extractor interfaces](jmx/more/interface) with key-type `index_t`.
 
 ## Inputs
 
@@ -34,7 +34,7 @@ args.getstr(k,"Hello");
 // special containers
 args.getcell(k);
 args.getstruct(k);
-args.getstruct(k,n);            // struct-array
+args.getstruct(k,n);            // item n in struct-array
 ```
 
 Output arrays returned by `get(vec|mat|vol)` are `_ro` variants by default (using [`ReadOnlyMemory`](jmx/more/memory)), meaning that they cannot be reallocated or freed, and that their value-type is const. Use `get(vec|mat|vol)_rw` to return the `_mx` array variants (using [`MatlabMemory`](jmx/more/memory)), which have a non-const value-type.
@@ -55,7 +55,7 @@ args.mkvol(k,nr,nc,ns);         // template T = double
 // special containers
 args.mkcell(k,len);
 args.mkstruct(k,{"f1","f2",...});
-args.mkstructarr(k,{"f1","f2",...},nr,nc);
+args.mkstruct(k,{"f1","f2",...},nr,nc); // struct-array
 ```
 
 Working with struct-arrays is a little bit complicated, and only row-shaped cells are implemented at the moment.
