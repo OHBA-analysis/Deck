@@ -1,7 +1,7 @@
 
 # Arrays
 
-JMX defines three array containers: vector, matrix and volume.
+JMX defines three array containers: vector, matrix and volume. Only real-valued matrices at the moment.
 
 ## Abstract base
 

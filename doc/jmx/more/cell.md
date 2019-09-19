@@ -23,17 +23,17 @@ Using an input cell:
 auto c = args.getcell(0);        // field 0 is the first input
 
 JMX_ASSERT( c.numel() > 2, "Bad cell-length." )
-auto x = c.getvec<uint8_t>(2); // vector of uint8 at index 3
+auto x = c.getvec(2); // vector of doubles at index 3
 
 JMX_ASSERT( x.length() > 2, "Bad length." )
-jmx::println( "%" PRIu8, x[2] ); // #include <cinttypes>
+jmx::println( "%g", x[2] );
 ```
 
 Creating an output cell:
 ```cpp
-// create struct with fields {foo, bar} in first output
-auto s = args.mkcell( 0, {"foo","bar"} );
-auto M = s.mkmat<float>("foo",3,4); // 3x4 matrix of singles in field "foo"
+// create cell of length 10 in first output
+auto s = args.mkcell(0,10);
+auto M = s.mkmat<float>(5,3,4); // 3x4 matrix of singles in sixth cell
 
 M(0,2) = -1.0f; // use the matrix
 ```

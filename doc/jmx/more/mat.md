@@ -1,15 +1,44 @@
 
 # MAT files
 
-MAT files allow writing data to disk, and sharing it with others.
-It is probably simpler and clearer to deal with MAT reading/writing directly from Matlab, but we also provide functions in this library.
+JMX supports both reading and writing of MAT files. The `MAT` class implements the [creator/extractor interfaces](jmx/more/interface) with key-type `const char*`.
 
-## Reading MAT files
+## API
 
-Simple wrapper, behaves like a struct.
+```cpp
+open( const char *name, const char *mode= "r" );
 
-## Creating MAT files
+int set_value( std::string name, mxArray *value ) const;
+mxArray* get_value( std::string name ) const;
+mxArray* operator[] ( std::string name ) const;
+```
 
-> Pay attention to storage format
+> **Note:** the `operator[]` cannot be used to create fields!
 
-Create using Mex API (especially format), and then wrap using `jmx::MAT`, set variables using either function `set_variable` or method `set_value`.
+File-opening modes are:
+```
+r       read-only
+u       update (preserve version)
+w4      older than version 4
+w6,wL   for Matlab 6 or 6.5 (native char encoding)
+w7,wz   compressed MAT file with unicode
+w7.3    HDF-5 format
+```
+
+## Practical use
+
+Open an existing MAT-file:
+```cpp
+auto F = jmx::MAT( "foo.mat" );
+auto x = F.getvec<float>("x"); // vector of floats saved as "x"
+```
+
+Creating a new MAT-file:
+```cpp
+auto F = jmx::MAT( "bar.mat", "w7" );
+auto M = F.mkstruct( "s", {"a","b"} );
+
+M.mkbool("a",true);
+M.mkstr("b","Hello!");
+```
+
