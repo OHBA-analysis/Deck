@@ -19,6 +19,8 @@ mxArray* get_value( std::string name ) const;
 mxArray* operator[] ( std::string name ) const;
 ```
 
+> **Note:** the `operator[]` cannot be used to create fields!
+
 Specifically for struct-arrays:
 ```cpp
 index_t ndims() const;
@@ -55,7 +57,7 @@ M(0,2) = -1.0f; // use the matrix
 
 ## Struct-arrays
 
-Struct-arrays within JMX are regular `Struct` objects, within which scalar structs can be "selected" at a particular index. 
+Struct-arrays in JMX are regular `Struct` objects, within which individual structs can be "selected" one at a time by specifying an index. 
 
 Using an input struct-matrix:
 ```cpp

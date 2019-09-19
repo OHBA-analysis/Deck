@@ -52,7 +52,7 @@ namespace jmx {
             return has_field(name) ? m_fmap.find(name)->second : nullptr; 
         }
 
-        virtual int set_value( const char *name, mxArray *value ) const =0;
+        virtual int set_value( const char *name, mxArray *value ) =0;
 
         // extractor/constructor interfaces
         using extractor_type = Extractor<const char*>;
@@ -84,18 +84,21 @@ namespace jmx {
         MAT() 
             : mfile(nullptr)
             { clear(); }
-        MAT( const char *name ) 
+        MAT( const char *name, const char *mode = "r" ) 
             : mfile(nullptr)
             { open(name); }
 
+        ~MAT() { clear(); }
+
         void clear();
-        bool open( const char *name );
+        bool open( const char *name, const char *mode = "r" );
 
         inline bool valid() const { return mfile; }
         inline const MATFile* mx() const { return mfile; }
 
-        inline int set_value( const char *name, mxArray *value ) const {
-            return set_variable( const_cast<MATFile*>(mfile), name, value );
+        inline int set_value( const char *name, mxArray *value ) {
+            m_fmap[name] = value;
+            return set_variable( mfile, name, value );
         }
 
     private:
@@ -118,7 +121,8 @@ namespace jmx {
         bool wrap( const mxArray* ms, index_t index = 0 );
         inline const mxArray* mx() const { return mstruct; }
 
-        inline int set_value( const char *name, mxArray *value ) const {
+        inline int set_value( const char *name, mxArray *value ) {
+            m_fmap[name] = value;
             return set_field( const_cast<mxArray*>(mstruct), name, value );
         }
 

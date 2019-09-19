@@ -146,23 +146,21 @@ namespace jmx {
         AbstractMapping::clear();
     }
 
-    bool MAT::open( const char *name )
+    bool MAT::open( const char *name, const char *mode )
     {
         clear();
         JMX_ASSERT( name, "Null filename." );
 
-        MATFile *mf = matOpen( name, "r" );
+        MATFile *mf = matOpen( name, mode );
         JMX_ASSERT( mf, "Error opening file: %s", name );
 
         int nf = 0;
         const char **fnames = (const char**) matGetDir( mf, &nf );
-        JMX_WREJECT( nf == 0, "Empty file." );
 
         mfile = mf;
         this->m_fields.resize(nf);
 
-        for ( int f = 0; f < nf; ++f )
-        {
+        for ( int f = 0; f < nf; ++f ) {
             this->m_fields[f] = fnames[f];
             this->m_fmap[ this->m_fields[f] ] = matGetVariable( mf, fnames[f] );
         }
@@ -181,7 +179,7 @@ namespace jmx {
         JMX_WREJECT( nc == 0, "Empty cell." );
         JMX_WREJECT( mxGetNumberOfDimensions(ms) > 1, 
             "Multi-dimensional cells are not supported; wrapping input as vector-cell instead." )
-            
+
         mcell = ms;
     }
 
@@ -205,8 +203,7 @@ namespace jmx {
         mstruct = ms;
         this->m_fields.resize(nf);
 
-        for ( index_t f = 0; f < nf; ++f )
-        {
+        for ( index_t f = 0; f < nf; ++f ) {
             this->m_fields[f] = mxGetFieldNameByNumber(ms,f);
             this->m_fmap[ this->m_fields[f] ] = mxGetFieldByNumber(ms,index,f);
         }
