@@ -24,8 +24,9 @@ namespace jmx {
         virtual ptr_t _creator_assign( key_t k, ptr_t val ) =0;
 
         // forward declarations (see forward.h)
-        Struct mkstruct( key_t k, inilst<const char*> fields ); 
         Cell mkcell( key_t k, index_t len );
+        Struct mkstruct( key_t k, inilst<const char*> fields, index_t nr, index_t nc );
+        Struct mkstruct( key_t k, inilst<const char*> fields );
 
         // ----------  =====  ----------
 
@@ -59,10 +60,7 @@ namespace jmx {
             ptr_t pk = _creator_assign(k, make_volume( nr, nc, cpp2mex<T>::classid )); 
             return Volume_mx<T>( static_cast<T*>(mxGetData(pk)), nr, nc, ns );
         }
-
-        inline ptr_t mkstructarr( key_t k, inilst<const char*> fields, index_t nr, index_t nc ) {
-            return _creator_assign(k, make_struct( fields, nr, nc ));
-        }
+        
     };
 
 }

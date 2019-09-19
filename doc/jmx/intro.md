@@ -3,7 +3,7 @@
 
 ### Libraries and executables
 
-Not all C++ programs are meant to be executed; that is, called with arguments from a terminal. Such non-callable programs are called **libraries**, because they usually implement a range of functions and classes for a particular purpose (e.g. to build a web-server, or to read/write JSON files), designed and organised to facilitate their use by other programs to build specific applications (e.g. creating a website, or running simulations and save them as files).
+Not all C++ programs are meant to be executed; that is, called with arguments from a terminal. Non-executable programs are called **libraries**, because they usually implement a range of functions and classes for a particular purpose (e.g. to build a web-server, or to read/write JSON files), and are designed and organised to facilitate their use by other programs for building specific applications (e.g. creating a website, or saving simulations as JSON files).
 
 The JMX library is an example of such non-executable program. It mainly defines a set of classes that make it easier to write **Mex files**, which are Matlab executable programs written in one of the supported languages (C, C++, and ForTran). 
 

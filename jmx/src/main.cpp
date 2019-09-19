@@ -174,12 +174,14 @@ namespace jmx {
     
     void Cell::wrap( const mxArray *ms ) 
     {
-        JMX_ASSERT( ms, "Null pointer." );
-        JMX_ASSERT( mxIsCell(ms), "Input is not a cell." );
+        JMX_ASSERT( ms, "Null pointer." )
+        JMX_ASSERT( mxIsCell(ms), "Input is not a cell." )
 
         int nc = mxGetNumberOfElements(ms);
         JMX_WREJECT( nc == 0, "Empty cell." );
-
+        JMX_WREJECT( mxGetNumberOfDimensions(ms) > 1, 
+            "Multi-dimensional cells are not supported; wrapping input as vector-cell instead." )
+            
         mcell = ms;
     }
 
@@ -210,6 +212,17 @@ namespace jmx {
         }
 
         return true;
+    }
+
+    Struct& Struct::select( index_t k )
+    {
+        const index_t nf = nfields();
+        JMX_ASSERT( k < numel(), "Index out of bounds." )
+
+        for ( index_t f = 0; f < nf; ++f )
+            this->m_fmap[ this->m_fields[f] ] = mxGetFieldByNumber(mstruct,k,f);
+
+        return *this;
     }
 
 }
