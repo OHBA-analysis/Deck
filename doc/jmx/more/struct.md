@@ -14,7 +14,7 @@ bool has_field( std::string name ) const;
 bool has_fields( inilst<const char*> names ) const;
 bool has_any( inilst<const char*> names ) const;
 
-int set_value( std::string name, mxArray *value ) const;
+int set_value( std::string name, mxArray *value );
 mxArray* get_value( std::string name ) const;
 mxArray* operator[] ( std::string name ) const;
 ```

@@ -8,7 +8,7 @@ JMX supports both reading and writing of MAT files. The `MAT` class implements t
 ```cpp
 open( const char *name, const char *mode= "r" );
 
-int set_value( std::string name, mxArray *value ) const;
+int set_value( std::string name, mxArray *value );
 mxArray* get_value( std::string name ) const;
 mxArray* operator[] ( std::string name ) const;
 ```
