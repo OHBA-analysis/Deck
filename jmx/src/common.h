@@ -26,9 +26,9 @@
 static char jhm_msgbuf[JMX_MSGBUF_SIZE];
 
 #define JMX_THROW( msg, args... ) \
-    { sprintf( jhm_msgbuf, "::JH-MEX-Exception:: " msg "\n", ##args ); throw std::runtime_error(jhm_msgbuf); }
+    { sprintf( jhm_msgbuf, "::JMX-Exception:: " msg "\n", ##args ); throw std::runtime_error(jhm_msgbuf); }
 #define JMX_WARN( msg, args... ) \
-    { mexPrintf( "::JH-MEX-Warning:: " msg "\n", ##args ); }
+    { mexPrintf( "::JMX-Warning:: " msg "\n", ##args ); }
 
 // exception by default
 #define JMX_REJECT( cdt, msg, args... ) { if (cdt) JMX_THROW(msg,##args) }
