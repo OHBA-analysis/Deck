@@ -105,7 +105,7 @@ end
 
 function num = parse_number(car)
     num = '^\s*-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+\-]?\d+)?';
-	len = regexp( car.skipspaces().sub(63), num, 'end' );
+    len = regexp( car.skipspaces().sub(63), num, 'end' );
     num = str2double(car.sub(len));
     car.inc(len);
 end

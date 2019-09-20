@@ -32,6 +32,21 @@ namespace jmx {
         virtual void alloc( index_t n ) =0;
         virtual void free() =0;
     };
+
+    // ------------------------------------------------------------------------
+    
+    template <class T>
+    struct ExternalMemory : public AbstractMemory<T>
+    {
+        // template type can be const or not
+        using value_type = T;
+
+        void alloc( index_t n )
+            { JMX_THROW( "External memory cannot be allocated." ); }
+
+        void free()
+            { JMX_THROW( "External memory cannot be freed." ); }
+    };
     
     // ------------------------------------------------------------------------
     

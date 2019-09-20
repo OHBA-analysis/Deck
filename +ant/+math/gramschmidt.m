@@ -4,13 +4,13 @@ function [og,on] = gramschmidt(M)
 % Gram-Schmidt orthogonalization of matrix M.
 %
 % Input:
-%	M is a matrix.
+%   M is a matrix.
 %
 % Constraints:
-%	M is square with full rank.
+%   M is square with full rank.
 %
 % Output:
-%	og is the orthogonalization
+%   og is the orthogonalization
 %   on is the orthonormalization
     
     n = size(M,1);

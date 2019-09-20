@@ -7,11 +7,11 @@ function [center,normal] = fit_plane( points )
 %   points is a nx3 matrix of coordinates row by row.
 %
 % Output:
-%	center is the barycenter of points, normal is the normal to the fitted plane.
+%   center is the barycenter of points, normal is the normal to the fitted plane.
 %
 % Contact: jhadida [at] fmrib.ox.ac.uk
 
-	assert( ismatrix(points) && size(points,2) == 3, 'points must be nx3.' );
+    assert( ismatrix(points) && size(points,2) == 3, 'points must be nx3.' );
 
     % Find the least square fit
     center  = mean(points);
