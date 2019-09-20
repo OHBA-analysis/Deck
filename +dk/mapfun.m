@@ -20,7 +20,7 @@ function out = mapfun( fun, val, unif )
         end
     else
         if nargout > 0
-        	out = arrayfun( fun, val, 'UniformOutput', unif );
+            out = arrayfun( fun, val, 'UniformOutput', unif );
         else
             arrayfun( fun, val, 'UniformOutput', unif );
         end

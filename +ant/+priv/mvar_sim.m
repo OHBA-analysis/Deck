@@ -1,5 +1,5 @@
 function [v] = mvar_sim(w,A,C,n,ndisc)
-%ARSIM	Simulation of AR process.	
+%ARSIM  Simulation of AR process.   
 %
 %  v=ARSIM(w,A,C,n) simulates n time steps of the AR(p) process
 %
@@ -33,7 +33,7 @@ function [v] = mvar_sim(w,A,C,n,ndisc)
   w       = w(:)';                      % force w to be row vector
 
   % Check whether specified model is stable
-  A1 	  = [A; eye((p-1)*m) zeros((p-1)*m,m)];
+  A1      = [A; eye((p-1)*m) zeros((p-1)*m,m)];
   lambda  = eig(A1);
   if any(abs(lambda) > 1)
     warning('The specified AR model is unstable.')
@@ -68,7 +68,7 @@ function [v] = mvar_sim(w,A,C,n,ndisc)
     %  Process has nonzero mean    mval = inv(B)*w'    where 
     %             B = eye(m) - A1 -... - Ap; 
     %  Assemble B
-    B 	 = eye(m);
+    B    = eye(m);
     for j=1:p
       B = B - A(:, (j-1)*m+1:j*m);
     end

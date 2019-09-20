@@ -6,10 +6,10 @@ function varargout = print(varargin)
 % 300dpi is sufficient for a high resolution tiff for inclusion in papers
 %
 % Usage:
-%	dk.fig.print('test') - save current figure as 'test.png' to the desktop
+%   dk.fig.print('test') - save current figure as 'test.png' to the desktop
 %   dk.fig.print('test.ext') - save current figure to the desktop with format specified by ext
 %   dk.fig.print(h,'test') - first argument can be a figure handle
-%	dk.fig.print(h,'test_%d',1) - additional arguments are used for string replacement
+%   dk.fig.print(h,'test_%d',1) - additional arguments are used for string replacement
 %
 % RA
 
@@ -59,7 +59,7 @@ function varargout = print(varargin)
             print(fhandle,'-r300','-djpeg',output_fname);
         case {'.tif','.tiff'}
             print(fhandle,'-r300','-dtiff',output_fname);
-        case {'.pdf'} 		
+        case {'.pdf'}       
             print(fhandle,'-r300','-dpdf',output_fname);
         case {'.png'} 
             print(fhandle,'-r400','-dpng',output_fname);
@@ -75,5 +75,5 @@ function varargout = print(varargin)
     if nargout > 0
         varargout{1} = output_fname;
     end
-	
+    
 end

@@ -1,5 +1,5 @@
 function [w, A, C, sbc, fpe, th] = mvar_fit(v, pmin, pmax, selector, no_const)
-%ARFIT	Stepwise least squares estimation of multivariate AR model.
+%ARFIT  Stepwise least squares estimation of multivariate AR model.
 %
 %  [w,A,C,SBC,FPE,th]=ARFIT(v,pmin,pmax) produces estimates of the
 %  parameters of a multivariate AR model of order p,
@@ -60,25 +60,25 @@ function [w, A, C, sbc, fpe, th] = mvar_fit(v, pmin, pmax, selector, no_const)
   % set defaults and check for optional arguments
   if (nargin == 3)              % no optional arguments => set default values
     mcor       = 1;               % fit intercept vector
-    selector   = 'sbc';	          % use SBC as order selection criterion
+    selector   = 'sbc';           % use SBC as order selection criterion
   elseif (nargin == 4)          % one optional argument
     if strcmp(selector, 'zero')
       mcor     = 0;               % no intercept vector to be fitted
-      selector = 'sbc';	          % default order selection 
+      selector = 'sbc';           % default order selection 
     else
-      mcor     = 1; 		  % fit intercept vector
+      mcor     = 1;           % fit intercept vector
     end
   elseif (nargin == 5)          % two optional arguments
     if strcmp(no_const, 'zero')
       mcor     = 0;               % no intercept vector to be fitted
     else
       error(['Bad argument. Usage: ', ...
-	     '[w,A,C,SBC,FPE,th]=AR(v,pmin,pmax,SELECTOR,''zero'')'])
+         '[w,A,C,SBC,FPE,th]=AR(v,pmin,pmax,SELECTOR,''zero'')'])
     end
   end
 
-  ne  	= n-pmax;               % number of block equations of size m
-  npmax	= m*pmax+mcor;          % maximum number of parameter vectors of length m
+  ne    = n-pmax;               % number of block equations of size m
+  npmax = m*pmax+mcor;          % maximum number of parameter vectors of length m
 
   if (ne <= npmax)
     error('Time series too short.')
@@ -113,8 +113,8 @@ function [w, A, C, sbc, fpe, th] = mvar_fit(v, pmin, pmax, selector, no_const)
   if np > 0
     if mcor == 1
       % improve condition of R11 by re-scaling first column
-      con 	= max(scale(2:npmax+m)) / scale(1); 
-      R11(:,1)	= R11(:,1)*con; 
+      con   = max(scale(2:npmax+m)) / scale(1); 
+      R11(:,1)  = R11(:,1)*con; 
     end
     Aaug = (R11\R12)';
     

@@ -2,16 +2,16 @@ function Ynew = interp_field( Xold, Yold, Xnew, type )
 % Ynew = interp_field( Xold, Yold, Xnew, type )
 %
 % Inputs:
-%	Xold are the points at which the vector field F takes the values Yold = F(Xold)
-%	Xnew are the points where the force field needs to be interpolated
+%   Xold are the points at which the vector field F takes the values Yold = F(Xold)
+%   Xnew are the points where the force field needs to be interpolated
 %   type is either 'euclidean' (default) or 'Mahalanobis'.
 %
 % Constraints:
-%	Xold and Yold should both have n rows (# of observations).
+%   Xold and Yold should both have n rows (# of observations).
 %   Xold and Xnew should both have d columns (# of dimensions).
 %
 % Output:
-%	Ynew are the interpolated values of F(Xnew).
+%   Ynew are the interpolated values of F(Xnew).
 
     d    = size(Xold,2);
     Nold = size(Xold,1);

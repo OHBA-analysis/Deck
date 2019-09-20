@@ -10,11 +10,11 @@ function n = lnorm( X, p, dim )
 %  dim: dimension along which to compute the norm (default 1)
 %
 % OUTPUT:
-%	n is an array of same size as X, except that size(n,dim) == 1.
+%   n is an array of same size as X, except that size(n,dim) == 1.
 %
 % JH
 
-	if nargin < 3, dim=1; end
+    if nargin < 3, dim=1; end
     if nargin < 2, p=2; end
     
     switch p

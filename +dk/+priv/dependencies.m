@@ -5,10 +5,10 @@ function [extfun,matfun] = dependencies( name, recursive )
 % List all functions used in Matlab script "name" or in all Matlab scripts in directory "name".
 %
 % INPUT
-%	name        Full path to either a Matlab script or a directory containing Matlab scripts.
+%   name        Full path to either a Matlab script or a directory containing Matlab scripts.
 %
 % OUTPUT
-%	Two cell arrays containing respectively non-native and built-in Matlab functions.
+%   Two cell arrays containing respectively non-native and built-in Matlab functions.
 %
 % Contact: jhadida [at] fmrib.ox.ac.uk
 

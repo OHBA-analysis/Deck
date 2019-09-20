@@ -5,13 +5,13 @@ classdef MVAR < handle
 
     properties
         order
-		intercept
-		coefmat
-		noise
+        intercept
+        coefmat
+        noise
         fsamp
-	end
+    end
 
-	methods
+    methods
 
         function self = MVAR(varargin)
             self.clear();

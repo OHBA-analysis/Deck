@@ -2,7 +2,7 @@ function [o,r] = band_overlap( a, b )
 %
 % [o,r] = ant.util.band_overlap( band1, band2 )
 %
-% 	o   width of overlap (>= 0)
+%   o   width of overlap (>= 0)
 %   r   overlap ratio relative to smallest bandwidth
 %
 % JH
