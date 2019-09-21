@@ -35,22 +35,22 @@ const mxArray* _extractor_get(key) const;
 
 Writing `ptr = const mxArray*` for short, extractors expose the following methods:
 ```cpp
-bool getbool(key);
-std::string getstr(key);
-T getnum<T = double>(key);
+bool getbool(key) const;
+std::string getstr(key) const;
+T getnum<T = double>(key) const;
 
-bool getbool(key,default);
-std::string getstr(key,default);
-T getnum<T = double>(key,default);
+bool getbool(key,default) const;
+std::string getstr(key,default) const;
+T getnum<T = double>(key,default) const;
 
-Vector_ro<T> getvec<T = double>(key);
-Matrix_ro<T> getmat<T = double>(key);
-Volume_ro<T> getvol<T = double>(key);
+Vector_ro<T> getvec<T = double>(key) const;
+Matrix_ro<T> getmat<T = double>(key) const;
+Volume_ro<T> getvol<T = double>(key) const;
 
-Vector_mx<T> getvec_rw<T = double>(key);
-Matrix_mx<T> getmat_rw<T = double>(key);
-Volume_mx<T> getvol_rw<T = double>(key);
+Vector_mx<T> getvec_rw<T = double>(key) const;
+Matrix_mx<T> getmat_rw<T = double>(key) const;
+Volume_mx<T> getvol_rw<T = double>(key) const;
 
-Struct getstruct(key, ind=0);
-Cell getcell(key, ind=0);
+Struct getstruct(key, ind=0) const;
+Cell getcell(key) const;
 ```
