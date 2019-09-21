@@ -28,11 +28,8 @@ function rebuild(p)
     jmx_cleanup( p.bin );
     jmx_cleanup( p.mex );
 
-    % build and copy JMX library to bin/ folder
-    % (bin/ folder is scanned in jmake)
+    % build JMX library
     jmx_build();
-    jmxbin = fullfile( p.bin, 'jmx.o' ); 
-    copyfile( jmx_path('inc/jmx.o'), jmxbin );
 
 end
 
