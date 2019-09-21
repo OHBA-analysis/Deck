@@ -25,6 +25,7 @@ function cmd = jmx_compile( files, options, varargin )
 %   mwlapack    false             Setup paths/libs to use Matlab's BLAS/LAPACK.
 %   arma        false             Setup paths/libs to use Armadillo.
 %   jmx         true              Setup paths/libs to use JMX.
+%   jmxobj      <auto>            Override JMX binary.
 %
 %   index32     <auto>            Newer versions of Matlab use 64-bits indices (-largeArrayDims).
 %                                 Set to true to use 32-bits legacy indexing (-compatibleArrayDims).
@@ -70,11 +71,13 @@ function cmd = jmx_compile( files, options, varargin )
     filetest = @(f) any( exist(f,'file') == [2,7] );
     
     assert( iscellstr(files), 'Files ($1) should be a string or cell-string.' );
-    assert( all(cellfun( filetest, files )), 'One or several files not found (please use absolute paths).' );
+    
+    % JH: dont do this, too inconvenient
+    %assert( all(cellfun( filetest, files )), ...
+    %    'One or several files not found (please use absolute paths).' );
     
     T = parse_options(options, fileparts(files{1})); % default output dir with target file
     S = parse_settings(varargin{:});
-    files = dk.mapfun( @addquotes, files, false );
     
     % apply side-effects
     std = 98;
@@ -96,6 +99,7 @@ function cmd = jmx_compile( files, options, varargin )
         else
             S = append(S,'def','JMX_64BIT');
         end
+        files{end+1} = T.jmxobj;
     end
     if T.jmx || T.arma 
         S = append(S,'ipath',jmx_path('inc'));
@@ -138,6 +142,7 @@ function cmd = jmx_compile( files, options, varargin )
         cmd{end+1} = addquotes(T.outfile);
     end
     
+    files = dk.mapfun( @addquotes, files, false );
     cmd = horzcat( cmd, F, D, U, L, l, I );
     cmd = cmd(cellfun( @(x) ~isempty(x), cmd ));
     cmd = horzcat( cmd, files );
@@ -162,6 +167,7 @@ function out = parse_options(in,filedir)
     out.cpp11 = true;
     out.cpp14 = false;
     out.cpp17 = false;
+    out.jmxobj = jmx_path('inc','jmx.o');
 
     % detect integer width
     out.index32 = dk.env.is32bits();

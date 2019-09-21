@@ -28,13 +28,10 @@ function cmd = jmx( files, options, varargin )
     % force jmx option
     options.jmx = true;
     
-    % include jmx.o
+    % build JMX if needed
     objfile = jmx_path('inc/jmx.o');
     if exist(objfile,'file') ~= 2
         jmx_build();
-    end
-    if ~ismember( 'jmx.o', dk.mapfun( @dk.fs.basename, files, false ) )
-        files{end+1} = objfile;
     end
     
     % call jmx_compile
