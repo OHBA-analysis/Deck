@@ -25,10 +25,12 @@ function cmd = jmx_compile( files, options, varargin )
 %   mwlapack    false             Setup paths/libs to use Matlab's BLAS/LAPACK.
 %   arma        false             Setup paths/libs to use Armadillo.
 %   jmx         true              Setup paths/libs to use JMX.
-%   jmxobj      <auto>            Override JMX binary.
 %
 %   index32     <auto>            Newer versions of Matlab use 64-bits indices (-largeArrayDims).
 %                                 Set to true to use 32-bits legacy indexing (-compatibleArrayDims).
+%
+%   autojmx     true              If jmx==true, add JMX binary to files list.
+%                                 Set to false to specify JMX object manually.
 %
 %   outdir      pwd    -outdir    The folder in which to put the compiled object.
 %   outfile     ''     -ouput     The name of the compiled file.
@@ -99,7 +101,9 @@ function cmd = jmx_compile( files, options, varargin )
         else
             S = append(S,'def','JMX_64BIT');
         end
-        files{end+1} = T.jmxobj;
+        if T.autojmx
+            files{end+1} = jmx_path('inc','jmx.o');
+        end
     end
     if T.jmx || T.arma 
         S = append(S,'ipath',jmx_path('inc'));
@@ -167,7 +171,7 @@ function out = parse_options(in,filedir)
     out.cpp11 = true;
     out.cpp14 = false;
     out.cpp17 = false;
-    out.jmxobj = jmx_path('inc','jmx.o');
+    out.autojmx = true;
 
     % detect integer width
     out.index32 = dk.env.is32bits();
