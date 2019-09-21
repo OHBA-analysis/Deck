@@ -23,7 +23,7 @@ namespace jmx {
     }
 
     template <class K>
-    inline Struct Extractor<K>::getstruct( key_t k, index_t i ) 
+    inline Struct Extractor<K>::getstruct( key_t k, index_t i ) const
         { return get_struct( _extractor_get(k), i ); }
 
     template <class K>
@@ -86,7 +86,7 @@ namespace jmx {
     }
 
     template <class K>
-    inline Cell Extractor<K>::getcell( key_t k )
+    inline Cell Extractor<K>::getcell( key_t k ) const
         { return get_cell(_extractor_get(k)); }
 
     template <class K>
