@@ -1,6 +1,6 @@
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
-[![Documentation](https://img.shields.io/badge/-Documentation-yellowgreen.svg)](https://jhadida.gitlab.io/deck)
+[![Documentation](https://img.shields.io/badge/Documentation-https%3A%2F%2Fjhadida.gitlab.io%2Fdeck-orange.svg)](https://jhadida.gitlab.io/deck)
 
 > **NOTE (June 2019):**
 > This toolbox has undergone a considerable refactoring; a [new documentation](https://jhadida.gitlab.io/deck) is being written, but in case of inconsistencies, please rely on the functions' helptext.
