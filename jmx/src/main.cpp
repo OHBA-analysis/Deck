@@ -42,10 +42,10 @@ namespace jmx {
 
     void cerr_redirect( bool status )
     {
-        static std::unique_ptr< cerrRedirection<mexErrMsgIdAndTxt_ostream> > r;
+        static std::unique_ptr< cerrRedirection<mexWarnMsgIdAndTxt_ostream> > r;
 
         if ( status && !r )
-            r.reset( new cerrRedirection<mexErrMsgIdAndTxt_ostream>() );
+            r.reset( new cerrRedirection<mexWarnMsgIdAndTxt_ostream>() );
 
         if ( !status )
             r.reset();

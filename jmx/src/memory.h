@@ -53,7 +53,7 @@ namespace jmx {
     template <class T>
     struct ReadOnlyMemory : public AbstractMemory<const T>
     {
-        using value_type = const T;
+        using value_type = typename std::add_const<T>::type;
         static_assert( !std::is_const<T>::value, "Allocation type cannot be const." );
 
         void alloc( index_t n )
