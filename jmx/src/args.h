@@ -7,6 +7,7 @@
 // @contact      Jhadida87 [at] gmail
 //==================================================
 
+#include <iostream>
 #include <functional>
 
 // ------------------------------------------------------------------------
@@ -79,10 +80,18 @@ namespace jmx {
             int nargin, const mxArray *in[]
         ) : in(in,nargin), out(out,nargout) {}
 
+        inline void verify( index_t inmin, index_t outmin ) {
+            if ( in.len < inmin || out.len < outmin ) {
+                std::cerr << "Expected at least " << inmin << " input(s) but got " << in.len << std::endl;
+                std::cerr << "Expected at least " << output << " output(s) but got " << out.len << std::endl;
+                JMX_THROW( "Bad i/o." );
+            }
+        }
+
         inline void verify( index_t inmin, index_t outmin, std::function<void()> usage ) {
             if ( in.len < inmin || out.len < outmin ) {
                 usage();
-                JMX_THROW( "Bad i/o; please refer to usage help above." );
+                JMX_THROW( "Bad i/o; see usage above." );
             }
         }
     };
