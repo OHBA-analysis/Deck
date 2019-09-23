@@ -47,6 +47,10 @@ namespace jmx {
         return mxCreateCellMatrix( 1, nc );
     }
 
+    inline mxArray* make_struct( index_t nrows=1, index_t ncols=1 ) { 
+        return mxCreateStructMatrix( nrows, ncols, 0, nullptr ); 
+    }
+
     inline mxArray* make_struct( const char *fields[], index_t nfields, index_t nrows=1, index_t ncols=1 ) { 
         return mxCreateStructMatrix( nrows, ncols, nfields, (const char**) fields ); 
     }
