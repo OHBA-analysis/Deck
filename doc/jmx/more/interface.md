@@ -22,7 +22,9 @@ Volume_mx<T> mkvol<T = double>(key, nr, nc, ns);
 
 Cell mkcell(key, len);
 Struct mkstruct(key, {"f1","f2",...});
-ptr mkstructarr(key, {"f1","f2",...}, nr, nc);
+Struct mkstruct(key, {"f1","f2",...}, nr, nc);
+Struct mkstruct(key, nr, nc); 
+Struct mkstruct(key); 
 ```
 
 ## Extractor interface
