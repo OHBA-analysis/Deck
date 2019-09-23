@@ -128,8 +128,7 @@ namespace jmx {
     bool AbstractMapping::has_fields ( const inilst<const char*>& names ) const
     {
         for ( auto& name: names ) 
-            if ( !has_field(name) ) 
-            {
+            if ( !has_field(name) ) {
                 println( "Field '%s' doesn't exist.", name );
                 return false;
             }
@@ -174,13 +173,11 @@ namespace jmx {
     {
         JMX_ASSERT( ms, "Null pointer." )
         JMX_ASSERT( mxIsCell(ms), "Input is not a cell." )
+        mcell = ms;
 
         int nc = mxGetNumberOfElements(ms);
-        JMX_WREJECT( nc == 0, "Empty cell." );
         JMX_WREJECT( mxGetNumberOfDimensions(ms) > 1, 
             "Multi-dimensional cells are not supported; wrapping input as vector-cell instead." )
-
-        mcell = ms;
     }
 
     // ----------  =====  ----------
@@ -196,11 +193,9 @@ namespace jmx {
         clear();
         JMX_ASSERT( ms, "Null pointer." );
         JMX_ASSERT( mxIsStruct(ms), "Input is not a structure." );
+        mstruct = ms;
 
         const index_t nf = mxGetNumberOfFields(ms);
-        JMX_WREJECT( nf == 0, "Empty struct." );
-
-        mstruct = ms;
         this->m_fields.resize(nf);
 
         for ( index_t f = 0; f < nf; ++f ) {

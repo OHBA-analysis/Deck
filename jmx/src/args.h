@@ -83,7 +83,7 @@ namespace jmx {
         inline void verify( index_t inmin, index_t outmin ) {
             if ( in.len < inmin || out.len < outmin ) {
                 std::cerr << "Expected at least " << inmin << " input(s) but got " << in.len << std::endl;
-                std::cerr << "Expected at least " << output << " output(s) but got " << out.len << std::endl;
+                std::cerr << "Expected at least " << outmin << " output(s) but got " << out.len << std::endl;
                 JMX_THROW( "Bad i/o." );
             }
         }

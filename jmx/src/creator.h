@@ -27,6 +27,9 @@ namespace jmx {
         Cell mkcell( key_t k, index_t len );
         Struct mkstruct( key_t k, inilst<const char*> fields, index_t nr, index_t nc );
         Struct mkstruct( key_t k, inilst<const char*> fields );
+        
+        Struct mkstruct( key_t k, index_t nr, index_t nc );
+        Struct mkstruct( key_t k );
 
         // ----------  =====  ----------
 
