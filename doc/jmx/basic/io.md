@@ -56,6 +56,8 @@ args.mkvol(k,nr,nc,ns);         // template T = double
 args.mkcell(k,len);
 args.mkstruct(k,{"f1","f2",...});
 args.mkstruct(k,{"f1","f2",...},nr,nc); // struct-array
+args.mkstruct(k,nr,nc); // struct-array with no field
+args.mkstruct(k); // struct with no field
 ```
 
 Working with struct-arrays is a little bit complicated, and only row-shaped cells are implemented at the moment.
