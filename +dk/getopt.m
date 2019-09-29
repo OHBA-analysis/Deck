@@ -22,7 +22,7 @@ function out = getopt( arg, varargin )
 %       disp( opt.alpha );
 %
 %
-% See also: dk.getopt, dk.obj.kwArgs, inputParser
+% See also: dk.setopt, dk.obj.kwArgs, inputParser
 % 
 % JH
 
