@@ -49,7 +49,8 @@ namespace jmx {
         inline mxArray* operator[] ( const char* name )        const { return get_value(name); }
 
         inline mxArray* get_value( const std::string& name ) const { 
-            return has_field(name) ? m_fmap.find(name)->second : nullptr; 
+            JMX_ASSERT( has_field(name), "Field not found: '%s'", name.c_str() )
+            return m_fmap.find(name)->second; 
         }
 
         virtual int set_value( const char *name, mxArray *value ) =0;
