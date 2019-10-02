@@ -70,7 +70,7 @@ namespace jmx {
         inline void enable()
             { m_backup = std::cout.rdbuf( &m_buf ); }
         inline void disable()
-            { std::cout.rdbuf( m_backup ); }
+            { flush_console(); std::cout.rdbuf( m_backup ); }
     };
 
     template <class B = mexWarnMsgIdAndTxt_ostream>
@@ -93,7 +93,7 @@ namespace jmx {
         inline void enable()
             { m_backup = std::cerr.rdbuf( &m_buf ); }
         inline void disable()
-            { std::cerr.rdbuf( m_backup ); }
+            { flush_console(); std::cerr.rdbuf( m_backup ); }
     };
 
     // ------------------------------------------------------------------------

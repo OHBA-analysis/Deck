@@ -15,6 +15,7 @@
 #include <cstdint>
 
 #include <string>
+#include <limits>
 #include <utility>
 #include <stdexcept>
 #include <type_traits>
@@ -109,6 +110,14 @@ namespace jmx {
     {
         fmt += "\n"; 
         mexPrintf( fmt.c_str(), std::forward<Args>(args)... );
+    }
+
+    // force printing to console
+    inline void flush_console() {
+        static mxArray *t = mxCreateDoubleScalar(std::numeric_limits<double>::epsilon());
+        mexCallMATLAB(0, NULL, 0, NULL, "drawnow");
+        mexCallMATLAB(0, NULL, 1, &t, "pause");
+        mexCallMATLAB(0, NULL, 0, NULL, "drawnow");
     }
 
     // more intuitive alias
