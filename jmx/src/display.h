@@ -7,81 +7,115 @@
 // @contact      Jhadida87 [at] gmail
 //==================================================
 
+#include <type_traits>
+#include <stdexcept>
+#include <iostream>
+#include <iomanip>
+
 // ------------------------------------------------------------------------
 
 namespace jmx {
 
+    inline unsigned& disp_intw() {
+        static unsigned n = 4;
+        return n;
+    }
+
+    inline unsigned& disp_floatw() {
+        static unsigned n = 9;
+        return n;
+    }
+
+    inline unsigned& disp_prec() {
+        static unsigned n = 3;
+        return n;
+    }
+
+    inline void disp_intw( unsigned n ) { disp_intw()=n; }
+    inline void disp_floatw( unsigned n ) { disp_floatw()=n; }
+    inline void disp_prec( unsigned n ) { disp_prec()=n; }
+    
+    // ----------  =====  ----------
+    
     template <class T>
-    void dispScalar( const T& x ) 
-    {
-        static const char b2c[2] = { 'F', 'T' };
-        static const char *b2s[2] = { "false", "true" };
+    typename std::enable_if< 
+        std::is_floating_point<T>::value, 
+        std::ostream& 
+    >::type disp( std::ostream& os, T x ) {
+        return os 
+            << std::fixed 
+            << std::setw(disp_floatw()) 
+            << std::setprecision(disp_prec())
+            << x;
+    }
 
-        // use tag dispatch instead
-        if ( islogical(T) ) {
-            print( " %s,", b2s[x] );
-        }
-        else if ( isIntegral(T) ) {
-            print( " %d,", x );
-        }
-        else () {
-            print( " %g,", x );
-        }
+    template <class T>
+    typename std::enable_if< 
+        std::is_integral<T>::value, 
+        std::ostream& 
+    >::type disp( std::ostream& os, T x ) {
+        return os 
+            << std::fixed 
+            << std::setw(disp_intw()) 
+            << x;
+    }    
+
+    inline std::ostream& disp( std::ostream& os, bool x ) {
+        static const char *b2s[2] = { "False", " True" };
+        return os << b2s[x];
+    }
+    
+    // ----------  =====  ----------
+    
+    template <class T, class M>
+    std::ostream& operator<< ( std::ostream& os, const Vector<T,M>& vec )
+    {
+        const index_t n = vec.length();
+        os << "[Vector " << n << "]: ";
+        for ( index_t k=0; k < n; k++ ) 
+            disp<T>(os,vec[k]) << ", ";
+        return os << "\b\b \n";
     }
 
     template <class T, class M>
-    void dispVector( const Vector<T,M>& vec, const char *name="" )
+    std::ostream& operator<< ( std::ostream& os, const Matrix<T,M>& mat )
     {
-        println("Vector %s (size %d)", name, vec.n);
-        if ( vec.numel() == 0 ) {
-            println("\t(empty)"); 
-            return;
+        const index_t nr = mat.nrows();
+        const index_t nc = mat.ncols();
+
+        os << "[Matrix " << nr << "x" << nc << "]:";
+        for ( index_t r=0; r < nr; ++r ) {
+            os << "\n\t";
+            for ( index_t c=0; c < nc; ++c ) 
+                disp<T>(os,mat(r,c)) << ", ";
+            os << "\b\b ";
         }
-        print("\t[");
-        for ( int i=0; i < vec.n; i++ )
-            print(" %g,", vec[i]);
-        print("]\n");
+        return os << "\n";
     }
 
     template <class T, class M>
-    void dispMatrix( const Matrix<T,M>& mat, const char *name="" )
+    std::ostream& operator<< ( std::ostream &os, const Volume<T,M>& vol ) 
     {
-        println("Matrix %s (size %dx%d)", name, mat.nr, mat.nc);
-        if ( mat.numel() == 0 ) {
-            println("\t(empty)"); 
-            return;
-        }
-        for ( int r = 0; r < mat.nr; r++ ) {
-            print("\t");
-            for ( int c = 0; c < mat.nc; c++ )
-                print(" %g,", mat(r,c));
-            print("\n");
-        }
-    }
+        const index_t nr = vol.nrows();
+        const index_t nc = vol.ncols();
+        const index_t ns = vol.nslabs();
 
-    template <class T, class M>
-    void dispVolume( const Volume<T,M>& vol, const char *name="" )
-    {
-        println("Volume %s (size %dx%dx%d)", name, vol.nr, vol.nc, vol.ns);
-        if ( vol.numel() == 0 ) {
-            println("\t(empty)"); 
-            return;
-        }
-        for ( int s = 0; s < vol.ns; s++ ) {
-            println("---------- Slice %d", s);
-            for ( int r = 0; r < vol.nr; r++ ) {
-                print("\t");
-                for ( int c = 0; c < vol.nc; c++ )
-                    print(" %g,", vol(r,c,s));
-                print("\n");
+        os << "[Volume " << nr << "x" << nc << "x" << ns << "]:";
+        for ( index_t s=0; s < ns; ++s ) {
+            os << "\n---------- slab " << s;
+            for ( index_t r=0; r < nr; ++r ) {
+                os << "\n\t";
+                for ( index_t c=0; c < nc; ++c ) 
+                    disp<T>(os,vol(r,c,s)) << ", ";
+                os << "\b\b ";
             }
-            println("----------");
         }
+        return os << "\n";
     }
 
-    void dispCell();
-    void dispStruct();
-
+    std::ostream operator<< ( std::ostream& os, const Struct& x );
+    std::ostream operator<< ( std::ostream& os, const MAT& x );
+    std::ostream operator<< ( std::ostream& os, const Cell& x );
 }
 
 #endif

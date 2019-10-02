@@ -114,10 +114,9 @@ namespace jmx {
 
     // force printing to console
     inline void flush_console() {
-        static mxArray *t = mxCreateDoubleScalar(std::numeric_limits<double>::epsilon());
+        // static mxArray *t = mxCreateDoubleScalar(std::numeric_limits<double>::epsilon());
         mexCallMATLAB(0, NULL, 0, NULL, "drawnow");
-        mexCallMATLAB(0, NULL, 1, &t, "pause");
-        mexCallMATLAB(0, NULL, 0, NULL, "drawnow");
+        // mexCallMATLAB(0, NULL, 1, &t, "pause");
     }
 
     // more intuitive alias

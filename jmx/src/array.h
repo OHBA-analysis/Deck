@@ -1,8 +1,8 @@
-#ifndef JMX_SEQUENCE_H_INCLUDED
-#define JMX_SEQUENCE_H_INCLUDED
+#ifndef JMX_ARRAY_H_INCLUDED
+#define JMX_ARRAY_H_INCLUDED
 
 //==================================================
-// @title        sequence.h
+// @title        array.h
 // @author       Jonathan Hadida
 // @contact      Jhadida87 [at] gmail
 //==================================================
@@ -16,7 +16,7 @@
 namespace jmx {
 
     template <class T, class M >
-    struct Container
+    struct Array
     {
         static_assert( !std::is_const<T>::value, "Data type cannot be const." );
         using value_type = typename M::value_type;
@@ -36,7 +36,7 @@ namespace jmx {
     // ----------  =====  ----------
     
     template <class T, class M = CppMemory<T> >
-    struct Vector : public Container<T,M>
+    struct Vector : public Array<T,M>
     {
         using value_type = typename M::value_type;
         index_t n;
@@ -65,7 +65,7 @@ namespace jmx {
     // ----------  =====  ----------
 
     template <class T, class M = CppMemory<T> >
-    struct Matrix : public Container<T,M>
+    struct Matrix : public Array<T,M>
     {
         using value_type = typename M::value_type;
         index_t nr, nc;
@@ -98,7 +98,7 @@ namespace jmx {
     // ----------  =====  ----------
 
     template <class T, class M = CppMemory<T> >
-    struct Volume : public Container<T,M>
+    struct Volume : public Array<T,M>
     {
         using value_type = typename M::value_type;
         index_t nr, nc, ns;
@@ -114,6 +114,7 @@ namespace jmx {
         inline index_t nrows() const { return nr; }
         inline index_t ncols() const { return nc; }
         inline index_t nslabs() const { return ns; }
+        inline index_t nslices() const { return ns; }
 
         inline void clear()
             { this->mem.clear(); nr = nc = ns = 0; }

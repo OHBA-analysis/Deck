@@ -19,23 +19,24 @@
 
 // common stuff
 #include "common.h"
-
 #include "redirect.h"
 #include "makers.h"
 #include "setters.h"
 
-// sequence containers
-#include "sequence.h"
+// array containers
+#include "array.h"
 
 // forward declarations of Struct and Cell
 // Allows Abstract mapping to implement creator/extractor interfaces.
 namespace jmx { class Struct; class Cell; }
+
 #include "getters.h"
 #include "creator.h"
 #include "extractor.h"
-
-// definition of Struct, and forward definitions
 #include "mapping.h"
+
+// definition of other containers, and forward definitions
+#include "container.h"
 #include "forward.h"
 #include "args.h"
 
