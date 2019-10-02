@@ -20,7 +20,7 @@ makers:
 setters:
   assign mxArray* cells / fields / variables 
 
-sequence: (cf memory)
+array: (cf memory)
   define Vector, Matrix and Volume
   + forward declare Struct and Cell
 
@@ -40,11 +40,12 @@ extractor:
 mapping:
   wrapper around unordered map (string -> mxArray*)
   implements Creator and Extractor patterns with string keys
-  + derive MAT and Struct classes
+
+container:
+  concrete definitions of MAT, Struct and Cell
 
 forward:
   definition of getters + creator + extractor
-  definition of Cell implementing Creator + Extractor patterns with index keys
 
 args:
   wrapper around Mex function inputs
@@ -56,7 +57,7 @@ args:
 On the side:
 ```
 redirect:
-  redirecting cout to mexPrintf
+  redirecting cout/cerr to mexPrintf
 
 memory:
   ReadOnly, Matlab (mxCalloc) and Cpp (new[]) allocators
@@ -64,6 +65,5 @@ memory:
 
 display: not available yet
   display containers to console
-  TODO: tag-dispatch for scalar handling + dispCell/dispStruct
 
 ```

@@ -26,6 +26,7 @@ Three types of memory allocations are implemented in JMX:
 Concrete type:      Parent type:                alloc/free:
 
 ReadOnlyMemory<T>   AbstractMemory<const T>     throws error
+ExternalMemory<T>   AbstractMemory<T>           throws error
 MatlabMemory<T>     AbstractMemory<T>           uses mxCalloc
 CppMemory<T>        AbstractMemory<T>           uses new
 ```

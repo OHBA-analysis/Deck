@@ -7,7 +7,7 @@ JMX defines three array containers: vector, matrix and volume. Only real-valued 
 
 The base class for all array containers depends on two template types:
 ```cpp
-template <class T, class M = CppMemory<T> > class Container;
+template <class T, class M = CppMemory<T> > class Array;
 ```
 where `T` is the type of the underlying data (non-const), and `M` is the allocation type, which defaults to `CppMemory` (i.e. using `new`, see [memory management](jmx/more/memory)). 
 
@@ -29,7 +29,7 @@ value_type* memptr() const; // underlying data
 void free(); // release memory (if allocation permits)
 ```
 
-## Concrete containers
+## Concrete arrays
 
 Additional members/methods for `Vector<T,M>`:
 ```cpp
