@@ -41,8 +41,10 @@ namespace jmx {
     {
     protected:
 
+        // mexWarnMsgIdAndTxt doesnt seem to be working properly
         virtual inline std::streamsize xsputn( const char* s, std::streamsize n )
-            { mexWarnMsgIdAndTxt("JMX::Error", "%.*s", n, s); return n; }
+            { mexPrintf("%.*s", n, s); return n; }
+            // { mexWarnMsgIdAndTxt("JMX::Error", "%.*s", n, s); return n; }
 
         virtual inline int overflow( int c = EOF )
             { if (c != EOF) mexPrintf("%.1s", &c); return 1; }
