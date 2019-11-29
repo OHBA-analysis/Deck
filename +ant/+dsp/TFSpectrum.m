@@ -301,7 +301,7 @@ classdef TFSpectrum < handle
                 plot( t, p );
                 xlabel('Time (sec)'); ylabel(name); legend(bname{:}); 
             else
-                ant.img.show( {t,f,p}, 'xlabel', 'Time (sec)', 'ylabel', 'Frequency (Hz)', ...
+                dk.ui.image( {t,f,p}, 'xlabel', 'Time (sec)', 'ylabel', 'Frequency (Hz)', ...
                     'clabel', name, varargin{:} );
             end
             
@@ -329,7 +329,7 @@ classdef TFSpectrum < handle
             
             % if used with positive properties, set 'positive', true
             [p,t,c] = self.xfpropavg(name,fs);
-            ant.img.show( {t,c,p}, 'xlabel', 'Time (sec)', 'ylabel', 'Channel', ...
+            dk.ui.image( {t,c,p}, 'xlabel', 'Time (sec)', 'ylabel', 'Channel', ...
                 'clabel', name, varargin{:} );
             
         end

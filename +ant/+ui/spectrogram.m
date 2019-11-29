@@ -6,7 +6,7 @@ function [p,t,f] = spectrogram( ts, freq, fs, sigma, varargin )
 % spectral signals at each frequency to a common sampling rate, and optionally smooth the result
 % with a Gaussian filter for improved display.
 % 
-% Additional inputs are forwarded to ant.img.show
+% Additional inputs are forwarded to dk.ui.image
 % NOTE: this function does NOT open a new window by default (ie it draws in gcf)
 %
 % JH
@@ -25,6 +25,6 @@ function [p,t,f] = spectrogram( ts, freq, fs, sigma, varargin )
     end
     
     % display
-    ant.img.show( {t,f,p}, 'xlabel','Time (sec)', 'ylabel','Frequency (Hz)', 'clabel','PSD', varargin{:} );
+    dk.ui.image( {t,f,p}, 'xlabel','Time (sec)', 'ylabel','Frequency (Hz)', 'clabel','PSD', varargin{:} );
 
 end

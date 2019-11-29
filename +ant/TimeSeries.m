@@ -114,6 +114,8 @@ classdef TimeSeries < ant.priv.Signal
                 case '1.0'
                     self.time = real(x.data(:,1));
                     self.vals = x.data(:,2:end);
+                otherwise
+                    error( 'Unknown version: %s', x.version );
             end
         end 
         
@@ -129,10 +131,9 @@ classdef TimeSeries < ant.priv.Signal
     methods (Static)
         
         function ts = loadobj(in)
-            if isstruct(in)
-                ts = ant.TimeSeries();
-                ts.unserialise(in);
-            else
+            try
+                ts = ant.TimeSeries(in);
+            catch
                 warning('Unknown serialised TimeSeries format.');
                 ts = in;
             end
@@ -423,7 +424,7 @@ classdef TimeSeries < ant.priv.Signal
         
         % Image plot (for lots of signals)
         function h = plot_image(self,varargin)
-            h = ant.img.show( {self.time, 1:self.ns, self.vals}, 'xlabel', 'Time (sec)', varargin{:} ); 
+            h = dk.ui.image( {self.time, 1:self.ns, self.vals}, 'xlabel', 'Time (sec)', varargin{:} ); 
         end
         
         % Value distribution plot
@@ -432,7 +433,7 @@ classdef TimeSeries < ant.priv.Signal
             ncols = fix( fs*self.tspan );
             [D,t,v] = ant.ui.ts2image( self, 1, nbins, ncols );
             D = dk.bsx.rdiv( D, max(1,sum(D,1)) ); % normalise
-            ant.img.show( {t,v,D}, varargin{:} );
+            dk.ui.image( {t,v,D}, varargin{:} );
         end
         
     end

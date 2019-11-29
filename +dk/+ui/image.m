@@ -1,6 +1,6 @@
 function [h,crange] = show( img, varargin )
 %
-% [h,crange] = ant.img.show( img, varargin )
+% [h,crange] = dk.ui.image( img, varargin )
 %
 % Display an image, with many options.
 %

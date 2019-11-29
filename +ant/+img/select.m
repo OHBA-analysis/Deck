@@ -8,7 +8,7 @@ function h = select( data, img, callback, scale, varargin )
 % Inputs data and img must be struct{x,y,z}, where x and y can be vectors or matrices.
 %
 % Scale is applied to the x and y axes (eg to display ms instead of sec).
-% Additional inputs are forwarded to ant.img.show
+% Additional inputs are forwarded to dk.ui.image
 %
 % A selection entry is added to the menu bar, and each selection invokes the callback as:
 %   callback( kx, ky, kz )
@@ -26,7 +26,7 @@ function h = select( data, img, callback, scale, varargin )
     img  = check_meshgrid(img);
 
     % show image
-    h = ant.img.show( { scale(1)*img.x, scale(2)*img.y, img.z }, varargin{:} );
+    h = dk.ui.image( { scale(1)*img.x, scale(2)*img.y, img.z }, varargin{:} );
 
     % setup selection
     function selection(x,y,varargin)

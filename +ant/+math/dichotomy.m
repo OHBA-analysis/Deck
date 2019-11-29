@@ -25,7 +25,7 @@ function [best,step] = dichotomy( is_greater_than, range, maxerr, maxshift )
 %       such that the final search range will be:
 %           range +/- k*diff(range)   with   k <= maxshift
 %
-%       The format of the input is: [maxdownshit, maxupshit]
+%       The format of the input is: [maxdownshift, maxupshift]
 %       If the input range is shifted more than maxshift times, an error is thrown.
 %       
 %

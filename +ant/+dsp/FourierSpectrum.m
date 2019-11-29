@@ -179,7 +179,7 @@ classdef FourierSpectrum < ant.priv.Spectrum
             out.z = self.psd';
             out.y = 1:size(out.z,1);
             
-            ant.img.show( out, 'positive', true, ...
+            dk.ui.image( out, 'positive', true, ...
                 'xlabel', 'Frequency (Hz)', 'ylabel', 'Signal', 'clabel', 'PSD' );
             xlim( opt.flim );
         

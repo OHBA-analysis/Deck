@@ -4,7 +4,7 @@ function gobj = grid( slices, names, samerng, varargin )
 %
 % Draw each slice of input 3D matrix in a separate subplot.
 % The size of the subplot grid is computed using dk.gridfit.
-% Additional inputs are forwarded to ant.img.show.
+% Additional inputs are forwarded to dk.ui.image.
 %
 %
 % INPUTS
@@ -20,7 +20,7 @@ function gobj = grid( slices, names, samerng, varargin )
 %    samerng  Display all matrices in the same color-range.
 %             Default is false.
 %
-%   varargin  Additional inputs are forwarded to ant.img.show.
+%   varargin  Additional inputs are forwarded to dk.ui.image.
 %
 %
 % OUTPUT
@@ -29,7 +29,7 @@ function gobj = grid( slices, names, samerng, varargin )
 %   Vector of handles to each image axes.
 %
 %
-% See also: ant.img.show, dk.gridfit
+% See also: dk.ui.image, dk.gridfit
 %
 % JH
 
@@ -64,7 +64,7 @@ function gobj = grid( slices, names, samerng, varargin )
     % draw figure
     gobj = gobjects(1,n);
     for i = 1:n
-        gobj(i) = ant.img.show( slices{i}, 'subplot', {h,w,i}, 'title', names{i}, ...
+        gobj(i) = dk.ui.image( slices{i}, 'subplot', {h,w,i}, 'title', names{i}, ...
             'crange', r, 'rmbar', samerng && mod(i,w), varargin{:} );
     end
     
