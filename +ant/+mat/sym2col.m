@@ -12,8 +12,8 @@ function C = sym2col( S, nodiag )
 % S can be a square matrix, or a volume of square slices.
 %   size(S,1)=size(S,2)=n   and   size(S,3)=3
 %
-% nodiag=true : diagonal elements are excluded              output is n(n+1)/2-by-s
-% nodiag=false: diagonal elements are included (default)    output is n(n-1)/2-by-s
+% nodiag=true : diagonal elements are excluded              output is n(n-1)/2-by-s
+% nodiag=false: diagonal elements are included (default)    output is n(n+1)/2-by-s
 %
 % JH
 
