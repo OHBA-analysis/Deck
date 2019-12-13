@@ -282,6 +282,19 @@ classdef Signal < handle
         end
         
         % for added convenience
+        function ts = randwin(self,len)
+            margin = self.tspan - len;
+            assert( margin >= 0, 'Requested length is not feasible.' );
+            
+            tstart = self.time(1) + margin*rand();
+            tend = tstart + len;
+            
+            if nargout == 0
+                self.between( tstart, tend );
+            else
+                ts = self.between( tstart, tend );
+            end
+        end
         function ts = window(self,tstart,tlen,rel)
             if nargin < 4, rel=false; end
             if rel, tstart = self.time(1) + tstart; end
