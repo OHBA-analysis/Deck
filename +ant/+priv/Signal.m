@@ -73,7 +73,7 @@ classdef Signal < handle
                 [chk,dt] = self.is_arithmetic();
                 assert( chk, 'Timestep is not regular.' );
             else
-                dt = abs(self.time(2)-self.time(1));
+                dt = abs(self.time(end)-self.time(1)) / self.nt;
             end
         end
         

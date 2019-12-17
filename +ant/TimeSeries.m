@@ -180,7 +180,7 @@ classdef TimeSeries < ant.priv.Signal
         function ts = resample(self,fs,tol)
             
             if nargin < 3, tol=0.1; end
-            curfs = self.fs;
+            curfs = self.fs();
             
             if abs(fs - curfs) <= tol
                 dk.info( '[ant.TimeSeries:resample] Already at the required sampling rate.' );

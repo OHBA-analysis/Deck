@@ -208,7 +208,7 @@ classdef FourierSpectrum < ant.priv.Spectrum
             novr = floor(wsiz*overlap); % noverlap
             win  = tukeywin(wsiz); % sliding window
 
-            [self.psd,self.frq] = pwelch( preproc(ts), win, novr, [], info.fs );
+            [self.psd,self.frq] = pwelch( preproc(ts), win, novr, [], ts.fs );
 
         end
 
