@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 HERE=$(dirname "${BASH_SOURCE}")
 
