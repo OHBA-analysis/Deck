@@ -45,6 +45,12 @@ classdef Signal < handle
         function Dt = get.tspan(self), Dt = abs(self.time(end) - self.time(1)); end
         function Dt = get.tframe(self), Dt = [self.time(1), self.time(end)]; end
         
+        % Convert to struct
+        function s = to_struct(self)
+            s.time = self.time;
+            s.vals = self.vals;
+        end
+        
     end
     
     
